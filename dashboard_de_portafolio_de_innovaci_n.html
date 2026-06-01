@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Portafolio de Innovación</title>
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para los gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons para iconos modernos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-100 flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+                    <i data-lucide="rocket" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Portafolio de Innovación <span class="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full font-medium">Interno</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Visualización interactiva y análisis de iniciativas</p>
+                </div>
+            </div>
+            
+            <!-- Botón de Carga de CSV -->
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <label for="csvFileInput" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-700 cursor-pointer transition-all w-full text-sm font-medium shadow-sm">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    <span>Cargar nuevo CSV (.csv)</span>
+                </label>
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Alerta informativa de datos por defecto -->
+        <div id="dataAlert" class="bg-indigo-950/40 border border-indigo-500/20 text-indigo-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm">
+            <i data-lucide="info" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+            <div>
+                <span class="font-semibold text-white">¡Visualizando datos preliminares!</span> 
+                Este dashboard ya incluye información base de tu portafolio actual (Proyectos como <i>Autoguías</i>, <i>Logística inversa</i>, etc.). Puedes cargar un nuevo reporte exportado en formato CSV utilizando el botón superior para actualizar las métricas en tiempo real.
+            </div>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Proyectos -->
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-all">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/10 group-hover:scale-110 transition-transform">
+                    <i data-lucide="briefcase" class="w-24 h-24"></i>
+                </div>
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Iniciativas</span>
+                    <span class="p-1.5 bg-blue-500/10 text-blue-400 rounded-lg"><i data-lucide="folder" class="w-4 h-4"></i></span>
+                </div>
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiTotalProjects">0</span>
+                    <p class="text-xs text-slate-500 mt-1" id="kpiOpenProjects">0 activos actualmente</p>
+                </div>
+            </div>
+
+            <!-- EBITDA Potencial Total -->
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-all">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/10 group-hover:scale-110 transition-transform">
+                    <i data-lucide="trending-up" class="w-24 h-24"></i>
+                </div>
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">EBITDA Potencial</span>
+                    <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="dollar-sign" class="w-4 h-4"></i></span>
+                </div>
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiEbitda">0</span>
+                    <p class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> <span id="kpiValidatedEbitda">0% validado</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Inversión Total -->
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-all">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/10 group-hover:scale-110 transition-transform">
+                    <i data-lucide="coins" class="w-24 h-24"></i>
+                </div>
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Inversión Estimada</span>
+                    <span class="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg"><i data-lucide="wallet" class="w-4 h-4"></i></span>
+                </div>
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiInvestment">0</span>
+                    <p class="text-xs text-slate-500 mt-1">Presupuesto total del portafolio</p>
+                </div>
+            </div>
+
+            <!-- Esfuerzo / Horas Hombre -->
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-all">
+                <div class="absolute -right-4 -bottom-4 text-slate-800/10 group-hover:scale-110 transition-transform">
+                    <i data-lucide="clock" class="w-24 h-24"></i>
+                </div>
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Esfuerzo HHT</span>
+                    <span class="p-1.5 bg-purple-500/10 text-purple-400 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></span>
+                </div>
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiHht">0 h</span>
+                    <p class="text-xs text-slate-500 mt-1">Horas estimadas de desarrollo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Dinámicos -->
+        <div class="bg-slate-950/40 border border-slate-800 p-5 rounded-2xl space-y-4">
+            <div class="flex items-center gap-2 text-slate-200">
+                <i data-lucide="sliders-horizontal" class="w-4.5 h-4.5 text-indigo-400"></i>
+                <h3 class="font-semibold text-sm">Filtros Avanzados</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Buscador de proyectos -->
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="filterSearch" placeholder="Buscar proyecto, líder o sponsor..." class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 placeholder-slate-500">
+                </div>
+
+                <!-- Select Gerencia -->
+                <div>
+                    <select id="filterGerencia" class="w-full px-3 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100">
+                        <option value="">Todas las Gerencias</option>
+                    </select>
+                </div>
+
+                <!-- Select Nivel de Riesgo -->
+                <div>
+                    <select id="filterRisk" class="w-full px-3 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100">
+                        <option value="">Todos los Riesgos</option>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Medio">Medio</option>
+                        <option value="Alto">Alto</option>
+                    </select>
+                </div>
+
+                <!-- Select Estado del Proyecto -->
+                <div>
+                    <select id="filterStatus" class="w-full px-3 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100">
+                        <option value="">Todos los Estados</option>
+                        <option value="Abierto">Abiertos</option>
+                        <option value="Cerrado">Cerrados</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Gráfico 1: Proyectos por Gerencia -->
+            <div class="bg-slate-950/20 border border-slate-800 p-5 rounded-2xl flex flex-col h-[350px]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="p-1.5 bg-blue-500/10 text-blue-400 rounded-lg"><i data-lucide="bar-chart-3" class="w-4 h-4"></i></span>
+                    <h3 class="font-bold text-sm text-slate-200">Proyectos por Gerencia</h3>
+                </div>
+                <div class="flex-1 relative">
+                    <canvas id="chartGerencia"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 2: Nivel de Riesgo -->
+            <div class="bg-slate-950/20 border border-slate-800 p-5 rounded-2xl flex flex-col h-[350px]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg"><i data-lucide="pie-chart" class="w-4 h-4"></i></span>
+                    <h3 class="font-bold text-sm text-slate-200">Distribución de Riesgo</h3>
+                </div>
+                <div class="flex-1 relative flex items-center justify-center">
+                    <canvas id="chartRisk" class="max-h-[220px]"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Tipo de Innovación -->
+            <div class="bg-slate-950/20 border border-slate-800 p-5 rounded-2xl flex flex-col h-[350px]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="p-1.5 bg-purple-500/10 text-purple-400 rounded-lg"><i data-lucide="lightbulb" class="w-4 h-4"></i></span>
+                    <h3 class="font-bold text-sm text-slate-200">Tipo de Innovación</h3>
+                </div>
+                <div class="flex-1 relative flex items-center justify-center">
+                    <canvas id="chartInnovation" class="max-h-[220px]"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="bg-slate-950/20 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h3 class="font-bold text-base text-slate-200">Iniciativas Registradas</h3>
+                    <p class="text-xs text-slate-500 mt-1">Lista detallada del portafolio. Haz clic en las filas para ver la descripción completa.</p>
+                </div>
+                <span class="text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-full" id="tableRecordCount">
+                    Mostrando 0 de 0 registros
+                </span>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            <th class="py-3 px-5">ID</th>
+                            <th class="py-3 px-5">Proyecto</th>
+                            <th class="py-3 px-5">Líder Funcional</th>
+                            <th class="py-3 px-5">Gerencia</th>
+                            <th class="py-3 px-5 text-center">Riesgo</th>
+                            <th class="py-3 px-5 text-right">EBITDA Potencial</th>
+                            <th class="py-3 px-5 text-right">Inversión</th>
+                            <th class="py-3 px-5 text-center">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-sm divide-y divide-slate-800/60">
+                        <!-- Creado dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
+                <i data-lucide="ban" class="w-10 h-10 text-slate-600"></i>
+                <p>No se encontraron proyectos con los filtros seleccionados.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-6 px-6 text-center text-xs text-slate-500 bg-slate-950/20 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2026 Portafolio de Innovación corporativo. Todos los derechos reservados.</p>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-indigo-400 transition-colors">Seguridad</a>
+                <a href="#" class="hover:text-indigo-400 transition-colors">Soporte TI</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Modal para detalles extendidos -->
+    <div id="projectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span id="modalGerencia" class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-medium">Gerencia</span>
+                    <span id="modalFunnel" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-full font-medium">Funnel</span>
+                </div>
+                <h3 id="modalTitle" class="text-xl font-bold text-white">Nombre del Proyecto</h3>
+            </div>
+
+            <!-- Descripción -->
+            <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+                <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
+                <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed">Sin descripción.</p>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <span class="text-xs text-slate-500">Líder Funcional</span>
+                    <p class="text-sm text-slate-200 flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+                        <span id="modalLeader">Nombre</span>
+                    </p>
+                    <span id="modalEmail" class="text-xs text-slate-500 block pl-6 hover:text-indigo-400 cursor-pointer">correo@empresa.com</span>
+                </div>
+
+                <div class="space-y-1">
+                    <span class="text-xs text-slate-500">Sponsor</span>
+                    <p class="text-sm text-slate-200 flex items-center gap-2">
+                        <i data-lucide="award" class="w-4 h-4 text-slate-400"></i>
+                        <span id="modalSponsor">-</span>
+                    </p>
+                </div>
+
+                <div class="space-y-1 border-t border-slate-800/60 pt-3">
+                    <span class="text-xs text-slate-500">EBITDA Capturado</span>
+                    <p id="modalEbitdaCaptured" class="text-sm font-semibold text-emerald-400">$-</p>
+                </div>
+
+                <div class="space-y-1 border-t border-slate-800/60 pt-3">
+                    <span class="text-xs text-slate-500">Gobernanza TD / Escalamiento</span>
+                    <p id="modalGovernance" class="text-sm text-slate-300">-</p>
+                </div>
+            </div>
+
+            <!-- KPI's específicos -->
+            <div class="border-t border-slate-800 pt-4 space-y-2">
+                <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider">KPIs Clave</h4>
+                <ul id="modalKPIs" class="text-sm text-slate-300 space-y-1 list-disc list-inside">
+                    <!-- Dinámico -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Funcionalidad y Parsing -->
+    <script>
+        // Datos Base Iniciales (extraídos de la base maestra proporcionada)
+        let dataset = [
+            {
+                id: "1",
+                nombre: "Autoguias",
+                descripcion: "Busca mejorar la eficiencia operativa, reduciendo los tiempos de espera, y prevenir conflictos con la comunidad o eventuales multas, donde los transportistas impriman directamente su hoja de ruta y guía de despacho.",
+                riesgo: "Bajo",
+                responsable: "Isidora González",
+                gerencia: "Recupac",
+                area: "Administración",
+                kr: "Nulo",
+                vertical: "Transformación procesos internos",
+                tipoInnovacion: "Incremental",
+                lider: "Jorge Honores",
+                correo: "jorge.honores@recupac.cl",
+                funnel: "Seguimiento",
+                tipoSolucion: "Desarrollo interno",
+                origen: "Embajador",
+                inversion: 0,
+                ebitdaPotencial: 0,
+                valEbitdaPotencial: "Validado",
+                ebitdaCapturado: 0,
+                valEbitdaCapturado: "",
+                hht: 2184,
+                estado: "Abierto",
+                gobernanza: "No",
+                escalamiento: "no",
+                anio: 2024,
+                comentario: "-",
+                sponsor: "E. Bascuñán",
+                kpis: []
+            },
+            {
+                id: "2",
+                nombre: "Maxibolsas",
+                descripcion: "Busca disminuir los costos de las sacas con propuesta más sostenible y económica, reemplazándolas por bolsas de pellet reciclado a ¼ del valor de la saca de rafia actual.",
+                riesgo: "Medio",
+                responsable: "Isidora González",
+                gerencia: "Recupac",
+                area: "Servicios",
+                kr: "Asegurar Mg en GR >MM$ 7.000 y ROA >80%",
+                vertical: "Nuevas soluciones",
+                tipoInnovacion: "Incremental",
+                lider: "Jorge Honores",
+                correo: "jorge.honores@recupac.cl",
+                funnel: "Ejecución pilotaje",
+                tipoSolucion: "Desarrollo interno",
+                origen: "Embajador",
+                inversion: 12000000,
+                ebitdaPotencial: 45000000,
+                valEbitdaPotencial: "Validado",
+                ebitdaCapturado: 15000000,
+                valEbitdaCapturado: "Parcial",
+                hht: 850,
+                estado: "Abierto",
+                gobernanza: "No",
+                escalamiento: "si",
+                anio: 2024,
+                comentario: "-",
+                sponsor: "E. Bascuñán",
+                kpis: ["Disminuir costo de saca de rafia", "Disminución huella de carbono"]
+            },
+            {
+                id: "17",
+                nombre: "Reutilización de Caños de Alambre",
+                descripcion: "Consiste en la reutilización de caños ya consumidos para las bobinas. Es un proyecto de economía circular que impactará favorablemente tanto en costos como en sustentabilidad ambiental.",
+                riesgo: "Bajo",
+                responsable: "Laura Chamorro",
+                gerencia: "CPP",
+                area: "Logística",
+                kr: "Reducir costo en 5 USD/Ton en SF y 1 USD/Ton en SP",
+                vertical: "Transformación procesos internos",
+                tipoInnovacion: "Incremental",
+                lider: "Katherine Alvarez",
+                correo: "kalvarez@cpp.cl",
+                funnel: "Desarrollo interno",
+                tipoSolucion: "Desarrollo interno",
+                origen: "Embajador",
+                inversion: 21200000,
+                ebitdaPotencial: 0,
+                valEbitdaPotencial: "No validado",
+                ebitdaCapturado: 0,
+                valEbitdaCapturado: "",
+                hht: 0,
+                estado: "Cerrado",
+                gobernanza: "No",
+                escalamiento: "si",
+                anio: 2024,
+                comentario: "Operacionalmente complejo. Además no era el equipo adecuado.",
+                sponsor: "N. Fernández",
+                kpis: ["Ahorro USD/Ton"]
+            },
+            {
+                id: "18",
+                nombre: "Logística inversa",
+                descripcion: "Captura de fibra para Recupac desde cliente de Corrupac mediante la instalación de enfardadoras, ubicados a más de 150 km de Santiago, aprovechando la capacidad ociosa en el retorno de los camiones que despachan las cajas.",
+                riesgo: "Medio",
+                responsable: "Laura Chamorro",
+                gerencia: "Recupac",
+                area: "Comercial",
+                kr: "Capturar >= 67.000 ton cartón rentable",
+                vertical: "Nuevas soluciones",
+                tipoInnovacion: "Incremental",
+                lider: "Carlos Quijanes",
+                correo: "cquijanes@recupac.cl",
+                funnel: "Ejecución pilotaje",
+                tipoSolucion: "Desarrollo interno",
+                origen: "Pedida ejecutiva",
+                inversion: 0,
+                ebitdaPotencial: 10006402,
+                valEbitdaPotencial: "Validado",
+                ebitdaCapturado: 0,
+                valEbitdaCapturado: "",
+                hht: 1200,
+                estado: "Abierto",
+                gobernanza: "No",
+                escalamiento: "no",
+                anio: 2025,
+                comentario: "-",
+                sponsor: "Sponsor Corporativo",
+                kpis: ["Toneladas capturadas", "Margen unitario"]
+            }
+        ];
+
+        // Instancias de Gráficos de Chart.js
+        let chartG = null;
+        let chartR = null;
+        let chartI = null;
+
+        // Inicializar Aplicación al cargar
+        window.onload = function() {
+            lucide.createIcons();
+            populateFilters();
+            renderDashboard();
+            setupEventListeners();
+        }
+
+        // Configurar Event Listeners para cambios en filtros y carga de archivos
+        function setupEventListeners() {
+            document.getElementById('filterSearch').addEventListener('input', renderDashboard);
+            document.getElementById('filterGerencia').addEventListener('change', renderDashboard);
+            document.getElementById('filterRisk').addEventListener('change', renderDashboard);
+            document.getElementById('filterStatus').addEventListener('change', renderDashboard);
+            document.getElementById('csvFileInput').addEventListener('change', handleCSVUpload);
+        }
+
+        // Llenar selectores únicos basados en la data actual
+        function populateFilters() {
+            const selectGerencia = document.getElementById('filterGerencia');
+            const currentSelected = selectGerencia.value;
+            
+            // Obtener gerencias únicas
+            const gerencias = [...new Set(dataset.map(item => item.gerencia).filter(Boolean))];
+            
+            // Re-poblar select
+            selectGerencia.innerHTML = '<option value="">Todas las Gerencias</option>';
+            gerencias.sort().forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.textContent = g;
+                selectGerencia.appendChild(opt);
+            });
+            
+            selectGerencia.value = currentSelected;
+        }
+
+        // Render Principal del Dashboard (Métricas, Gráficos y Tabla)
+        function renderDashboard() {
+            const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+            const filterG = document.getElementById('filterGerencia').value;
+            const filterR = document.getElementById('filterRisk').value;
+            const filterS = document.getElementById('filterStatus').value;
+
+            // Filtrar Dataset
+            const filteredData = dataset.filter(item => {
+                const matchSearch = (item.nombre || "").toLowerCase().includes(searchTerm) || 
+                                    (item.lider || "").toLowerCase().includes(searchTerm) || 
+                                    (item.sponsor || "").toLowerCase().includes(searchTerm);
+                const matchGerencia = filterG === "" || item.gerencia === filterG;
+                const matchRisk = filterR === "" || item.riesgo === filterR;
+                const matchStatus = filterS === "" || item.estado === filterS;
+
+                return matchSearch && matchGerencia && matchRisk && matchStatus;
+            });
+
+            // Actualizar KPIs
+            updateKPIs(filteredData);
+
+            // Actualizar Gráficos
+            updateCharts(filteredData);
+
+            // Actualizar Tabla de Datos
+            updateTable(filteredData);
+        }
+
+        // Lógica de Actualización de Indicadores KPI
+        function updateKPIs(data) {
+            const totalProjects = data.length;
+            const openProjects = data.filter(i => i.estado.toLowerCase() === 'abierto').length;
+            
+            const totalEbitda = data.reduce((acc, curr) => acc + (curr.ebitdaPotencial || 0), 0);
+            const totalInvestment = data.reduce((acc, curr) => acc + (curr.inversion || 0), 0);
+            const totalHHT = data.reduce((acc, curr) => acc + (curr.hht || 0), 0);
+
+            // Calcular % de EBITDA Validado
+            const validatedEbitdaCount = data.filter(i => i.valEbitdaPotencial?.toLowerCase() === 'validado').length;
+            const pctValidated = totalProjects > 0 ? Math.round((validatedEbitdaCount / totalProjects) * 100) : 0;
+
+            // Renderizar valores en pantalla formateados
+            document.getElementById('kpiTotalProjects').textContent = totalProjects;
+            document.getElementById('kpiOpenProjects').textContent = `${openProjects} activos actualmente`;
+            document.getElementById('kpiEbitda').textContent = formatCurrency(totalEbitda);
+            document.getElementById('kpiValidatedEbitda').textContent = `${pctValidated}% validado`;
+            document.getElementById('kpiInvestment').textContent = formatCurrency(totalInvestment);
+            document.getElementById('kpiHht').textContent = totalHHT.toLocaleString('es-CL') + ' h';
+        }
+
+        // Lógica de Gráficos (Chart.js)
+        function updateCharts(data) {
+            // Destruir gráficos anteriores para evitar superposiciones al filtrar
+            if (chartG) chartG.destroy();
+            if (chartR) chartR.destroy();
+            if (chartI) chartI.destroy();
+
+            // 1. Datos para Gerencia (Distribución de barras)
+            const gerenciaCounts = {};
+            data.forEach(item => {
+                const g = item.gerencia || "No Definida";
+                gerenciaCounts[g] = (gerenciaCounts[g] || 0) + 1;
+            });
+
+            const ctxG = document.getElementById('chartGerencia').getContext('2d');
+            chartG = new Chart(ctxG, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(gerenciaCounts),
+                    datasets: [{
+                        label: 'Iniciativas',
+                        data: Object.values(gerenciaCounts),
+                        backgroundColor: 'rgba(79, 70, 229, 0.65)',
+                        borderColor: 'rgb(99, 102, 241)',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { color: '#94a3b8', stepSize: 1 }, 
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' } 
+                        },
+                        x: { 
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false } 
+                        }
+                    }
+                }
+            });
+
+            // 2. Datos para Riesgo (Pie/Doughnut)
+            const riskCounts = { "Bajo": 0, "Medio": 0, "Alto": 0 };
+            data.forEach(item => {
+                if (riskCounts[item.riesgo] !== undefined) {
+                    riskCounts[item.riesgo]++;
+                }
+            });
+
+            const ctxR = document.getElementById('chartRisk').getContext('2d');
+            chartR = new Chart(ctxR, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(riskCounts),
+                    datasets: [{
+                        data: Object.values(riskCounts),
+                        backgroundColor: ['rgba(34, 197, 94, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(239, 68, 68, 0.7)'],
+                        borderColor: '#0f172a',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 3. Datos para Tipo de Innovación
+            const innovationCounts = {};
+            data.forEach(item => {
+                const t = item.tipoInnovacion || "No Especificado";
+                innovationCounts[t] = (innovationCounts[t] || 0) + 1;
+            });
+
+            const ctxI = document.getElementById('chartInnovation').getContext('2d');
+            chartI = new Chart(ctxI, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(innovationCounts),
+                    datasets: [{
+                        data: Object.values(innovationCounts),
+                        backgroundColor: [
+                            'rgba(147, 51, 234, 0.6)',
+                            'rgba(236, 72, 153, 0.6)',
+                            'rgba(14, 165, 233, 0.6)',
+                            'rgba(234, 179, 8, 0.6)'
+                        ],
+                        borderColor: '#0f172a',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // Renderizar tabla interactiva
+        function updateTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('tableEmptyState');
+            tbody.innerHTML = '';
+
+            document.getElementById('tableRecordCount').textContent = `Mostrando ${data.length} de ${dataset.length} registros`;
+
+            if (data.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 cursor-pointer transition-colors border-b border-slate-800/40";
+                tr.onclick = () => openModal(item);
+
+                // Colores de insignias
+                const riskBadge = item.riesgo === 'Alto' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                  item.riesgo === 'Medio' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                  'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+
+                const statusBadge = item.estado.toLowerCase() === 'abierto' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-slate-700/30 text-slate-400 border-slate-700/50';
+
+                tr.innerHTML = `
+                    <td class="py-3 px-5 text-slate-500 font-semibold">#${item.id}</td>
+                    <td class="py-3 px-5 font-semibold text-white">${item.nombre}</td>
+                    <td class="py-3 px-5 text-slate-300">${item.lider || '-'}</td>
+                    <td class="py-3 px-5 text-slate-300">${item.gerencia}</td>
+                    <td class="py-3 px-5 text-center">
+                        <span class="inline-block text-xs border rounded-full px-2.5 py-0.5 font-medium ${riskBadge}">
+                            ${item.riesgo}
+                        </span>
+                    </td>
+                    <td class="py-3 px-5 text-right font-medium text-emerald-400">${formatCurrency(item.ebitdaPotencial)}</td>
+                    <td class="py-3 px-5 text-right font-medium text-slate-300">${formatCurrency(item.inversion)}</td>
+                    <td class="py-3 px-5 text-center">
+                        <span class="inline-block text-xs border rounded-full px-2.5 py-0.5 font-medium ${statusBadge}">
+                            ${item.estado}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Utilidad: Formatear moneda (CLP / USD)
+        function formatCurrency(val) {
+            if (val === undefined || val === null || val === 0) return '$-';
+            return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(val);
+        }
+
+        // Lógica de Modal de Detalles del Proyecto
+        function openModal(item) {
+            document.getElementById('modalTitle').textContent = item.nombre;
+            document.getElementById('modalDesc').textContent = item.descripcion || "Sin descripción proporcionada.";
+            document.getElementById('modalLeader').textContent = item.lider || "No asignado";
+            document.getElementById('modalEmail').textContent = item.correo || "-";
+            document.getElementById('modalSponsor').textContent = item.sponsor || "No asignado";
+            document.getElementById('modalGerencia').textContent = item.gerencia || "Gerencia";
+            document.getElementById('modalFunnel').textContent = `Fase: ${item.funnel || 'No especificada'}`;
+            document.getElementById('modalEbitdaCaptured').textContent = formatCurrency(item.ebitdaCapturado);
+            document.getElementById('modalGovernance').textContent = `Gobernanza: ${item.gobernanza || 'No'} | Escalamiento: ${item.escalamiento || 'No'}`;
+
+            // Listado de KPIs
+            const kpisUl = document.getElementById('modalKPIs');
+            kpisUl.innerHTML = '';
+            if (item.kpis && item.kpis.length > 0) {
+                item.kpis.forEach(kpi => {
+                    const li = document.createElement('li');
+                    li.textContent = kpi;
+                    kpisUl.appendChild(li);
+                });
+            } else {
+                kpisUl.innerHTML = '<span class="text-slate-500 text-xs italic">No hay KPIs específicos registrados.</span>';
+            }
+
+            document.getElementById('projectModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.add('hidden');
+        }
+
+        // Parsing dinámico de archivos CSV cargados manualmente
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+
+        // Parser CSV minimalista pero robusto
+        function parseCSV(text) {
+            try {
+                const lines = text.split(/\r?\n/);
+                if (lines.length < 2) return;
+
+                // Extraer headers
+                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                
+                let tempDataset = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    // Expresión regular para parsear comas respetando comillas dobles
+                    const columns = [];
+                    let insideQuote = false;
+                    let currentField = '';
+
+                    for (let c = 0; c < line.length; c++) {
+                        const char = line[c];
+                        if (char === '"') {
+                            insideQuote = !insideQuote;
+                        } else if (char === ',' && !insideQuote) {
+                            columns.push(currentField.trim());
+                            currentField = '';
+                        } else {
+                            currentField += char;
+                        }
+                    }
+                    columns.push(currentField.trim());
+
+                    if (columns.length < 5) continue; // Salto de filas rotas
+
+                    // Mapeo seguro basándonos en nombres de columnas clásicas o índices fijos
+                    const id = columns[0]?.replace(/^"|"$/g, '') || String(i);
+                    const nombre = columns[1]?.replace(/^"|"$/g, '') || "Sin Nombre";
+                    const descripcion = columns[2]?.replace(/^"|"$/g, '') || "";
+                    const riesgo = columns[3]?.replace(/^"|"$/g, '') || "Bajo";
+                    const responsable = columns[4]?.replace(/^"|"$/g, '') || "";
+                    const gerencia = columns[5]?.replace(/^"|"$/g, '') || "No Definida";
+                    const area = columns[6]?.replace(/^"|"$/g, '') || "";
+                    const kr = columns[7]?.replace(/^"|"$/g, '') || "";
+                    const vertical = columns[8]?.replace(/^"|"$/g, '') || "";
+                    const tipoInnovacion = columns[9]?.replace(/^"|"$/g, '') || "Incremental";
+                    const lider = columns[10]?.replace(/^"|"$/g, '') || "";
+                    const correo = columns[11]?.replace(/^"|"$/g, '') || "";
+                    const funnel = columns[12]?.replace(/^"|"$/g, '') || "";
+                    const inversion = parseNumber(columns[16]);
+                    const ebitdaPotencial = parseNumber(columns[17]);
+                    const valEbitdaPotencial = columns[18]?.replace(/^"|"$/g, '') || "";
+                    const ebitdaCapturado = parseNumber(columns[19]);
+                    const hht = parseNumber(columns[21]);
+                    const estado = columns[22]?.replace(/^"|"$/g, '') || "Abierto";
+                    const gobernanza = columns[23]?.replace(/^"|"$/g, '') || "No";
+                    const escalamiento = columns[24]?.replace(/^"|"$/g, '') || "no";
+                    const anio = parseNumber(columns[25]) || 2026;
+                    const comentario = columns[26]?.replace(/^"|"$/g, '') || "";
+                    const sponsor = columns[27]?.replace(/^"|"$/g, '') || "";
+
+                    tempDataset.push({
+                        id, nombre, descripcion, riesgo, responsable, gerencia, area, kr, vertical,
+                        tipoInnovacion, lider, correo, funnel, inversion, ebitdaPotencial, valEbitdaPotencial,
+                        ebitdaCapturado, hht, estado, gobernanza, escalamiento, anio, comentario, sponsor, kpis: []
+                    });
+                }
+
+                if (tempDataset.length > 0) {
+                    dataset = tempDataset;
+                    populateFilters();
+                    renderDashboard();
+                    
+                    // Ocultar mensaje informativo si cargaron datos nuevos exitosamente
+                    document.getElementById('dataAlert').classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Error al parsear el CSV", err);
+                alert("Hubo un problema procesando el archivo CSV. Por favor verifica que tenga el formato original estructurado.");
+            }
+        }
+
+        // Limpiar strings numéricos complejos del CSV (como " $21,200,000 ")
+        function parseNumber(val) {
+            if (!val) return 0;
+            const cleaned = val.replace(/[^0-9.-]/g, '');
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+    </script>
+</body>
+</html>
