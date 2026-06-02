@@ -83,7 +83,7 @@
                 <h3 class="font-bold text-xs uppercase tracking-wider">Filtros de Búsqueda Integrada</h3>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <!-- Buscador de proyectos -->
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
@@ -91,7 +91,12 @@
                     </span>
                     <input type="text" id="filterSearch" placeholder="Buscar proyecto, líder, sponsor..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 placeholder-slate-500 transition-all">
                 </div>
-
+                <!-- Año de Creación -->
+                <div>
+                    <select id="filterAnio" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 transition-all">
+                        <option value="">Todos los Años</option>
+                    </select>
+                </div>
                 <!-- Select Gerencia -->
                 <div>
                     <select id="filterGerencia" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 transition-all">
@@ -454,10 +459,11 @@
 
                 const id = findVal(["id", "codigo"]) || (index + 1).toString();
                 const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]) || "Sin nombre";
+                const anio = findVal(["anodecreacion", "anio", "ano", "creacion", "aniodecreacion"]) || "Sin año";
                 const descripcion = findVal(["descripcion", "detalle"]) || "Sin descripción detallada.";
                 const riesgo = findVal(["nivelderiesgo", "riesgo"]) || "No definido";
                 const gerencia = findVal(["gerencia", "unidad"]) || "Sin asignar";
-                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical"]) || "Incremental";
+                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical"]) || "Sin tipo";
                 const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]) || "No asignado";
                 const correo = findVal(["liderfuncionalcorreo", "correo", "email"]) || "";
                 const funnel = findVal(["funnel", "fase"]) || "-";
@@ -468,13 +474,13 @@
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadoclp", "ebitdacapturado"]));
                 const hht = parseNumeric(findVal(["hhtpotencial", "hht", "horas"]));
                 
-                const estado = findVal(["estadoproyecto", "estado", "status"]) || "Abierto";
+                const estado = findVal(["estadoproyecto", "estado", "status"]) || "Sin estado";
                 const sponsor = findVal(["sponsor"]) || "-";
                 const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]) || "no";
                 const tipoSolucion = findVal(["tipodesolucion", "solucion"]) || "-";
 
                 return {
-                    id, nombre, descripcion, riesgo, gerencia, tipoInnovacion,
+                    id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
                     escalamiento, tipoSolucion
@@ -567,6 +573,7 @@
 
         function setupEventListeners() {
             document.getElementById('filterSearch').addEventListener('input', renderDashboard);
+            document.getElementById('filterAnio').addEventListener('change', renderDashboard);
             document.getElementById('filterGerencia').addEventListener('change', renderDashboard);
             document.getElementById('filterRisk').addEventListener('change', renderDashboard);
             document.getElementById('filterStatus').addEventListener('change', renderDashboard);
@@ -606,10 +613,22 @@
                 selectGerencia.appendChild(opt);
             });
             selectGerencia.value = currentSelected;
+            const selectAnio = document.getElementById('filterAnio');
+            const currentSelectedAnio = selectAnio.value;
+            const anios = [...new Set(dataset.map(item => item.anio).filter(Boolean))];
+            
+            selectAnio.innerHTML = '<option value="">Todos los Años</option>';
+            anios.sort((a, b) => b - a).forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a; opt.textContent = a;
+                selectAnio.appendChild(opt);
+            });
+            selectAnio.value = currentSelectedAnio;
         }
 
         function renderDashboard() {
             const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+            const filterA = document.getElementById('filterAnio').value;
             const filterG = document.getElementById('filterGerencia').value;
             const filterR = document.getElementById('filterRisk').value;
             const filterS = document.getElementById('filterStatus').value;
@@ -618,10 +637,11 @@
                 const matchSearch = (item.nombre || "").toLowerCase().includes(searchTerm) || 
                                     (item.lider || "").toLowerCase().includes(searchTerm) ||
                                     (item.sponsor || "").toLowerCase().includes(searchTerm);
+                const matchAnio = filterA === "" || String(item.anio) === String(filterA);
                 const matchGerencia = filterG === "" || item.gerencia === filterG;
                 const matchRisk = filterR === "" || item.riesgo === filterR;
                 const matchStatus = filterS === "" || item.estado === filterS;
-                return matchSearch && matchGerencia && matchRisk && matchStatus;
+                return matchSearch && matchAnio && matchGerencia && matchRisk && matchStatus;
             });
 
             updateKPIs(filteredData);
