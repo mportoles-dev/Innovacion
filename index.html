@@ -352,7 +352,8 @@
         // ==========================================
         // 1. CONFIGURACIÓN DEL ARCHIVO EN GITHUB
         // ==========================================
-        const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv"; 
+        // Usamos una ruta relativa para mayor compatibilidad (inmune a CORS y a repositorios privados)
+        const GITHUB_CSV_URL = "portafolio-innovacion-2026-06-01.csv"; 
         
         // Formateador de moneda para Chile (CLP)
         const formatCurrency = (value) => {
