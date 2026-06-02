@@ -350,10 +350,10 @@
     <!-- Script de Funcionalidad -->
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN DEL ARCHIVO EN GITHUB
+        // 1. CONFIGURACIÓN DE LAS FUENTES DE DATOS
         // ==========================================
-        // Usamos una ruta relativa para mayor compatibilidad (inmune a CORS y a repositorios privados)
-        const GITHUB_CSV_URL = "portafolio-innovacion-2026-06-01.csv"; 
+        const GITHUB_ABSOLUTE_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv";
+        const GITHUB_RELATIVE_URL = "portafolio-innovacion-2026-06-01.csv"; 
         
         // Formateador de moneda para Chile (CLP)
         const formatCurrency = (value) => {
@@ -373,6 +373,25 @@
         // ==========================================
         // 2. PARSERS DE SEGURIDAD Y FORMATO
         // ==========================================
+        
+        // Detector inteligente de separador analizando la primera línea
+        const detectSeparator = (text) => {
+            if (!text) return ";";
+            const firstLine = text.split('\n')[0];
+            const separators = [';', ',', '\t', '|'];
+            let maxCount = -1;
+            let bestSeparator = ';';
+            
+            separators.forEach(sep => {
+                const count = firstLine.split(sep).length;
+                if (count > maxCount) {
+                    maxCount = count;
+                    bestSeparator = sep;
+                }
+            });
+            return bestSeparator;
+        };
+
         const parseNumeric = (val) => {
             if (val === undefined || val === null) return 0;
             if (typeof val === 'number') return val;
@@ -406,7 +425,14 @@
         };
 
         function processCSVRows(rows) {
+            if (!rows || rows.length === 0) return [];
+            
             return rows.map((row, index) => {
+                // Safeguard: si PapaParse usó el separador incorrecto, el row tendrá sólo 1 propiedad enorme
+                if (Object.keys(row).length < 3) {
+                    return null;
+                }
+
                 const normRow = {};
                 Object.keys(row).forEach(k => {
                     if (k !== undefined && k !== null) {
@@ -420,7 +446,7 @@
                     }
                     for (const kw of keywords) {
                         for (const actualKey of Object.keys(normRow)) {
-                            if (actualKey.includes(kw) || kw.includes(actualKey)) return normRow[actualKey];
+                            if (actualKey.includes(kw)) return normRow[actualKey];
                         }
                     }
                     return undefined;
@@ -453,40 +479,76 @@
                     valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
                     escalamiento, tipoSolucion
                 };
-            }).filter(item => item.nombre !== "Sin nombre" && item.id !== "-");
+            }).filter(item => item !== null && item.nombre !== "Sin nombre" && item.id !== "-");
         }
 
         // ==========================================
-        // 3. OBTENER DATOS DE GITHUB / DETECTAR DELIMITADOR
+        // 3. ESTRATEGIA DE DOBLE CARGA (RESILIENTE)
         // ==========================================
         async function fetchGitHubData() {
+            let csvText = "";
+            let success = false;
+            
+            // Intento 1: URL Absoluta de GitHub
             try {
-                const response = await fetch(GITHUB_CSV_URL);
-                if (!response.ok) throw new Error("No se pudo obtener el CSV. Comprueba la URL de GitHub.");
-                const csvText = await response.text();
-                
-                let delimiter = ";"; 
-                if (csvText.includes(";")) delimiter = ";";
-                else if (csvText.includes(",")) delimiter = ",";
-                else if (csvText.includes("\t")) delimiter = "\t";
-                
+                const response = await fetch(GITHUB_ABSOLUTE_URL);
+                if (response.ok) {
+                    csvText = await response.text();
+                    success = true;
+                }
+            } catch (e) {
+                console.warn("Fallo en la conexión absoluta:", e);
+            }
+            
+            // Intento 2: Ruta relativa en el mismo servidor
+            if (!success) {
+                try {
+                    const response = await fetch(GITHUB_RELATIVE_URL);
+                    if (response.ok) {
+                        csvText = await response.text();
+                        success = true;
+                    }
+                } catch (e) {
+                    console.warn("Fallo en la conexión relativa:", e);
+                }
+            }
+            
+            // 3. Procesar resultados o levantar respaldo local
+            if (success && csvText.trim() !== "") {
+                const delimiter = detectSeparator(csvText);
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
                     delimiter: delimiter,
                     dynamicTyping: true,
                     complete: function(results) {
-                        dataset = processCSVRows(results.data);
-                        updateAlertStatus("success", "Datos sincronizados correctamente", `Se cargaron ${dataset.length} registros desde tu base en GitHub.`);
-                        initializeApp();
+                        try {
+                            const parsedData = processCSVRows(results.data);
+                            if (parsedData.length === 0) {
+                                throw new Error("No rows matched requirements");
+                            }
+                            dataset = parsedData;
+                            updateAlertStatus("success", "Datos sincronizados correctamente", `Se cargaron ${dataset.length} registros desde tu base en GitHub.`);
+                            initializeApp();
+                        } catch (err) {
+                            console.error("Error procesando CSV:", err);
+                            loadFallbackAndShowError("El formato del archivo en GitHub no es compatible");
+                        }
+                    },
+                    error: function(err) {
+                        console.error("PapaParse error:", err);
+                        loadFallbackAndShowError("Fallo de lectura interna en la base de datos");
                     }
                 });
-            } catch (error) {
-                console.warn(error);
-                updateAlertStatus("error", "Error de conexión a GitHub", "Mostrando datos de prueba locales. Sube el CSV de innovación para ver las métricas actualizadas.");
-                loadFallbackData();
-                initializeApp();
+            } else {
+                loadFallbackAndShowError("No se pudo establecer conexión con el repositorio");
             }
+        }
+
+        function loadFallbackAndShowError(reason) {
+            updateAlertStatus("error", "Error en Base de Datos", `${reason}. Visualizando datos de respaldo locales.`);
+            loadFallbackData();
+            initializeApp();
         }
 
         // ==========================================
@@ -598,8 +660,6 @@
             // 1. Gerencia (Barras Horizontales)
             const gCounts = {};
             data.forEach(i => { const g = i.gerencia || "Otra"; gCounts[g] = (gCounts[g] || 0) + 1; });
-            
-            // Ordenar de mayor a menor volumen
             const sortedGerencias = Object.entries(gCounts).sort((a,b) => b[1] - a[1]);
 
             chartG = new Chart(document.getElementById('chartGerencia').getContext('2d'), {
@@ -615,7 +675,7 @@
                     }]
                 },
                 options: { 
-                    indexAxis: 'y', // Convertir en Barras Horizontales
+                    indexAxis: 'y', 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     plugins: { 
@@ -748,28 +808,47 @@
             document.getElementById('projectModal').classList.add('hidden');
         }
 
+        // ==========================================
+        // 5. CARGA MANUAL DE ARCHIVOS (IMPECABLE)
+        // ==========================================
         function handleLocalCSVUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(evt) {
-                const csvText = evt.target.result;
-                let delimiter = ";";
-                if (csvText.includes(";")) delimiter = ";";
-                else if (csvText.includes(",")) delimiter = ",";
+                try {
+                    const csvText = evt.target.result;
+                    const delimiter = detectSeparator(csvText);
 
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    delimiter: delimiter,
-                    dynamicTyping: true,
-                    complete: function(results) {
-                        dataset = processCSVRows(results.data);
-                        updateAlertStatus("success", "Archivo local cargado", `Se procesaron correctamente ${dataset.length} iniciativas desde el archivo cargado.`);
-                        initializeApp();
-                    }
-                });
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        delimiter: delimiter,
+                        dynamicTyping: true,
+                        complete: function(results) {
+                            try {
+                                const parsedData = processCSVRows(results.data);
+                                if (parsedData.length === 0) {
+                                    throw new Error("No se procesó ninguna fila correcta");
+                                }
+                                dataset = parsedData;
+                                updateAlertStatus("success", "Archivo local cargado", `Se procesaron correctamente ${dataset.length} iniciativas desde el archivo cargado.`);
+                                initializeApp();
+                            } catch (err) {
+                                console.error("Error interpretando archivo local:", err);
+                                updateAlertStatus("error", "Estructura de archivo incompatible", "No pudimos encontrar las columnas del portafolio. Revisa la cabecera.");
+                            }
+                        },
+                        error: function(err) {
+                            console.error("Fallo de PapaParse local:", err);
+                            updateAlertStatus("error", "Error leyendo el archivo", "Ocurrió un error al procesar el archivo CSV.");
+                        }
+                    });
+                } catch (err) {
+                    console.error("Fallo al abrir FileReader:", err);
+                    updateAlertStatus("error", "Error de lectura", "No pudimos abrir el archivo desde el explorador.");
+                }
             };
             reader.readAsText(file);
         }
