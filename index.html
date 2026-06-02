@@ -10,6 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide Icons para iconos modernos -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PapaParse para leer CSV desde GitHub -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body {
@@ -48,11 +51,11 @@
                 </div>
             </div>
             
-            <!-- Botón de Carga de CSV -->
+            <!-- Botón de Carga de CSV Local (Opcional si ya se conecta a Github) -->
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 <label for="csvFileInput" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-700 cursor-pointer transition-all w-full text-sm font-medium shadow-sm">
                     <i data-lucide="upload-cloud" class="w-4 h-4"></i>
-                    <span>Cargar nuevo CSV (.csv)</span>
+                    <span>Cargar archivo local (.csv)</span>
                 </label>
                 <input type="file" id="csvFileInput" accept=".csv" class="hidden">
             </div>
@@ -62,12 +65,12 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
-        <!-- Alerta informativa de datos por defecto -->
-        <div id="dataAlert" class="bg-indigo-950/40 border border-indigo-500/20 text-indigo-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm">
-            <i data-lucide="info" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+        <!-- Alerta de Estado de Conexión -->
+        <div id="connectionAlert" class="bg-indigo-950/40 border border-indigo-500/20 text-indigo-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm transition-all duration-300">
+            <i data-lucide="loader" id="alertIcon" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5 animate-spin"></i>
             <div>
-                <span class="font-semibold text-white">¡Visualizando datos preliminares!</span> 
-                Este dashboard ya incluye información base de tu portafolio actual (Proyectos como <i>Autoguías</i>, <i>Logística inversa</i>, etc.). Puedes cargar un nuevo reporte exportado en formato CSV utilizando el botón superior para actualizar las métricas en tiempo real.
+                <span id="alertTitle" class="font-semibold text-white">Conectando a base de datos...</span> 
+                <span id="alertMessage" class="block text-slate-300 mt-1">Obteniendo la información más reciente desde el repositorio en GitHub.</span>
             </div>
         </div>
 
@@ -98,7 +101,7 @@
                     <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="dollar-sign" class="w-4 h-4"></i></span>
                 </div>
                 <div class="mt-4">
-                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiEbitda">0</span>
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiEbitda">$0</span>
                     <p class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
                         <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> <span id="kpiValidatedEbitda">0% validado</span>
                     </p>
@@ -115,7 +118,7 @@
                     <span class="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg"><i data-lucide="wallet" class="w-4 h-4"></i></span>
                 </div>
                 <div class="mt-4">
-                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiInvestment">0</span>
+                    <span class="text-3xl font-bold text-white tracking-tight" id="kpiInvestment">$0</span>
                     <p class="text-xs text-slate-500 mt-1">Presupuesto total del portafolio</p>
                 </div>
             </div>
@@ -148,7 +151,7 @@
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <i data-lucide="search" class="w-4 h-4"></i>
                     </span>
-                    <input type="text" id="filterSearch" placeholder="Buscar proyecto, líder o sponsor..." class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 placeholder-slate-500">
+                    <input type="text" id="filterSearch" placeholder="Buscar proyecto, líder..." class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-100 placeholder-slate-500">
                 </div>
 
                 <!-- Select Gerencia -->
@@ -223,323 +226,252 @@
                     <p class="text-xs text-slate-500 mt-1">Lista detallada del portafolio. Haz clic en las filas para ver la descripción completa.</p>
                 </div>
                 <span class="text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-full" id="tableRecordCount">
-                    Mostrando 0 de 0 registros
+                    Mostrando 0 registros
                 </span>
             </div>
 
             <!-- Responsive Table Container -->
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead>
                         <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase tracking-wider text-slate-400">
                             <th class="py-3 px-5">ID</th>
                             <th class="py-3 px-5">Proyecto</th>
-                            <th class="py-3 px-5">Líder Funcional</th>
+                            <th class="py-3 px-5">Líder</th>
                             <th class="py-3 px-5">Gerencia</th>
                             <th class="py-3 px-5 text-center">Riesgo</th>
-                            <th class="py-3 px-5 text-right">EBITDA Potencial</th>
+                            <th class="py-3 px-5 text-right">EBITDA</th>
                             <th class="py-3 px-5 text-right">Inversión</th>
                             <th class="py-3 px-5 text-center">Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm divide-y divide-slate-800/60">
-                        <!-- Creado dinámicamente -->
+                    <tbody id="tableBody" class="text-sm divide-y divide-slate-800/60 cursor-pointer">
+                        <!-- Llenado dinámicamente -->
                     </tbody>
                 </table>
             </div>
-
-            <!-- Empty State -->
+            
             <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
                 <i data-lucide="ban" class="w-10 h-10 text-slate-600"></i>
                 <p>No se encontraron proyectos con los filtros seleccionados.</p>
             </div>
         </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 py-6 px-6 text-center text-xs text-slate-500 bg-slate-950/20 mt-12">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>© 2026 Portafolio de Innovación corporativo. Todos los derechos reservados.</p>
-            <div class="flex gap-4">
-                <a href="#" class="hover:text-indigo-400 transition-colors">Seguridad</a>
-                <a href="#" class="hover:text-indigo-400 transition-colors">Soporte TI</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Custom Modal para detalles extendidos -->
+    <!-- Modal Detalle Proyecto -->
     <div id="projectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             
-            <div class="space-y-2">
-                <div class="flex items-center gap-2">
-                    <span id="modalGerencia" class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-medium">Gerencia</span>
-                    <span id="modalFunnel" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-full font-medium">Funnel</span>
+            <div class="space-y-2 pr-8">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span id="modalGerencia" class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-medium"></span>
+                    <span id="modalFunnel" class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-full font-medium"></span>
                 </div>
-                <h3 id="modalTitle" class="text-xl font-bold text-white">Nombre del Proyecto</h3>
+                <h3 id="modalTitle" class="text-xl font-bold text-white leading-tight"></h3>
             </div>
 
-            <!-- Descripción -->
             <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
                 <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
-                <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed">Sin descripción.</p>
+                <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
             </div>
 
-            <!-- Info Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500">Líder Funcional</span>
                     <p class="text-sm text-slate-200 flex items-center gap-2">
                         <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-                        <span id="modalLeader">Nombre</span>
+                        <span id="modalLeader"></span>
                     </p>
-                    <span id="modalEmail" class="text-xs text-slate-500 block pl-6 hover:text-indigo-400 cursor-pointer">correo@empresa.com</span>
+                    <a id="modalEmail" href="#" class="text-xs text-indigo-400 block pl-6 hover:underline"></a>
                 </div>
 
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500">Sponsor</span>
                     <p class="text-sm text-slate-200 flex items-center gap-2">
                         <i data-lucide="award" class="w-4 h-4 text-slate-400"></i>
-                        <span id="modalSponsor">-</span>
+                        <span id="modalSponsor"></span>
                     </p>
                 </div>
 
                 <div class="space-y-1 border-t border-slate-800/60 pt-3">
                     <span class="text-xs text-slate-500">EBITDA Capturado</span>
-                    <p id="modalEbitdaCaptured" class="text-sm font-semibold text-emerald-400">$-</p>
+                    <p id="modalEbitdaCaptured" class="text-sm font-semibold text-emerald-400"></p>
                 </div>
 
                 <div class="space-y-1 border-t border-slate-800/60 pt-3">
-                    <span class="text-xs text-slate-500">Gobernanza TD / Escalamiento</span>
-                    <p id="modalGovernance" class="text-sm text-slate-300">-</p>
+                    <span class="text-xs text-slate-500">Tipo de Solución / Escalamiento</span>
+                    <p id="modalGovernance" class="text-sm text-slate-300"></p>
                 </div>
-            </div>
-
-            <!-- KPI's específicos -->
-            <div class="border-t border-slate-800 pt-4 space-y-2">
-                <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider">KPIs Clave</h4>
-                <ul id="modalKPIs" class="text-sm text-slate-300 space-y-1 list-disc list-inside">
-                    <!-- Dinámico -->
-                </ul>
             </div>
         </div>
     </div>
 
-    <!-- Script de Funcionalidad y Parsing -->
+    <!-- Script de Funcionalidad -->
     <script>
-        // Datos Base Iniciales (extraídos de la base maestra proporcionada)
-        let dataset = [
-            {
-                id: "1",
-                nombre: "Autoguias",
-                descripcion: "Busca mejorar la eficiencia operativa, reduciendo los tiempos de espera, y prevenir conflictos con la comunidad o eventuales multas, donde los transportistas impriman directamente su hoja de ruta y guía de despacho.",
-                riesgo: "Bajo",
-                responsable: "Isidora González",
-                gerencia: "Recupac",
-                area: "Administración",
-                kr: "Nulo",
-                vertical: "Transformación procesos internos",
-                tipoInnovacion: "Incremental",
-                lider: "Jorge Honores",
-                correo: "jorge.honores@recupac.cl",
-                funnel: "Seguimiento",
-                tipoSolucion: "Desarrollo interno",
-                origen: "Embajador",
-                inversion: 0,
-                ebitdaPotencial: 0,
-                valEbitdaPotencial: "Validado",
-                ebitdaCapturado: 0,
-                valEbitdaCapturado: "",
-                hht: 2184,
-                estado: "Abierto",
-                gobernanza: "No",
-                escalamiento: "no",
-                anio: 2024,
-                comentario: "-",
-                sponsor: "E. Bascuñán",
-                kpis: []
-            },
-            {
-                id: "2",
-                nombre: "Maxibolsas",
-                descripcion: "Busca disminuir los costos de las sacas con propuesta más sostenible y económica, reemplazándolas por bolsas de pellet reciclado a ¼ del valor de la saca de rafia actual.",
-                riesgo: "Medio",
-                responsable: "Isidora González",
-                gerencia: "Recupac",
-                area: "Servicios",
-                kr: "Asegurar Mg en GR >MM$ 7.000 y ROA >80%",
-                vertical: "Nuevas soluciones",
-                tipoInnovacion: "Incremental",
-                lider: "Jorge Honores",
-                correo: "jorge.honores@recupac.cl",
-                funnel: "Ejecución pilotaje",
-                tipoSolucion: "Desarrollo interno",
-                origen: "Embajador",
-                inversion: 12000000,
-                ebitdaPotencial: 45000000,
-                valEbitdaPotencial: "Validado",
-                ebitdaCapturado: 15000000,
-                valEbitdaCapturado: "Parcial",
-                hht: 850,
-                estado: "Abierto",
-                gobernanza: "No",
-                escalamiento: "si",
-                anio: 2024,
-                comentario: "-",
-                sponsor: "E. Bascuñán",
-                kpis: ["Disminuir costo de saca de rafia", "Disminución huella de carbono"]
-            },
-            {
-                id: "17",
-                nombre: "Reutilización de Caños de Alambre",
-                descripcion: "Consiste en la reutilización de caños ya consumidos para las bobinas. Es un proyecto de economía circular que impactará favorablemente tanto en costos como en sustentabilidad ambiental.",
-                riesgo: "Bajo",
-                responsable: "Laura Chamorro",
-                gerencia: "CPP",
-                area: "Logística",
-                kr: "Reducir costo en 5 USD/Ton en SF y 1 USD/Ton en SP",
-                vertical: "Transformación procesos internos",
-                tipoInnovacion: "Incremental",
-                lider: "Katherine Alvarez",
-                correo: "kalvarez@cpp.cl",
-                funnel: "Desarrollo interno",
-                tipoSolucion: "Desarrollo interno",
-                origen: "Embajador",
-                inversion: 21200000,
-                ebitdaPotencial: 0,
-                valEbitdaPotencial: "No validado",
-                ebitdaCapturado: 0,
-                valEbitdaCapturado: "",
-                hht: 0,
-                estado: "Cerrado",
-                gobernanza: "No",
-                escalamiento: "si",
-                anio: 2024,
-                comentario: "Operacionalmente complejo. Además no era el equipo adecuado.",
-                sponsor: "N. Fernández",
-                kpis: ["Ahorro USD/Ton"]
-            },
-            {
-                id: "18",
-                nombre: "Logística inversa",
-                descripcion: "Captura de fibra para Recupac desde cliente de Corrupac mediante la instalación de enfardadoras, ubicados a más de 150 km de Santiago, aprovechando la capacidad ociosa en el retorno de los camiones que despachan las cajas.",
-                riesgo: "Medio",
-                responsable: "Laura Chamorro",
-                gerencia: "Recupac",
-                area: "Comercial",
-                kr: "Capturar >= 67.000 ton cartón rentable",
-                vertical: "Nuevas soluciones",
-                tipoInnovacion: "Incremental",
-                lider: "Carlos Quijanes",
-                correo: "cquijanes@recupac.cl",
-                funnel: "Ejecución pilotaje",
-                tipoSolucion: "Desarrollo interno",
-                origen: "Pedida ejecutiva",
-                inversion: 0,
-                ebitdaPotencial: 10006402,
-                valEbitdaPotencial: "Validado",
-                ebitdaCapturado: 0,
-                valEbitdaCapturado: "",
-                hht: 1200,
-                estado: "Abierto",
-                gobernanza: "No",
-                escalamiento: "no",
-                anio: 2025,
-                comentario: "-",
-                sponsor: "Sponsor Corporativo",
-                kpis: ["Toneladas capturadas", "Margen unitario"]
-            }
-        ];
+        // ==========================================
+        // 1. CONFIGURACIÓN DEL ARCHIVO EN GITHUB
+        // ==========================================
+        // Pega aquí la URL "Raw" de tu archivo CSV subido a Github
+        const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv"; 
+        
+        // Formateador de moneda para Chile
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP',
+                minimumFractionDigits: 0
+            }).format(value || 0);
+        };
 
-        // Instancias de Gráficos de Chart.js
+        // Variables Globales
+        let dataset = [];
         let chartG = null;
         let chartR = null;
         let chartI = null;
 
-        // Inicializar Aplicación al cargar
+        // ==========================================
+        // 2. OBTENER DATOS DE GITHUB
+        // ==========================================
+        async function fetchGitHubData() {
+            try {
+                const response = await fetch(GITHUB_CSV_URL);
+                if (!response.ok) throw new Error("No se pudo obtener el CSV. Comprueba la URL de GitHub.");
+                
+                const csvText = await response.text();
+                
+                // Procesar el CSV con PapaParse
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: true, // Convierte números automáticamente
+                    complete: function(results) {
+                        // Mapear los datos del CSV a las variables que usa tu panel
+                        dataset = results.data.map(row => ({
+                            id: row.id || row.ID || "-",
+                            nombre: row.nombre || row.Proyecto || row.Nombre || "Sin nombre",
+                            descripcion: row.descripcion || row.Descripcion || "Sin descripción detallada.",
+                            riesgo: row.riesgo || row.Riesgo || "No definido",
+                            gerencia: row.gerencia || row.Gerencia || "Sin asignar",
+                            tipoInnovacion: row.tipoInnovacion || row["Tipo Innovacion"] || row.vertical || "General",
+                            lider: row.lider || row.Lider || row.responsable || "No asignado",
+                            correo: row.correo || row.Email || "",
+                            funnel: row.funnel || row.Estado || row.fase || "-",
+                            inversion: parseFloat(row.inversion || row.Inversion || 0),
+                            ebitdaPotencial: parseFloat(row.ebitdaPotencial || row.EBITDA || 0),
+                            valEbitdaPotencial: row.valEbitdaPotencial || "No validado",
+                            ebitdaCapturado: parseFloat(row.ebitdaCapturado || 0),
+                            hht: parseFloat(row.hht || row.HHT || 0),
+                            estado: row.estado || row.Estado || "Abierto",
+                            sponsor: row.sponsor || row.Sponsor || "-",
+                            escalamiento: row.escalamiento || row.Escalamiento || "-",
+                            tipoSolucion: row.tipoSolucion || "-"
+                        }));
+
+                        updateAlertStatus("success", "Datos sincronizados correctamente", `Se cargaron ${dataset.length} registros desde GitHub.`);
+                        initializeApp();
+                    }
+                });
+
+            } catch (error) {
+                console.warn(error);
+                updateAlertStatus("error", "Error de conexión a GitHub", "Mostrando datos de prueba locales por ahora. Verifica la URL de tu archivo.");
+                
+                // Fallback: Si falla la conexión a Github, cargamos datos por defecto para que no se caiga la página
+                loadFallbackData();
+                initializeApp();
+            }
+        }
+
+        // ==========================================
+        // 3. INICIALIZACIÓN Y RENDERIZADO
+        // ==========================================
         window.onload = function() {
             lucide.createIcons();
-            populateFilters();
-            renderDashboard();
+            fetchGitHubData(); // Inicia la descarga automática de Github
             setupEventListeners();
         }
 
-        // Configurar Event Listeners para cambios en filtros y carga de archivos
+        function initializeApp() {
+            populateFilters();
+            renderDashboard();
+        }
+
         function setupEventListeners() {
             document.getElementById('filterSearch').addEventListener('input', renderDashboard);
             document.getElementById('filterGerencia').addEventListener('change', renderDashboard);
             document.getElementById('filterRisk').addEventListener('change', renderDashboard);
             document.getElementById('filterStatus').addEventListener('change', renderDashboard);
-            document.getElementById('csvFileInput').addEventListener('change', handleCSVUpload);
+            document.getElementById('csvFileInput').addEventListener('change', handleLocalCSVUpload);
         }
 
-        // Llenar selectores únicos basados en la data actual
+        function updateAlertStatus(type, title, message) {
+            const alertBox = document.getElementById('connectionAlert');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const msgEl = document.getElementById('alertMessage');
+            
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+
+            if(type === 'success') {
+                alertBox.className = "bg-emerald-950/40 border border-emerald-500/20 text-emerald-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm transition-all";
+                icon.setAttribute("data-lucide", "check-circle");
+                icon.className = "w-5 h-5 text-emerald-400 shrink-0 mt-0.5";
+            } else if(type === 'error') {
+                alertBox.className = "bg-amber-950/40 border border-amber-500/20 text-amber-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm transition-all";
+                icon.setAttribute("data-lucide", "alert-triangle");
+                icon.className = "w-5 h-5 text-amber-400 shrink-0 mt-0.5";
+            }
+            lucide.createIcons();
+        }
+
         function populateFilters() {
             const selectGerencia = document.getElementById('filterGerencia');
             const currentSelected = selectGerencia.value;
-            
-            // Obtener gerencias únicas
             const gerencias = [...new Set(dataset.map(item => item.gerencia).filter(Boolean))];
             
-            // Re-poblar select
             selectGerencia.innerHTML = '<option value="">Todas las Gerencias</option>';
             gerencias.sort().forEach(g => {
                 const opt = document.createElement('option');
-                opt.value = g;
-                opt.textContent = g;
+                opt.value = g; opt.textContent = g;
                 selectGerencia.appendChild(opt);
             });
-            
             selectGerencia.value = currentSelected;
         }
 
-        // Render Principal del Dashboard (Métricas, Gráficos y Tabla)
         function renderDashboard() {
             const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
             const filterG = document.getElementById('filterGerencia').value;
             const filterR = document.getElementById('filterRisk').value;
             const filterS = document.getElementById('filterStatus').value;
 
-            // Filtrar Dataset
             const filteredData = dataset.filter(item => {
                 const matchSearch = (item.nombre || "").toLowerCase().includes(searchTerm) || 
-                                    (item.lider || "").toLowerCase().includes(searchTerm) || 
-                                    (item.sponsor || "").toLowerCase().includes(searchTerm);
+                                    (item.lider || "").toLowerCase().includes(searchTerm);
                 const matchGerencia = filterG === "" || item.gerencia === filterG;
                 const matchRisk = filterR === "" || item.riesgo === filterR;
                 const matchStatus = filterS === "" || item.estado === filterS;
-
                 return matchSearch && matchGerencia && matchRisk && matchStatus;
             });
 
-            // Actualizar KPIs
             updateKPIs(filteredData);
-
-            // Actualizar Gráficos
             updateCharts(filteredData);
-
-            // Actualizar Tabla de Datos
             updateTable(filteredData);
         }
 
-        // Lógica de Actualización de Indicadores KPI
         function updateKPIs(data) {
             const totalProjects = data.length;
-            const openProjects = data.filter(i => i.estado.toLowerCase() === 'abierto').length;
-            
+            const openProjects = data.filter(i => (i.estado||'').toLowerCase() === 'abierto').length;
             const totalEbitda = data.reduce((acc, curr) => acc + (curr.ebitdaPotencial || 0), 0);
             const totalInvestment = data.reduce((acc, curr) => acc + (curr.inversion || 0), 0);
             const totalHHT = data.reduce((acc, curr) => acc + (curr.hht || 0), 0);
 
-            // Calcular % de EBITDA Validado
-            const validatedEbitdaCount = data.filter(i => i.valEbitdaPotencial?.toLowerCase() === 'validado').length;
+            const validatedEbitdaCount = data.filter(i => (i.valEbitdaPotencial||'').toLowerCase() === 'validado').length;
             const pctValidated = totalProjects > 0 ? Math.round((validatedEbitdaCount / totalProjects) * 100) : 0;
 
-            // Renderizar valores en pantalla formateados
             document.getElementById('kpiTotalProjects').textContent = totalProjects;
             document.getElementById('kpiOpenProjects').textContent = `${openProjects} activos actualmente`;
             document.getElementById('kpiEbitda').textContent = formatCurrency(totalEbitda);
@@ -548,197 +480,114 @@
             document.getElementById('kpiHht').textContent = totalHHT.toLocaleString('es-CL') + ' h';
         }
 
-        // Lógica de Gráficos (Chart.js)
         function updateCharts(data) {
-            // Destruir gráficos anteriores para evitar superposiciones al filtrar
             if (chartG) chartG.destroy();
             if (chartR) chartR.destroy();
             if (chartI) chartI.destroy();
 
-            // 1. Datos para Gerencia (Distribución de barras)
-            const gerenciaCounts = {};
-            data.forEach(item => {
-                const g = item.gerencia || "No Definida";
-                gerenciaCounts[g] = (gerenciaCounts[g] || 0) + 1;
-            });
-
-            const ctxG = document.getElementById('chartGerencia').getContext('2d');
-            chartG = new Chart(ctxG, {
+            // 1. Gerencia (Barras)
+            const gCounts = {};
+            data.forEach(i => { const g = i.gerencia || "Otra"; gCounts[g] = (gCounts[g] || 0) + 1; });
+            chartG = new Chart(document.getElementById('chartGerencia').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(gerenciaCounts),
+                    labels: Object.keys(gCounts),
                     datasets: [{
-                        label: 'Iniciativas',
-                        data: Object.values(gerenciaCounts),
-                        backgroundColor: 'rgba(79, 70, 229, 0.65)',
-                        borderColor: 'rgb(99, 102, 241)',
-                        borderWidth: 1.5,
+                        data: Object.values(gCounts),
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
                         borderRadius: 6
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { color: '#94a3b8', stepSize: 1 }, 
-                            grid: { color: 'rgba(51, 65, 85, 0.3)' } 
-                        },
-                        x: { 
-                            ticks: { color: '#94a3b8' },
-                            grid: { display: false } 
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: {color: 'rgba(255,255,255,0.05)'} }, x: { grid: {display: false} } } }
             });
 
-            // 2. Datos para Riesgo (Pie/Doughnut)
-            const riskCounts = { "Bajo": 0, "Medio": 0, "Alto": 0 };
-            data.forEach(item => {
-                if (riskCounts[item.riesgo] !== undefined) {
-                    riskCounts[item.riesgo]++;
-                }
-            });
-
-            const ctxR = document.getElementById('chartRisk').getContext('2d');
-            chartR = new Chart(ctxR, {
+            // 2. Riesgo (Doughnut)
+            const rCounts = { "Bajo": 0, "Medio": 0, "Alto": 0 };
+            data.forEach(i => { if (rCounts[i.riesgo] !== undefined) rCounts[i.riesgo]++; else rCounts["Bajo"]++; });
+            chartR = new Chart(document.getElementById('chartRisk').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(riskCounts),
+                    labels: ['Bajo', 'Medio', 'Alto'],
                     datasets: [{
-                        data: Object.values(riskCounts),
-                        backgroundColor: ['rgba(34, 197, 94, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(239, 68, 68, 0.7)'],
-                        borderColor: '#0f172a',
-                        borderWidth: 3
+                        data: [rCounts.Bajo, rCounts.Medio, rCounts.Alto],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        cutout: '75%'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {color:'#94a3b8'} } } }
             });
 
-            // 3. Datos para Tipo de Innovación
-            const innovationCounts = {};
-            data.forEach(item => {
-                const t = item.tipoInnovacion || "No Especificado";
-                innovationCounts[t] = (innovationCounts[t] || 0) + 1;
-            });
-
-            const ctxI = document.getElementById('chartInnovation').getContext('2d');
-            chartI = new Chart(ctxI, {
-                type: 'polarArea',
+            // 3. Innovación (Pie)
+            const iCounts = {};
+            data.forEach(i => { const t = i.tipoInnovacion || "Incremental"; iCounts[t] = (iCounts[t] || 0) + 1; });
+            chartI = new Chart(document.getElementById('chartInnovation').getContext('2d'), {
+                type: 'pie',
                 data: {
-                    labels: Object.keys(innovationCounts),
+                    labels: Object.keys(iCounts),
                     datasets: [{
-                        data: Object.values(innovationCounts),
-                        backgroundColor: [
-                            'rgba(147, 51, 234, 0.6)',
-                            'rgba(236, 72, 153, 0.6)',
-                            'rgba(14, 165, 233, 0.6)',
-                            'rgba(234, 179, 8, 0.6)'
-                        ],
-                        borderColor: '#0f172a',
-                        borderWidth: 2
+                        data: Object.values(iCounts),
+                        backgroundColor: ['#8b5cf6', '#ec4899', '#3b82f6', '#06b6d4'],
+                        borderWidth: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { display: false } }
-                    },
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {color:'#94a3b8'} } } }
             });
         }
 
-        // Renderizar tabla interactiva
         function updateTable(data) {
             const tbody = document.getElementById('tableBody');
             const emptyState = document.getElementById('tableEmptyState');
+            const countLabel = document.getElementById('tableRecordCount');
+            
             tbody.innerHTML = '';
-
-            document.getElementById('tableRecordCount').textContent = `Mostrando ${data.length} de ${dataset.length} registros`;
+            countLabel.textContent = `Mostrando ${data.length} registros`;
 
             if (data.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
-            } else {
-                emptyState.classList.add('hidden');
             }
+            emptyState.classList.add('hidden');
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40 cursor-pointer transition-colors border-b border-slate-800/40";
-                tr.onclick = () => openModal(item);
+                tr.className = "hover:bg-slate-800/50 transition-colors";
+                tr.onclick = () => showModal(item);
 
-                // Colores de insignias
-                const riskBadge = item.riesgo === 'Alto' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                  item.riesgo === 'Medio' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                  'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-
-                const statusBadge = item.estado.toLowerCase() === 'abierto' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-slate-700/30 text-slate-400 border-slate-700/50';
+                // Colores dinámicos para riesgo
+                let riskClass = "bg-slate-800 text-slate-300";
+                if(item.riesgo === 'Bajo') riskClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                if(item.riesgo === 'Medio') riskClass = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                if(item.riesgo === 'Alto') riskClass = "bg-red-500/10 text-red-400 border border-red-500/20";
 
                 tr.innerHTML = `
-                    <td class="py-3 px-5 text-slate-500 font-semibold">#${item.id}</td>
-                    <td class="py-3 px-5 font-semibold text-white">${item.nombre}</td>
-                    <td class="py-3 px-5 text-slate-300">${item.lider || '-'}</td>
+                    <td class="py-3 px-5 text-slate-400 font-mono">${item.id}</td>
+                    <td class="py-3 px-5 font-medium text-white">${item.nombre}</td>
+                    <td class="py-3 px-5 text-slate-300">${item.lider}</td>
                     <td class="py-3 px-5 text-slate-300">${item.gerencia}</td>
-                    <td class="py-3 px-5 text-center">
-                        <span class="inline-block text-xs border rounded-full px-2.5 py-0.5 font-medium ${riskBadge}">
-                            ${item.riesgo}
-                        </span>
-                    </td>
+                    <td class="py-3 px-5 text-center"><span class="px-2 py-1 rounded text-xs ${riskClass}">${item.riesgo}</span></td>
                     <td class="py-3 px-5 text-right font-medium text-emerald-400">${formatCurrency(item.ebitdaPotencial)}</td>
-                    <td class="py-3 px-5 text-right font-medium text-slate-300">${formatCurrency(item.inversion)}</td>
-                    <td class="py-3 px-5 text-center">
-                        <span class="inline-block text-xs border rounded-full px-2.5 py-0.5 font-medium ${statusBadge}">
-                            ${item.estado}
-                        </span>
-                    </td>
+                    <td class="py-3 px-5 text-right text-slate-300">${formatCurrency(item.inversion)}</td>
+                    <td class="py-3 px-5 text-center text-slate-400">${item.estado}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Utilidad: Formatear moneda (CLP / USD)
-        function formatCurrency(val) {
-            if (val === undefined || val === null || val === 0) return '$-';
-            return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(val);
-        }
-
-        // Lógica de Modal de Detalles del Proyecto
-        function openModal(item) {
+        function showModal(item) {
             document.getElementById('modalTitle').textContent = item.nombre;
-            document.getElementById('modalDesc').textContent = item.descripcion || "Sin descripción proporcionada.";
-            document.getElementById('modalLeader').textContent = item.lider || "No asignado";
-            document.getElementById('modalEmail').textContent = item.correo || "-";
-            document.getElementById('modalSponsor').textContent = item.sponsor || "No asignado";
-            document.getElementById('modalGerencia').textContent = item.gerencia || "Gerencia";
-            document.getElementById('modalFunnel').textContent = `Fase: ${item.funnel || 'No especificada'}`;
-            document.getElementById('modalEbitdaCaptured').textContent = formatCurrency(item.ebitdaCapturado);
-            document.getElementById('modalGovernance').textContent = `Gobernanza: ${item.gobernanza || 'No'} | Escalamiento: ${item.escalamiento || 'No'}`;
+            document.getElementById('modalGerencia').textContent = item.gerencia;
+            document.getElementById('modalFunnel').textContent = item.funnel;
+            document.getElementById('modalDesc').textContent = item.descripcion;
+            document.getElementById('modalLeader').textContent = item.lider;
+            
+            const emailEl = document.getElementById('modalEmail');
+            emailEl.textContent = item.correo || 'Sin correo registrado';
+            emailEl.href = item.correo ? `mailto:${item.correo}` : '#';
 
-            // Listado de KPIs
-            const kpisUl = document.getElementById('modalKPIs');
-            kpisUl.innerHTML = '';
-            if (item.kpis && item.kpis.length > 0) {
-                item.kpis.forEach(kpi => {
-                    const li = document.createElement('li');
-                    li.textContent = kpi;
-                    kpisUl.appendChild(li);
-                });
-            } else {
-                kpisUl.innerHTML = '<span class="text-slate-500 text-xs italic">No hay KPIs específicos registrados.</span>';
-            }
+            document.getElementById('modalSponsor').textContent = item.sponsor;
+            document.getElementById('modalEbitdaCaptured').textContent = formatCurrency(item.ebitdaCapturado);
+            document.getElementById('modalGovernance').textContent = `${item.tipoSolucion} (Escalamiento: ${item.escalamiento})`;
 
             document.getElementById('projectModal').classList.remove('hidden');
         }
@@ -747,107 +596,39 @@
             document.getElementById('projectModal').classList.add('hidden');
         }
 
-        // Parsing dinámico de archivos CSV cargados manualmente
-        function handleCSVUpload(event) {
-            const file = event.target.files[0];
+        // Carga de archivo CSV manual si el usuario quiere probar uno antes de subirlo a Github
+        function handleLocalCSVUpload(e) {
+            const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                parseCSV(text);
-            };
-            reader.readAsText(file, "UTF-8");
+            Papa.parse(file, {
+                header: true, skipEmptyLines: true, dynamicTyping: true,
+                complete: function(results) {
+                    dataset = results.data.map((row, i) => ({
+                        id: row.id || row.ID || (i+1).toString(),
+                        nombre: row.nombre || row.Proyecto || "Sin nombre",
+                        descripcion: row.descripcion || row.Descripcion || "N/A",
+                        riesgo: row.riesgo || row.Riesgo || "Bajo",
+                        gerencia: row.gerencia || row.Gerencia || "General",
+                        tipoInnovacion: row.tipoInnovacion || row["Tipo Innovacion"] || "General",
+                        lider: row.lider || row.Lider || "No asignado",
+                        inversion: parseFloat(row.inversion || row.Inversion || 0),
+                        ebitdaPotencial: parseFloat(row.ebitdaPotencial || row.EBITDA || 0),
+                        hht: parseFloat(row.hht || row.HHT || 0),
+                        estado: row.estado || row.Estado || "Abierto",
+                    }));
+                    updateAlertStatus("success", "Archivo local cargado", "Visualizando datos desde el archivo cargado manualmente.");
+                    initializeApp();
+                }
+            });
         }
 
-        // Parser CSV minimalista pero robusto
-        function parseCSV(text) {
-            try {
-                const lines = text.split(/\r?\n/);
-                if (lines.length < 2) return;
-
-                // Extraer headers
-                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-                
-                let tempDataset = [];
-
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    // Expresión regular para parsear comas respetando comillas dobles
-                    const columns = [];
-                    let insideQuote = false;
-                    let currentField = '';
-
-                    for (let c = 0; c < line.length; c++) {
-                        const char = line[c];
-                        if (char === '"') {
-                            insideQuote = !insideQuote;
-                        } else if (char === ',' && !insideQuote) {
-                            columns.push(currentField.trim());
-                            currentField = '';
-                        } else {
-                            currentField += char;
-                        }
-                    }
-                    columns.push(currentField.trim());
-
-                    if (columns.length < 5) continue; // Salto de filas rotas
-
-                    // Mapeo seguro basándonos en nombres de columnas clásicas o índices fijos
-                    const id = columns[0]?.replace(/^"|"$/g, '') || String(i);
-                    const nombre = columns[1]?.replace(/^"|"$/g, '') || "Sin Nombre";
-                    const descripcion = columns[2]?.replace(/^"|"$/g, '') || "";
-                    const riesgo = columns[3]?.replace(/^"|"$/g, '') || "Bajo";
-                    const responsable = columns[4]?.replace(/^"|"$/g, '') || "";
-                    const gerencia = columns[5]?.replace(/^"|"$/g, '') || "No Definida";
-                    const area = columns[6]?.replace(/^"|"$/g, '') || "";
-                    const kr = columns[7]?.replace(/^"|"$/g, '') || "";
-                    const vertical = columns[8]?.replace(/^"|"$/g, '') || "";
-                    const tipoInnovacion = columns[9]?.replace(/^"|"$/g, '') || "Incremental";
-                    const lider = columns[10]?.replace(/^"|"$/g, '') || "";
-                    const correo = columns[11]?.replace(/^"|"$/g, '') || "";
-                    const funnel = columns[12]?.replace(/^"|"$/g, '') || "";
-                    const inversion = parseNumber(columns[16]);
-                    const ebitdaPotencial = parseNumber(columns[17]);
-                    const valEbitdaPotencial = columns[18]?.replace(/^"|"$/g, '') || "";
-                    const ebitdaCapturado = parseNumber(columns[19]);
-                    const hht = parseNumber(columns[21]);
-                    const estado = columns[22]?.replace(/^"|"$/g, '') || "Abierto";
-                    const gobernanza = columns[23]?.replace(/^"|"$/g, '') || "No";
-                    const escalamiento = columns[24]?.replace(/^"|"$/g, '') || "no";
-                    const anio = parseNumber(columns[25]) || 2026;
-                    const comentario = columns[26]?.replace(/^"|"$/g, '') || "";
-                    const sponsor = columns[27]?.replace(/^"|"$/g, '') || "";
-
-                    tempDataset.push({
-                        id, nombre, descripcion, riesgo, responsable, gerencia, area, kr, vertical,
-                        tipoInnovacion, lider, correo, funnel, inversion, ebitdaPotencial, valEbitdaPotencial,
-                        ebitdaCapturado, hht, estado, gobernanza, escalamiento, anio, comentario, sponsor, kpis: []
-                    });
-                }
-
-                if (tempDataset.length > 0) {
-                    dataset = tempDataset;
-                    populateFilters();
-                    renderDashboard();
-                    
-                    // Ocultar mensaje informativo si cargaron datos nuevos exitosamente
-                    document.getElementById('dataAlert').classList.add('hidden');
-                }
-            } catch (err) {
-                console.error("Error al parsear el CSV", err);
-                alert("Hubo un problema procesando el archivo CSV. Por favor verifica que tenga el formato original estructurado.");
-            }
-        }
-
-        // Limpiar strings numéricos complejos del CSV (como " $21,200,000 ")
-        function parseNumber(val) {
-            if (!val) return 0;
-            const cleaned = val.replace(/[^0-9.-]/g, '');
-            const parsed = parseFloat(cleaned);
-            return isNaN(parsed) ? 0 : parsed;
+        // Datos de ejemplo en caso de que Github falle o la URL esté vacía
+        function loadFallbackData() {
+            dataset = [
+                { id: "1", nombre: "Logística inversa", descripcion: "Captura de fibra aprovechando retorno de camiones.", riesgo: "Medio", gerencia: "Recupac", tipoInnovacion: "Incremental", lider: "Carlos Quijanes", correo: "cquijanes@recupac.cl", funnel: "Ejecución", inversion: 0, ebitdaPotencial: 10006402, valEbitdaPotencial: "Validado", hht: 1200, estado: "Abierto", sponsor: "Sponsor Corp", escalamiento: "no", tipoSolucion: "Desarrollo" },
+                { id: "2", nombre: "Maxibolsas", descripcion: "Disminuir costos reemplazando sacas de rafia.", riesgo: "Bajo", gerencia: "Recupac", tipoInnovacion: "Transformación", lider: "Jorge Honores", correo: "jorge@recupac.cl", funnel: "Piloto", inversion: 12000000, ebitdaPotencial: 45000000, valEbitdaPotencial: "Validado", hht: 850, estado: "Abierto", sponsor: "E. Bascuñán", escalamiento: "si", tipoSolucion: "Desarrollo" }
+            ];
         }
     </script>
 </body>
