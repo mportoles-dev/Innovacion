@@ -315,7 +315,7 @@
         // 1. CONFIGURACIÓN DEL ARCHIVO EN GITHUB
         // ==========================================
         // Pega aquí la URL "Raw" de tu archivo CSV subido a Github
-        const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv"; 
+        const GITHUB_CSV_URL = "https://raw.githubusercontent.com/TuUsuario/TuRepo/main/datos.csv"; 
         
         // Formateador de moneda para Chile
         const formatCurrency = (value) => {
@@ -333,7 +333,105 @@
         let chartI = null;
 
         // ==========================================
-        // 2. OBTENER DATOS DE GITHUB
+        // 2. PARSERS DE SEGURIDAD Y FORMATO
+        // ==========================================
+        
+        // Limpiador de números flexible para monedas e HHT (ej. "$21,200,000", "$-", "12.500,50")
+        const parseNumeric = (val) => {
+            if (val === undefined || val === null) return 0;
+            let str = String(val).trim();
+            if (str === "" || str === "-" || str === "$-" || str === "$- " || str === " - ") return 0;
+            
+            // Quitar signo de moneda y espacios
+            str = str.replace(/[\$\s]/g, "");
+            
+            // Evaluar formato chileno/europeo (separador de miles '.' y decimal ',')
+            if (str.includes('.') && !str.includes(',')) {
+                if (/\.\d{3}(\.|$)/.test(str)) {
+                    str = str.replace(/\./g, ""); // "21.200.000" -> "21200000"
+                }
+            } else if (str.includes(',') && !str.includes('.')) {
+                if (/\,\d{3}(\,|$)/.test(str)) {
+                    str = str.replace(/,/g, ""); // "21,200,000" -> "21200000"
+                } else {
+                    str = str.replace(/,/g, "."); // "12,5" -> "12.5"
+                }
+            } else if (str.includes('.') && str.includes(',')) {
+                if (str.indexOf('.') < str.indexOf(',')) {
+                    str = str.replace(/\./g, "").replace(/,/g, "."); // "12.500,50" -> "12500.50"
+                } else {
+                    str = str.replace(/,/g, ""); // "12,500.50" -> "12500.50"
+                }
+            }
+            
+            const parsed = parseFloat(str);
+            return isNaN(parsed) ? 0 : parsed;
+        };
+
+        // Normalizador de claves (remueve tildes, mayúsculas, espacios y caracteres especiales)
+        const normalizeKey = (key) => {
+            return key.toLowerCase()
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "") // Quita acentos
+                      .replace(/[^a-z0-9]/g, "");     // Deja solo letras y números
+        };
+
+        // Procesador de filas mapeando cabeceras de columnas variadas
+        function processCSVRows(rows) {
+            return rows.map(row => {
+                const normRow = {};
+                // Crear objeto temporal con cabeceras normalizadas
+                Object.keys(row).forEach(k => {
+                    normRow[normalizeKey(k)] = row[k];
+                });
+
+                // Mapear campos adaptándose a las columnas de tu reporte real
+                const id = normRow["id"] || "-";
+                const nombre = normRow["nombredelproyecto"] || normRow["nombre"] || "Sin nombre";
+                const descripcion = normRow["descripcion"] || "Sin descripción detallada.";
+                const riesgo = normRow["nivelderiesgo"] || normRow["riesgo"] || "No definido";
+                const gerencia = normRow["gerencia"] || "Sin asignar";
+                const tipoInnovacion = normRow["tipodeinnovacion"] || normRow["vertical"] || "Incremental";
+                const lider = normRow["liderfuncionalnombre"] || normRow["lider"] || normRow["responsabledeinnovacion"] || "No asignado";
+                const correo = normRow["liderfuncionalcorreo"] || normRow["correo"] || "";
+                const funnel = normRow["funnel"] || "-";
+                
+                const inversion = parseNumeric(normRow["inversion"]);
+                const ebitdaPotencial = parseNumeric(normRow["ebitdapotencialclp"] || normRow["ebitdapotencial"]);
+                const valEbitdaPotencial = normRow["estadodevalidacionebitdapotencial"] || "No validado";
+                const ebitdaCapturado = parseNumeric(normRow["ebitdacapturadoclp"] || normRow["ebitdacapturado"]);
+                const hht = parseNumeric(normRow["hhtpotencial"] || normRow["hht"]);
+                
+                const estado = normRow["estadoproyecto"] || normRow["estado"] || "Abierto";
+                const sponsor = normRow["sponsor"] || "-";
+                const escalamiento = normRow["potencialdeescalamiento"] || "no";
+                const tipoSolucion = normRow["tipodesolucion"] || "-";
+
+                return {
+                    id,
+                    nombre,
+                    descripcion,
+                    riesgo,
+                    gerencia,
+                    tipoInnovacion,
+                    lider,
+                    correo,
+                    funnel,
+                    inversion,
+                    ebitdaPotencial,
+                    valEbitdaPotencial,
+                    ebitdaCapturado,
+                    hht,
+                    estado,
+                    sponsor,
+                    escalamiento,
+                    tipoSolucion
+                };
+            }).filter(item => item.nombre !== "Sin nombre" && item.id !== "-"); // Limpiar filas vacías residuales
+        }
+
+        // ==========================================
+        // 3. OBTENER DATOS DE GITHUB
         // ==========================================
         async function fetchGitHubData() {
             try {
@@ -342,34 +440,13 @@
                 
                 const csvText = await response.text();
                 
-                // Procesar el CSV con PapaParse
+                // Procesar el CSV con PapaParse de manera robusta
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
-                    dynamicTyping: true, // Convierte números automáticamente
+                    delimitersToGuess: [';', ',', '\t', '|'], // Autodetectar delimitador español (;)
                     complete: function(results) {
-                        // Mapear los datos del CSV a las variables que usa tu panel
-                        dataset = results.data.map(row => ({
-                            id: row.id || row.ID || "-",
-                            nombre: row.nombre || row.Proyecto || row.Nombre || "Sin nombre",
-                            descripcion: row.descripcion || row.Descripcion || "Sin descripción detallada.",
-                            riesgo: row.riesgo || row.Riesgo || "No definido",
-                            gerencia: row.gerencia || row.Gerencia || "Sin asignar",
-                            tipoInnovacion: row.tipoInnovacion || row["Tipo Innovacion"] || row.vertical || "General",
-                            lider: row.lider || row.Lider || row.responsable || "No asignado",
-                            correo: row.correo || row.Email || "",
-                            funnel: row.funnel || row.Estado || row.fase || "-",
-                            inversion: parseFloat(row.inversion || row.Inversion || 0),
-                            ebitdaPotencial: parseFloat(row.ebitdaPotencial || row.EBITDA || 0),
-                            valEbitdaPotencial: row.valEbitdaPotencial || "No validado",
-                            ebitdaCapturado: parseFloat(row.ebitdaCapturado || 0),
-                            hht: parseFloat(row.hht || row.HHT || 0),
-                            estado: row.estado || row.Estado || "Abierto",
-                            sponsor: row.sponsor || row.Sponsor || "-",
-                            escalamiento: row.escalamiento || row.Escalamiento || "-",
-                            tipoSolucion: row.tipoSolucion || "-"
-                        }));
-
+                        dataset = processCSVRows(results.data);
                         updateAlertStatus("success", "Datos sincronizados correctamente", `Se cargaron ${dataset.length} registros desde GitHub.`);
                         initializeApp();
                     }
@@ -377,20 +454,18 @@
 
             } catch (error) {
                 console.warn(error);
-                updateAlertStatus("error", "Error de conexión a GitHub", "Mostrando datos de prueba locales por ahora. Verifica la URL de tu archivo.");
-                
-                // Fallback: Si falla la conexión a Github, cargamos datos por defecto para que no se caiga la página
+                updateAlertStatus("error", "Error de conexión a GitHub", "Mostrando datos de prueba locales. Sube el CSV de innovación para ver las métricas actualizadas.");
                 loadFallbackData();
                 initializeApp();
             }
         }
 
         // ==========================================
-        // 3. INICIALIZACIÓN Y RENDERIZADO
+        // 4. INICIALIZACIÓN Y RENDERIZADO
         // ==========================================
         window.onload = function() {
             lucide.createIcons();
-            fetchGitHubData(); // Inicia la descarga automática de Github
+            fetchGitHubData(); 
             setupEventListeners();
         }
 
@@ -596,38 +671,27 @@
             document.getElementById('projectModal').classList.add('hidden');
         }
 
-        // Carga de archivo CSV manual si el usuario quiere probar uno antes de subirlo a Github
+        // Carga manual local de contingencia
         function handleLocalCSVUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             Papa.parse(file, {
-                header: true, skipEmptyLines: true, dynamicTyping: true,
+                header: true,
+                skipEmptyLines: true,
+                delimitersToGuess: [';', ',', '\t', '|'],
                 complete: function(results) {
-                    dataset = results.data.map((row, i) => ({
-                        id: row.id || row.ID || (i+1).toString(),
-                        nombre: row.nombre || row.Proyecto || "Sin nombre",
-                        descripcion: row.descripcion || row.Descripcion || "N/A",
-                        riesgo: row.riesgo || row.Riesgo || "Bajo",
-                        gerencia: row.gerencia || row.Gerencia || "General",
-                        tipoInnovacion: row.tipoInnovacion || row["Tipo Innovacion"] || "General",
-                        lider: row.lider || row.Lider || "No asignado",
-                        inversion: parseFloat(row.inversion || row.Inversion || 0),
-                        ebitdaPotencial: parseFloat(row.ebitdaPotencial || row.EBITDA || 0),
-                        hht: parseFloat(row.hht || row.HHT || 0),
-                        estado: row.estado || row.Estado || "Abierto",
-                    }));
-                    updateAlertStatus("success", "Archivo local cargado", "Visualizando datos desde el archivo cargado manualmente.");
+                    dataset = processCSVRows(results.data);
+                    updateAlertStatus("success", "Archivo local cargado", `Se procesaron correctamente ${dataset.length} iniciativas desde el archivo cargado.`);
                     initializeApp();
                 }
             });
         }
 
-        // Datos de ejemplo en caso de que Github falle o la URL esté vacía
         function loadFallbackData() {
             dataset = [
-                { id: "1", nombre: "Logística inversa", descripcion: "Captura de fibra aprovechando retorno de camiones.", riesgo: "Medio", gerencia: "Recupac", tipoInnovacion: "Incremental", lider: "Carlos Quijanes", correo: "cquijanes@recupac.cl", funnel: "Ejecución", inversion: 0, ebitdaPotencial: 10006402, valEbitdaPotencial: "Validado", hht: 1200, estado: "Abierto", sponsor: "Sponsor Corp", escalamiento: "no", tipoSolucion: "Desarrollo" },
-                { id: "2", nombre: "Maxibolsas", descripcion: "Disminuir costos reemplazando sacas de rafia.", riesgo: "Bajo", gerencia: "Recupac", tipoInnovacion: "Transformación", lider: "Jorge Honores", correo: "jorge@recupac.cl", funnel: "Piloto", inversion: 12000000, ebitdaPotencial: 45000000, valEbitdaPotencial: "Validado", hht: 850, estado: "Abierto", sponsor: "E. Bascuñán", escalamiento: "si", tipoSolucion: "Desarrollo" }
+                { id: "1", nombre: "Autoguias", descripcion: "Busca mejorar la eficiencia operativa en guías de despacho.", riesgo: "Bajo", gerencia: "Recupac", tipoInnovacion: "Incremental", lider: "Jorge Honores", correo: "jorge.honores@recupac.cl", funnel: "Seguimiento", inversion: 0, ebitdaPotencial: 0, valEbitdaPotencial: "Validado", hht: 2184, estado: "Abierto", sponsor: "E. Bascuñán", escalamiento: "no", tipoSolucion: "Desarrollo interno" },
+                { id: "2", nombre: "Maxibolsas", descripcion: "Disminuir costos con bolsas de pellet reciclado.", riesgo: "Medio", gerencia: "Recupac", tipoInnovacion: "Incremental", lider: "Jorge Honores", correo: "jorge.honores@recupac.cl", funnel: "Ejecución pilotaje", inversion: 12000000, ebitdaPotencial: 45000000, valEbitdaPotencial: "Validado", hht: 850, estado: "Abierto", sponsor: "E. Bascuñán", escalamiento: "si", tipoSolucion: "Desarrollo interno" }
             ];
         }
     </script>
