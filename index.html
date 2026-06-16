@@ -14,7 +14,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script>
-        // Configuración personalizada de temas de Tailwind
         tailwind.config = {
             theme: {
                 extend: {
@@ -217,10 +216,10 @@
 
         <!-- ROW 1 DE GRÁFICOS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- EBITDA POR PROYECTO -->
+            <!-- EBITDA POR UNIDAD -->
             <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-lg">
                 <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">EBITDA Potencial vs Capturado por Proyecto (Top 10)</h3>
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
                 </div>
                 <div class="flex-1 min-h-0 relative">
                     <canvas id="chartEbitdaProyecto"></canvas>
@@ -256,7 +255,7 @@
                 <div class="flex items-center gap-2 mb-4">
                     <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">ETAPA EN EL FUNNEL</h3>
                 </div>
-                <div class="flex-1 min-h-0 relative flex flex-col justify-between py-1" id="funnelContainer"></div>
+                <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
             </div>
 
             <!-- ORIGEN DE SOLUCIÓN -->
@@ -395,6 +394,16 @@
         let currentDataset = []; // Dataset activo en pantalla
         let charts = {}; // Instancias de Chart.js
 
+        // Estandarización fija para el Funnel de Innovación según image_dc1ea3.png
+        const FUNNEL_STAGES = [
+            "Problematización",
+            "Alternativas de solución",
+            "Diseño pilotaje",
+            "Ejecución pilotaje",
+            "Implementación",
+            "Seguimiento"
+        ];
+
         // ==========================================
         // FORMATOS DE MONEDA Y PARSE NUMÉRICO
         // ==========================================
@@ -423,6 +432,19 @@
                       .normalize("NFD")
                       .replace(/[\u0300-\u036f]/g, "")
                       .replace(/[^a-z0-9]/g, "");
+        };
+
+        // Mapeo inteligente para estandarizar el funnel
+        const normalizeFunnelStage = (val) => {
+            if (!val) return "Problematización";
+            const s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            if (s.includes("problema") || s.includes("inicial")) return "Problematización";
+            if (s.includes("alternativa") || s.includes("solucion")) return "Alternativas de solución";
+            if (s.includes("diseno") || (s.includes("pilotaje") && !s.includes("ejecucion"))) return "Diseño pilotaje";
+            if (s.includes("ejecucion") || s.includes("ejecutar")) return "Ejecución pilotaje";
+            if (s.includes("implementa")) return "Implementación";
+            if (s.includes("seguimiento") || s.includes("control") || s.includes("fase final")) return "Seguimiento";
+            return "Problematización"; // Etapa de fallback
         };
 
         // ==========================================
@@ -462,7 +484,10 @@
                 const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]) || "Incremental";
                 const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]) || "No asignado";
                 const correo = findVal(["liderfuncionalcorreo", "correo", "email"]) || "";
-                const funnel = findVal(["funnel", "fase", "etapa"]) || "Fase Inicial";
+                
+                // Normalizamos inmediatamente la etapa del funnel para evitar desalineaciones
+                const rawFunnel = findVal(["funnel", "fase", "etapa"]) || "Problematización";
+                const funnel = normalizeFunnelStage(rawFunnel);
                 
                 const inversion = parseNumeric(findVal(["inversion", "presupuesto"]));
                 const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialclp", "ebitdapotencial", "ebitda"]));
@@ -536,7 +561,7 @@
                     id: "PM-001", nombre: "Recuperación de Fibra", anio: "2025",
                     descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
                     riesgo: "Bajo", gerencia: "Logística", tipoInnovacion: "Incremental",
-                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Seguimiento",
+                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
                     inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 16500000, hht: 250, estado: "Abierto", sponsor: "Director de Operaciones",
                     escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno"
@@ -779,20 +804,31 @@
                 if (charts[key]) charts[key].destroy();
             });
 
-            // 1. Chart EBITDA Potencial vs Capturado (Top 10)
-            const top10 = [...filteredDataset]
-                .sort((a, b) => b.ebitdaPotencial - a.ebitdaPotencial)
-                .slice(0, 10);
+            // 1. Chart EBITDA Potencial vs Capturado por Unidad (Agrupado por gerencia)
+            const ebitdaByGerencia = {};
+            filteredDataset.forEach(item => {
+                const gerencia = item.gerencia || "Sin asignar";
+                if (!ebitdaByGerencia[gerencia]) {
+                    ebitdaByGerencia[gerencia] = { potencial: 0, capturado: 0 };
+                }
+                ebitdaByGerencia[gerencia].potencial += item.ebitdaPotencial;
+                ebitdaByGerencia[gerencia].capturado += item.ebitdaCapturado;
+            });
+
+            // Ordenar de mayor a menor EBITDA potencial
+            const sortedGerencias = Object.keys(ebitdaByGerencia).sort((a, b) => {
+                return ebitdaByGerencia[b].potencial - ebitdaByGerencia[a].potencial;
+            });
 
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             charts.ebitda = new Chart(ctxEbitda, {
                 type: 'bar',
                 data: {
-                    labels: top10.map(i => i.nombre),
+                    labels: sortedGerencias,
                     datasets: [
                         {
                             label: 'EBITDA Potencial',
-                            data: top10.map(i => i.ebitdaPotencial),
+                            data: sortedGerencias.map(g => ebitdaByGerencia[g].potencial),
                             backgroundColor: 'rgba(168, 85, 247, 0.65)',
                             borderColor: '#a855f7',
                             borderWidth: 1,
@@ -800,7 +836,7 @@
                         },
                         {
                             label: 'EBITDA Capturado',
-                            data: top10.map(i => i.ebitdaCapturado),
+                            data: sortedGerencias.map(g => ebitdaByGerencia[g].capturado),
                             backgroundColor: 'rgba(0, 230, 118, 0.75)',
                             borderColor: '#00e676',
                             borderWidth: 1,
@@ -815,7 +851,7 @@
                         legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
                             grid: { color: 'rgba(29, 45, 77, 0.2)' },
                             ticks: { font: { size: 9 }, callback: (v) => '$' + (v / 1e6) + 'M' }
@@ -934,36 +970,61 @@
                 `;
             });
 
-            // 5. Etapas del Funnel Dinámico (Embudo HTML)
-            const funnelCount = {};
+            // 5. Etapas del Funnel Fijo y Centrado (Alineación Horizontal de image_dc1ea3.png)
+            const funnelCount = {
+                "Problematización": 0,
+                "Alternativas de solución": 0,
+                "Diseño pilotaje": 0,
+                "Ejecución pilotaje": 0,
+                "Implementación": 0,
+                "Seguimiento": 0
+            };
+
             filteredDataset.forEach(i => {
-                funnelCount[i.funnel] = (funnelCount[i.funnel] || 0) + 1;
+                const normalized = normalizeFunnelStage(i.funnel);
+                if (funnelCount[normalized] !== undefined) {
+                    funnelCount[normalized]++;
+                }
             });
 
-            const sortedFunnel = Object.entries(funnelCount).sort((a, b) => b[1] - a[1]);
+            const maxVal = Math.max(...Object.values(funnelCount));
             const funnelContainer = document.getElementById("funnelContainer");
             funnelContainer.innerHTML = "";
 
-            if (sortedFunnel.length === 0) {
-                funnelContainer.innerHTML = `<p class="text-xs text-slate-500 text-center">Sin fases registradas</p>`;
-            } else {
-                const maxVal = Math.max(...sortedFunnel.map(e => e[1]));
-                const widths = ["w-full", "w-[85%]", "w-[70%]", "w-[55%]", "w-[40%]"];
+            let funnelHTML = `<div class="flex flex-col gap-3.5 w-full py-1">`;
+            
+            FUNNEL_STAGES.forEach(stage => {
+                const countVal = funnelCount[stage] || 0;
+                // Calculamos proporcionalidad para centrar y dimensionar las barras respecto al máximo valor
+                const rawPercent = maxVal > 0 ? (countVal / maxVal) * 100 : 0;
+                // Seteamos un ancho mínimo estético (25%) si el conteo es mayor a 0 para que sea legible el número interior
+                const barWidth = countVal > 0 ? Math.max(25, rawPercent * 0.9) : 0;
 
-                sortedFunnel.slice(0, 5).forEach((stage, idx) => {
-                    const pctWidth = maxVal > 0 ? (stage[1] / maxVal) * 100 : 0;
-                    const blockWidthClass = widths[idx] || "w-[30%]";
-
-                    funnelContainer.innerHTML += `
-                        <div class="flex flex-col items-center w-full">
-                            <div class="flex justify-between items-center ${blockWidthClass} text-[10px] px-3 py-1 bg-gradient-to-r from-cyan-950 to-blue-900 border border-cyan-500/20 rounded-lg text-slate-200 hover:border-cyan-400/50 transition-all">
-                                <span class="font-semibold truncate max-w-[120px]" title="${stage[0]}">${stage[0]}</span>
-                                <span class="font-extrabold text-[#00E5FF]">${stage[1]}</span>
-                            </div>
+                funnelHTML += `
+                    <div class="flex items-center w-full min-h-[36px]">
+                        <!-- Columna Izquierda: Etiqueta derecha alineada -->
+                        <div class="w-[40%] text-right pr-4 text-[11px] font-semibold text-slate-300 leading-tight">
+                            ${stage}
                         </div>
-                    `;
-                });
-            }
+                        <!-- Columna Derecha: Barra centrada de color morado sólido -->
+                        <div class="w-[60%] flex justify-center items-center">
+                            ${countVal > 0 ? `
+                                <div style="width: ${barWidth}%;" class="bg-[#7c3aed] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md shadow-purple-900/10">
+                                    ${countVal}
+                                </div>
+                            ` : `
+                                <!-- Contenedor vacío o gris muy sutil en 0 para no desalinear -->
+                                <div class="w-[12%] bg-slate-800/20 text-slate-600 text-[10px] py-1 rounded text-center">
+                                    0
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            funnelHTML += `</div>`;
+            funnelContainer.innerHTML = funnelHTML;
         }
 
         // ==========================================
