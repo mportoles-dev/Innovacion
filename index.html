@@ -400,7 +400,7 @@
         let currentDataset = []; // Dataset activo en pantalla
         let charts = {}; // Instancias de Chart.js
 
-        // Estandarización fija para el Funnel de Innovación según image_dc1ea3.png
+        // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
             "Archivados",
             "Problematización",
@@ -446,21 +446,41 @@
                       .replace(/[^a-z0-9]/g, "");
         };
 
-        // Mapeo inteligente para estandarizar el funnel (sin rellenar por defecto si está vacío)
+        // Mapeo ultra flexible para estandarizar las etapas del embudo de innovación
+        // Diseñado para ser inmune a problemas de codificación de caracteres rotos (ej: DiseÃ±o o EjecuciÃ³n)
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
             let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             
-            // Elimina prefijos numéricos típicos como "08. Seguimiento" o "01. Problematización"
-            s = s.replace(/^\d+[\s\.\-\_]+/, ""); 
+            // 1. Archivados
+            if (s.includes("archiv")) {
+                return "Archivados";
+            }
+            // 2. Problematización
+            if (s.includes("proble") || s.includes("prob")) {
+                return "Problematización";
+            }
+            // 3. Alternativas de solución (evitando que choque con pilotajes)
+            if ((s.includes("alternat") || s.includes("soluc")) && !s.includes("pilot") && !s.includes("disen") && !s.includes("dise") && !s.includes("ejec")) {
+                return "Alternativas de solución";
+            }
+            // 4. Diseño pilotaje (busca coincidencias de 'dise' o 'disen' o 'pilot' sin 'ejec')
+            if (s.includes("disen") || s.includes("dise") || (s.includes("pilot") && !s.includes("ejec") && !s.includes("exec"))) {
+                return "Diseño pilotaje";
+            }
+            // 5. Ejecución pilotaje (busca 'ejec', 'exec' o 'pilot' combinado con ejecuciones)
+            if (s.includes("ejec") || s.includes("exec")) {
+                return "Ejecución pilotaje";
+            }
+            // 6. Implementación
+            if (s.includes("implem") || s.includes("impl")) {
+                return "Implementación";
+            }
+            // 7. Seguimiento
+            if (s.includes("seguim") || s.includes("control") || s.includes("fase fin")) {
+                return "Seguimiento";
+            }
             
-            if (s.includes("archivado") || s.includes("archivados")) return "Archivados";
-            if (s.includes("problema") || s.includes("inicial")) return "Problematización";
-            if (s.includes("alternativa") || s.includes("solucion")) return "Alternativas de solución";
-            if (s.includes("diseno") || (s.includes("pilot") && s.includes("diseno"))) return "Diseño pilotaje";
-            if (s.includes("ejecucion") || s.includes("ejecutar")) return "Ejecución pilotaje";
-            if (s.includes("implementa")) return "Implementación";
-            if (s.includes("seguimiento") || s.includes("control") || s.includes("fase final")) return "Seguimiento";
             return ""; // Se mantiene vacío si no calza con ninguna etapa oficial
         };
 
@@ -509,7 +529,7 @@
                 const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]);
                 const correo = findVal(["liderfuncionalcorreo", "correo", "email"]);
                 
-                // Nueva columna mapeada: EMBUDO
+                // Mapeo y normalización resiliente de la columna EMBUDO
                 const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
                 const funnel = normalizeFunnelStage(rawFunnel);
                 
@@ -547,7 +567,6 @@
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                // El auto-detector de punto y coma se optimiza aquí para que sea compatible con exportaciones en español
                 complete: function(results) {
                     if (results.data && results.data.length > 0) {
                         masterDataset = processCSVRows(results.data);
@@ -1134,6 +1153,7 @@
             document.getElementById("projectModal").classList.remove("hidden");
         }
 
+        // Cierre de ventana modal
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
