@@ -325,9 +325,11 @@
 
             <!-- Fila Descripción y Velocímetro de Riesgo -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg md:col-span-2">
-                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
-                    <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
+                <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg md:col-span-2 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
+                        <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
+                    </div>
                     
                     <!-- Comentarios / Notas adicionales si existen -->
                     <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-borderBg/60 hidden">
@@ -335,11 +337,12 @@
                         <p id="modalComment" class="text-xs text-slate-400 italic leading-relaxed"></p>
                     </div>
                 </div>
-                <!-- Velocímetro de Riesgo Estilizado -->
+                
+                <!-- Velocímetro de Riesgo Estilizado (SVG con overflow corregido) -->
                 <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
                     <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Nivel de Riesgo</h4>
-                    <div class="relative w-full flex items-center justify-center" style="height: 80px;">
-                        <svg class="w-32 h-16 overflow-visible" viewBox="0 0 100 50">
+                    <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 80px;">
+                        <svg class="w-32 h-16" viewBox="0 0 100 50">
                             <!-- Arco base gris de fondo -->
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round" />
                             <!-- Segmento Bajo (Verde) -->
@@ -348,8 +351,12 @@
                             <path d="M 36.6 26.6 A 40 40 0 0 1 63.4 26.6" fill="none" stroke="#f59e0b" stroke-width="12" />
                             <!-- Segmento Alto (Rojo) -->
                             <path d="M 63.4 26.6 A 40 40 0 0 1 90 50" fill="none" stroke="#ef4444" stroke-width="12" stroke-linecap="round" />
-                            <!-- Aguja -->
-                            <polygon id="gaugeNeedle" points="49,50 51,50 50,14" fill="#f8fafc" transform="rotate(0, 50, 50)" style="transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 50px 50px;" />
+                            
+                            <!-- Grupo de Aguja con transform-box: view-box corregido para evitar fugas -->
+                            <g id="needleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                                <polygon points="49,50 51,50 50,14" fill="#f8fafc" />
+                            </g>
+                            
                             <!-- Eje Central -->
                             <circle cx="50" cy="50" r="5" fill="#2979ff" stroke="#13223f" stroke-width="1" />
                         </svg>
@@ -358,8 +365,8 @@
                 </div>
             </div>
 
-            <!-- Detalles de la iniciativa -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Detalles de la iniciativa (Estructura expandida con KR y Responsable de innovación) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-borderBg/60 pt-4">
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500 font-medium">Líder Funcional</span>
                     <p class="text-sm text-slate-200 flex items-center gap-2">
@@ -370,6 +377,14 @@
                 </div>
 
                 <div class="space-y-1">
+                    <span class="text-xs text-slate-500 font-medium">Responsable de Innovación</span>
+                    <p class="text-sm text-slate-200 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+                        <span id="modalRespInnovacion"></span>
+                    </p>
+                </div>
+
+                <div class="space-y-1 border-t border-borderBg/40 sm:border-t-0 pt-3 sm:pt-0">
                     <span class="text-xs text-slate-500 font-medium">Sponsor del Proyecto</span>
                     <p class="text-sm text-slate-200 flex items-center gap-2">
                         <i data-lucide="award" class="w-4 h-4 text-slate-400"></i>
@@ -377,14 +392,28 @@
                     </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/60 pt-3">
+                <div class="space-y-1 border-t border-borderBg/40 sm:border-t-0 pt-3 sm:pt-0">
                     <span class="text-xs text-slate-500 font-medium">Origen de Solución</span>
-                    <p id="modalOrigen" class="text-sm font-semibold text-slate-300"></p>
+                    <p id="modalOrigen" class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-slate-400"></i>
+                        <span></span>
+                    </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/60 pt-3">
+                <div class="space-y-1 border-t border-borderBg/40 pt-3">
                     <span class="text-xs text-slate-500 font-medium">Tipo de Solución / Gobernanza TD</span>
-                    <p id="modalGovernance" class="text-sm text-slate-300 font-semibold"></p>
+                    <p id="modalGovernance" class="text-sm text-slate-300 font-semibold flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-4 h-4 text-slate-400"></i>
+                        <span></span>
+                    </p>
+                </div>
+
+                <div class="space-y-1 border-t border-borderBg/40 pt-3">
+                    <span class="text-xs text-slate-500 font-medium">KR (Key Result)</span>
+                    <p id="modalKR" class="text-sm text-slate-300 font-semibold flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4 text-slate-400"></i>
+                        <span></span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -410,6 +439,51 @@
             "Implementación",
             "Seguimiento"
         ];
+
+        // ==========================================
+        // SANITIZADOR Y DECODIFICADOR DE CARACTERES
+        // ==========================================
+        const cleanEncoding = (str) => {
+            if (str === undefined || str === null) return "";
+            let s = String(str).trim();
+            if (!s) return "";
+
+            // Intento 1: Decodificar codificaciones dobles UTF-8 comunes si contiene patrones característicos
+            if (s.includes("Ã")) {
+                try {
+                    return decodeURIComponent(escape(s));
+                } catch (e) {
+                    // Si falla, continuar con mapeo manual selectivo
+                    const map = {
+                        'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
+                        'Ã±': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
+                        'Ã': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ãœ': 'Ü',
+                        'â€“': '–', 'â€”': '—', 'Â°': '°', 'Â¿': '¿'
+                    };
+                    let cleaned = s;
+                    for (const [key, value] of Object.entries(map)) {
+                        cleaned = cleaned.split(key).join(value);
+                    }
+                    s = cleaned;
+                }
+            }
+
+            // Reemplazar caracteres de reemplazo "" comunes por su vocal correcta según contexto en español
+            s = s.replace(/Gonzlez/g, "González");
+            s = s.replace(/Innovacin/g, "Innovación");
+            s = s.replace(/Diseo/g, "Diseño");
+            s = s.replace(/Ejecucin/g, "Ejecución");
+            s = s.replace(/Resolucin/g, "Resolución");
+            s = s.replace(/Presentacin/g, "Presentación");
+            s = s.replace(/Evaluacin/g, "Evaluación");
+            s = s.replace(/Gestin/g, "Gestión");
+            s = s.replace(/Logistica/g, "Logística");
+            s = s.replace(/Logstica/g, "Logística");
+            s = s.replace(/Lder/g, "Líder");
+            s = s.replace(/lder/g, "líder");
+
+            return s;
+        };
 
         // ==========================================
         // FORMATOS DE MONEDA E INT COMPATIBLES
@@ -450,34 +524,17 @@
             if (!val || val.trim() === "") return "";
             let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             
-            // 1. Archivados
-            if (s.includes("archiv")) {
-                return "Archivados";
-            }
-            // 2. Problematización
-            if (s.includes("proble") || s.includes("prob")) {
-                return "Problematización";
-            }
-            // 3. Alternativas de solución (evitando que choque con pilotajes)
+            if (s.includes("archiv")) return "Archivados";
+            if (s.includes("proble") || s.includes("prob")) return "Problematización";
             if ((s.includes("alternat") || s.includes("soluc")) && !s.includes("pilot") && !s.includes("disen") && !s.includes("dise") && !s.includes("ejec")) {
                 return "Alternativas de solución";
             }
-            // 4. Diseño pilotaje
             if (s.includes("disen") || s.includes("dise") || (s.includes("pilot") && !s.includes("ejec") && !s.includes("exec"))) {
                 return "Diseño pilotaje";
             }
-            // 5. Ejecución pilotaje
-            if (s.includes("ejec") || s.includes("exec")) {
-                return "Ejecución pilotaje";
-            }
-            // 6. Implementación
-            if (s.includes("implem") || s.includes("impl")) {
-                return "Implementación";
-            }
-            // 7. Seguimiento
-            if (s.includes("seguim") || s.includes("control") || s.includes("fase fin")) {
-                return "Seguimiento";
-            }
+            if (s.includes("ejec") || s.includes("exec")) return "Ejecución pilotaje";
+            if (s.includes("implem") || s.includes("impl")) return "Implementación";
+            if (s.includes("seguim") || s.includes("control") || s.includes("fase fin")) return "Seguimiento";
             
             return "";
         };
@@ -494,7 +551,7 @@
                 const normRow = {};
                 Object.keys(row).forEach(k => {
                     if (k !== undefined && k !== null) {
-                        normRow[normalizeKey(k)] = row[k];
+                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
                     }
                 });
 
@@ -516,72 +573,98 @@
                     return "";
                 };
 
-                const id = findVal(["id", "codigo", "key"]) || `PM-${String(index+1).padStart(3, '0')}`;
-                const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]);
-                const anio = findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]);
-                const descripcion = findVal(["descripcion", "detalle"]);
-                const riesgo = findVal(["nivelderiesgo", "riesgo"]);
-                const gerencia = findVal(["unidad", "gerencia", "unidadgerencia"]);
-                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]);
-                const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]);
-                const correo = findVal(["liderfuncionalcorreo", "correo", "email"]);
+                // Limpiar codificación en todos los valores textuales leídos del CSV
+                const id = cleanEncoding(findVal(["id", "codigo", "key"])) || `PM-${String(index+1).padStart(3, '0')}`;
+                const nombre = cleanEncoding(findVal(["nombredelproyecto", "proyecto", "nombre"]));
+                const anio = cleanEncoding(findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]));
+                const descripcion = cleanEncoding(findVal(["descripcion", "detalle"]));
+                const riesgo = cleanEncoding(findVal(["nivelderiesgo", "riesgo"]));
+                const gerencia = cleanEncoding(findVal(["unidad", "gerencia", "unidadgerencia"]));
+                const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]));
+                const lider = cleanEncoding(findVal(["liderfuncionalnombre", "lider", "responsable"]));
+                const correo = cleanEncoding(findVal(["liderfuncionalcorreo", "correo", "email"]));
                 
                 const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
-                const funnel = normalizeFunnelStage(rawFunnel);
+                const funnel = normalizeFunnelStage(cleanEncoding(rawFunnel));
                 
                 const inversion = parseNumeric(findVal(["inversionejecutada", "inversion", "presupuesto"]));
                 const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialanualclp", "ebitdapotencialclp", "ebitdapotencial"]));
-                const valEbitdaPotencial = findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]);
+                const valEbitdaPotencial = cleanEncoding(findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]));
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadorealafechaclp", "ebitdacapturadoclp", "ebitdacapturado"]));
                 const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
                 
-                const estado = findVal(["estadoproyecto", "estado", "status"]);
-                const sponsor = findVal(["sponsor"]);
-                const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]);
-                const tipoSolucion = findVal(["tipodesolucion", "solucion"]);
-                const origenSolucion = findVal(["origensolucion", "origen"]);
-                const comentario = findVal(["comentario", "comentarios", "observacion"]);
-                const requiereGobernanza = findVal(["requieregobernanzatd", "gobernanza"]);
+                const estado = cleanEncoding(findVal(["estadoproyecto", "estado", "status"]));
+                const sponsor = cleanEncoding(findVal(["sponsor"]));
+                const escalamiento = cleanEncoding(findVal(["potencialdeescalamiento", "escalamiento"]));
+                const tipoSolucion = cleanEncoding(findVal(["tipodesolucion", "solucion"]));
+                const origenSolucion = cleanEncoding(findVal(["origensolucion", "origen"]));
+                const comentario = cleanEncoding(findVal(["comentario", "comentarios", "observacion"]));
+                const requiereGobernanza = cleanEncoding(findVal(["requieregobernanzatd", "gobernanza"]));
+                
+                // Nuevos campos solicitados
+                const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
+                const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
 
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
-                    escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza
+                    escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
+                    kr, respInnovacion
                 };
             }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
         }
 
         // ==========================================
-        // CARGA DESDE GITHUB (BASE MAESTRA)
+        // CARGA DIRECTA Y DECODIFICACIÓN BINARIA DETECTIVA
         // ==========================================
         function connectToGitHubCSV() {
             showConnectionStatus("loading", "Conectando con base maestra...", "Obteniendo datos de portafolio actualizados desde GitHub.");
             
-            Papa.parse(GITHUB_CSV_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        masterDataset = processCSVRows(results.data);
-                        console.log("Datos de GitHub descargados:", masterDataset);
-                        
-                        showConnectionStatus("success", "Base Maestra GitHub Conectada", `Se han cargado ${masterDataset.length} proyectos directamente de GitHub.`);
-                        
-                        if (document.getElementById('portfolioSelector').value === 'maestra') {
-                            currentDataset = [...masterDataset];
-                            initializeDashboard();
-                        }
-                    } else {
-                        handleGitHubError("Estructura vacía de datos en GitHub.");
+            fetch(GITHUB_CSV_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error("Fallo de red HTTP al solicitar el archivo.");
+                    return response.arrayBuffer();
+                })
+                .then(arrayBuffer => {
+                    let decodedText;
+                    try {
+                        // Forzamos la comprobación fatal en UTF-8. Si no es UTF-8 (ej. Windows-1252), arrojará error
+                        const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
+                        decodedText = utf8Decoder.decode(arrayBuffer);
+                    } catch (err) {
+                        console.log("Fallo de decodificación UTF-8 (fatal: true). Decodificando con Windows-1252...");
+                        const latin1Decoder = new TextDecoder("windows-1252");
+                        decodedText = latin1Decoder.decode(arrayBuffer);
                     }
-                },
-                error: function(err) {
-                    console.warn("Fallo de conexión directa a GitHub (CORS o Red). Usando respaldo local.", err);
-                    handleGitHubError(err.message || "Error de red / CORS");
-                }
-            });
+
+                    Papa.parse(decodedText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            if (results.data && results.data.length > 0) {
+                                masterDataset = processCSVRows(results.data);
+                                console.log("Datos de GitHub cargados:", masterDataset);
+                                
+                                showConnectionStatus("success", "Base Maestra GitHub Conectada", `Se han cargado ${masterDataset.length} proyectos directamente de GitHub.`);
+                                
+                                if (document.getElementById('portfolioSelector').value === 'maestra') {
+                                    currentDataset = [...masterDataset];
+                                    initializeDashboard();
+                                }
+                            } else {
+                                handleGitHubError("Estructura vacía de datos en GitHub.");
+                            }
+                        },
+                        error: function(err) {
+                            handleGitHubError(err.message || "Error al procesar el parser.");
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.warn("Fallo de conexión a GitHub, usando respaldo.", err);
+                    handleGitHubError(err.message || "Error de red");
+                });
         }
 
         function handleGitHubError(errorDetail) {
@@ -605,7 +688,8 @@
                     lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
                     inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 16500000, hht: 250, estado: "Abierto", sponsor: "Director de Operaciones",
-                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: ""
+                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
+                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés"
                 },
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
@@ -614,16 +698,18 @@
                     lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
                     inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 99000000, hht: 300, estado: "Cerrado", sponsor: "Director de Operaciones",
-                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: ""
+                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
+                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende"
                 },
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
                     descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
                     riesgo: "Alto", gerencia: "Operaciones", tipoInnovacion: "Adyacente",
-                    lider: "Juan Carlos Muñoz", correo: "jc.munoz@empresa.cl", funnel: "Diseño pilotaje",
+                    lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Diseño pilotaje",
                     inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
                     ebitdaCapturado: 0, hht: 240, estado: "Abierto", sponsor: "Gerente de Planta",
-                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: ""
+                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
+                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
                 }
             ];
         }
@@ -637,27 +723,42 @@
 
             showConnectionStatus("loading", "Cargando archivo local...", "Procesando el archivo CSV cargado.");
 
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        localDataset = processCSVRows(results.data);
-                        console.log("Archivo local procesado:", localDataset);
-                        
-                        document.getElementById('portfolioSelector').value = 'cargada';
-                        currentDataset = [...localDataset];
-                        
-                        showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas de tu archivo.`);
-                        initializeDashboard();
-                    } else {
-                        showConnectionStatus("error", "Error en archivo", "El archivo cargado no contiene un formato compatible o filas de datos.");
-                    }
-                },
-                error: function(err) {
-                    showConnectionStatus("error", "Error cargando archivo", err.message);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                let decodedText;
+                try {
+                    // Forzamos la comprobación fatal en UTF-8. Si no es UTF-8 (ej. Windows-1252), arrojará error
+                    const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
+                    decodedText = utf8Decoder.decode(arrayBuffer);
+                } catch (err) {
+                    console.log("Fallo de decodificación UTF-8 en archivo local. Probando Windows-1252...");
+                    const latin1Decoder = new TextDecoder("windows-1252");
+                    decodedText = latin1Decoder.decode(arrayBuffer);
                 }
-            });
+
+                Papa.parse(decodedText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.data && results.data.length > 0) {
+                            localDataset = processCSVRows(results.data);
+                            
+                            document.getElementById('portfolioSelector').value = 'cargada';
+                            currentDataset = [...localDataset];
+                            
+                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas de tu archivo.`);
+                            initializeDashboard();
+                        } else {
+                            showConnectionStatus("error", "Error en archivo", "El archivo cargado no contiene un formato compatible.");
+                        }
+                    },
+                    error: function(err) {
+                        showConnectionStatus("error", "Error cargando archivo", err.message);
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         // ==========================================
@@ -698,7 +799,7 @@
                 showConnectionStatus("success", "Mostrando Base Maestra (GitHub)", "La vista se ha sincronizado con el portafolio en la nube.");
             } else {
                 if (localDataset.length === 0) {
-                    showConnectionStatus("error", "Sin Base de Datos Cargada", "Por favor sube un archivo CSV/Excel para visualizar tu portafolio personalizado.");
+                    showConnectionStatus("error", "Sin Base de Datos Cargada", "Por favor sube un archivo CSV/Excel para visualizar tu portafolio.");
                     currentDataset = [];
                 } else {
                     currentDataset = [...localDataset];
@@ -773,7 +874,6 @@
             const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
             const cerrados = totalProjects - abiertos;
 
-            // Renderizado de KPIs
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
             document.getElementById("kpiHht").innerText = sumHht.toLocaleString("es-CL");
@@ -852,14 +952,12 @@
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
         }
 
-        // Declarar las variables de los gráficos globalmente para poder destruirlos correctamente
         let chartEbitdaInstance = null;
         let chartTipoInstance = null;
         let chartRiesgoInstance = null;
         let chartOrigenInstance = null;
 
         function renderCharts() {
-            // Destruir instancias previas explícitamente para evitar leaks y bugs visuales de hover
             if (chartEbitdaInstance) chartEbitdaInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
             if (chartRiesgoInstance) chartRiesgoInstance.destroy();
@@ -1087,7 +1185,7 @@
         }
 
         // ==========================================
-        // VENTANA MODAL DETALLE DE INICIATIVA
+        // VENTANA MODAL DETALLE DE INICIATIVA (Con KR y Responsable)
         // ==========================================
         function openModal(item) {
             document.getElementById("modalTitle").innerText = item.nombre || "Sin nombre";
@@ -1098,13 +1196,19 @@
             document.getElementById("modalEmail").innerText = item.correo || "No registra correo";
             document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
             document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
-            document.getElementById("modalOrigen").innerText = item.origenSolucion || "No especificado";
             
+            // Origen de la solución
+            document.querySelector("#modalOrigen span").innerText = item.origenSolucion || "No especificado";
+            
+            // Nuevos datos integrados
+            document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
+            document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
+
             let govText = item.tipoSolucion || "No especificado";
             if (item.requiereGobernanza) {
                 govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
             }
-            document.getElementById("modalGovernance").innerText = govText;
+            document.querySelector("#modalGovernance span").innerText = govText;
 
             const commContainer = document.getElementById("modalCommentContainer");
             const commText = document.getElementById("modalComment");
@@ -1115,7 +1219,8 @@
                 commContainer.classList.add("hidden");
             }
 
-            const needle = document.getElementById("gaugeNeedle");
+            // Rotación segura de la aguja con transform-box de view-box
+            const needleGroup = document.getElementById("needleGroup");
             const riskLabel = document.getElementById("modalRiskLabel");
             let rotation = 0;
 
@@ -1140,10 +1245,12 @@
                 riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
             }
 
-            needle.setAttribute("transform", `rotate(${rotation}, 50, 50)`);
+            needleGroup.style.transform = `rotate(${rotation}deg)`;
             document.getElementById("projectModal").classList.remove("hidden");
+            lucide.createIcons();
         }
 
+        // Cierre de ventana modal
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
@@ -1163,33 +1270,29 @@
             for (const url of urls) {
                 try {
                     await new Promise((resolve, reject) => {
-                        // Desactivar temporalmente AMD define para evitar conflictos de iframe
                         const tempDefine = window.define;
                         window.define = undefined;
 
                         const script = document.createElement("script");
                         script.src = url;
                         script.onload = () => {
-                            window.define = tempDefine; // Restaurar define
-                            if (window.zip) {
-                                resolve();
-                            } else {
-                                reject(new Error("Cargado pero window.zip sigue indefinido"));
-                            }
+                            window.define = tempDefine;
+                            if (window.zip) resolve();
+                            else reject(new Error("Cargado pero indefinido"));
                         };
                         script.onerror = () => {
-                            window.define = tempDefine; // Restaurar define
-                            reject(new Error("Fallo de red al solicitar CDN"));
+                            window.define = tempDefine;
+                            reject(new Error("Fallo de red"));
                         };
                         document.head.appendChild(script);
                     });
                     console.log("Biblioteca zip.js cargada con éxito desde: " + url);
                     return window.zip;
                 } catch (e) {
-                    console.warn("No se pudo cargar zip.js desde " + url + ", intentando servidor alternativo...", e);
+                    console.warn("No se pudo cargar zip.js desde " + url + ", reintentando...", e);
                 }
             }
-            throw new Error("No se pudo cargar la biblioteca de compresión zip.js desde ningún servidor disponible.");
+            throw new Error("No se pudo cargar la biblioteca zip.js.");
         }
 
         // ==========================================
@@ -1204,32 +1307,23 @@
             try {
                 showConnectionStatus("loading", "Cifrando datos...", "Generando contenedor seguro con contraseña...");
 
-                // 1. Generar el contenido CSV utilizando PapaParse
-                const csvData = Papa.unparse(filteredDataset);
-                
-                // 2. Resolver y cargar la biblioteca de compresión con el cargador resiliente
+                const csvData = "\ufeff" + Papa.unparse(filteredDataset);
                 const zipLib = await loadZipLibrary();
 
-                // Desactivar explícitamente el uso de subprocesos (Web Workers) para prevenir errores CORS de origen cruzado en Canvas / iFrame
-                zipLib.configure({
-                    useWebWorkers: false
-                });
+                zipLib.configure({ useWebWorkers: false });
 
                 const blobWriter = new zipLib.BlobWriter("application/zip");
                 const zipWriter = new zipLib.ZipWriter(blobWriter, {
-                    password: "coipsa_2026", // Contraseña configurada
-                    zipCrypto: true          // Compatibilidad estándar nativa de descompresión
+                    password: "coipsa_2026",
+                    zipCrypto: true
                 });
 
-                // 3. Insertar el archivo CSV interno
                 const fileName = `portafolio-innovacion-${new Date().toISOString().split('T')[0]}.csv`;
                 await zipWriter.add(fileName, new zipLib.TextReader(csvData));
                 
-                // 4. Cerrar la compresión y obtener el Blob
                 await zipWriter.close();
                 const zipBlob = await blobWriter.getData();
 
-                // 5. Gatillar la descarga
                 const link = document.createElement("a");
                 const url = URL.createObjectURL(zipBlob);
                 link.setAttribute("href", url);
@@ -1239,10 +1333,10 @@
                 link.click();
                 document.body.removeChild(link);
 
-                showConnectionStatus("success", "Descarga Completada", "Archivo ZIP descargado con contraseña 'coipsa_2026'");
+                showConnectionStatus("success", "Descarga Completada", "El archivo ZIP protegido ha sido descargado con éxito.");
             } catch (error) {
                 console.error("Error al cifrar el ZIP:", error);
-                showConnectionStatus("error", "Error al encriptar", `Error: ${error.message || "No se pudo generar el ZIP seguro. Intente de nuevo."}`);
+                showConnectionStatus("error", "Error al encriptar", `Error: ${error.message || "No se pudo generar el ZIP."}`);
             }
         }
 
