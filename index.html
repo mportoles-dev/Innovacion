@@ -434,9 +434,9 @@
                       .replace(/[^a-z0-9]/g, "");
         };
 
-        // Mapeo inteligente para estandarizar el funnel
+        // Mapeo inteligente para estandarizar el funnel (sin rellenar si está vacío)
         const normalizeFunnelStage = (val) => {
-            if (!val) return "Problematización";
+            if (!val || val.trim() === "") return "";
             const s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             if (s.includes("problema") || s.includes("inicial")) return "Problematización";
             if (s.includes("alternativa") || s.includes("solucion")) return "Alternativas de solución";
@@ -444,11 +444,11 @@
             if (s.includes("ejecucion") || s.includes("ejecutar")) return "Ejecución pilotaje";
             if (s.includes("implementa")) return "Implementación";
             if (s.includes("seguimiento") || s.includes("control") || s.includes("fase final")) return "Seguimiento";
-            return "Problematización"; // Etapa de fallback
+            return ""; // Mantener vacío si no calza con ninguna etapa oficial
         };
 
         // ==========================================
-        // PROCESAMIENTO GENERAL DE FILAS CSV (Robustez)
+        // PROCESAMIENTO GENERAL DE FILAS CSV (Sin rellenos por defecto)
         // ==========================================
         function processCSVRows(rows) {
             if (!rows || rows.length === 0) return [];
@@ -476,30 +476,31 @@
                 };
 
                 const id = findVal(["id", "codigo", "key"]) || `PM-${String(index+1).padStart(3, '0')}`;
-                const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]) || "Sin nombre";
-                const anio = findVal(["anodecreacion", "anio", "ano", "creacion", "aniodecreacion"]) || "Sin año";
-                const descripcion = findVal(["descripcion", "detalle"]) || "Sin descripción detallada.";
-                const riesgo = findVal(["nivelderiesgo", "riesgo"]) || "Medio";
-                const gerencia = findVal(["gerencia", "unidad", "unidadgerencia"]) || "Sin asignar";
-                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]) || "Incremental";
-                const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]) || "No asignado";
+                const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]) || "";
+                const anio = findVal(["anodecreacion", "anio", "ano", "creacion", "aniodecreacion"]) || "";
+                const descripcion = findVal(["descripcion", "detalle"]) || "";
+                const riesgo = findVal(["nivelderiesgo", "riesgo"]) || "";
+                const gerencia = findVal(["gerencia", "unidad", "unidadgerencia"]) || "";
+                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]) || "";
+                const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]) || "";
                 const correo = findVal(["liderfuncionalcorreo", "correo", "email"]) || "";
                 
-                // Normalizamos inmediatamente la etapa del funnel para evitar desalineaciones
-                const rawFunnel = findVal(["funnel", "fase", "etapa"]) || "Problematización";
+                // Normalización de funnel: si viene vacío, permanece vacío ""
+                const rawFunnel = findVal(["funnel", "fase", "etapa"]) || "";
                 const funnel = normalizeFunnelStage(rawFunnel);
                 
                 const inversion = parseNumeric(findVal(["inversion", "presupuesto"]));
                 const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialclp", "ebitdapotencial", "ebitda"]));
-                const valEbitdaPotencial = findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]) || "No validado";
+                const valEbitdaPotencial = findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]) || "";
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadoclp", "ebitdacapturado"]));
                 const hht = parseNumeric(findVal(["hhtpotencial", "hht", "horas"]));
                 
-                const estado = findVal(["estadoproyecto", "estado", "status"]) || "Abierto";
-                const sponsor = findVal(["sponsor"]) || "-";
-                const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]) || "no";
-                const tipoSolucion = findVal(["tipodesolucion", "solucion"]) || "-";
-                const origenSolucion = findVal(["origensolucion", "origen"]) || "Taller Interno";
+                // Estado del proyecto: si viene vacío, permanece vacío ""
+                const estado = findVal(["estadoproyecto", "estado", "status"]) || "";
+                const sponsor = findVal(["sponsor"]) || "";
+                const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]) || "";
+                const tipoSolucion = findVal(["tipodesolucion", "solucion"]) || "";
+                const origenSolucion = findVal(["origensolucion", "origen"]) || "";
 
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
@@ -507,7 +508,7 @@
                     valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion
                 };
-            }).filter(item => item !== null && item.nombre !== "Sin nombre" && item.id !== "-");
+            }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
         }
 
         // ==========================================
@@ -730,7 +731,7 @@
             const sumHht = filteredDataset.reduce((sum, item) => sum + item.hht, 0);
             
             const totalProjects = filteredDataset.length;
-            const abiertos = filteredDataset.filter(i => i.estado.toLowerCase().includes("abierto")).length;
+            const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
             const cerrados = totalProjects - abiertos;
 
             // Renderizado de KPIs
@@ -742,7 +743,7 @@
             const percentage = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaCapturado / sumEbitdaPotencial) * 100) : 0;
             document.getElementById("kpiEbitdaCapturadoSub").innerText = `${percentage}% del potencial capturado`;
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
-            document.getElementById("kpiTotalProjectsSubRight").innerText = `Cerrados: ${cerrados}`;
+            document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
         }
 
         // ==========================================
@@ -767,24 +768,40 @@
                 tr.onclick = () => openModal(item);
 
                 // Colores de Riesgo
-                let riskBadge = "bg-slate-800 text-slate-300";
-                if (item.riesgo.toLowerCase().includes("bajo")) riskBadge = "bg-emerald-500/10 text-[#00e676] border border-emerald-500/20";
-                else if (item.riesgo.toLowerCase().includes("medio")) riskBadge = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                else if (item.riesgo.toLowerCase().includes("alto")) riskBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                let riskBadge = "bg-slate-800 text-slate-400 border border-slate-700/50";
+                if (item.riesgo) {
+                    const rNorm = item.riesgo.toLowerCase();
+                    if (rNorm.includes("bajo")) riskBadge = "bg-emerald-500/10 text-[#00e676] border border-emerald-500/20";
+                    else if (rNorm.includes("medio")) riskBadge = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                    else if (rNorm.includes("alto")) riskBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                }
 
                 // Colores de Estado
-                let estadoBadge = "bg-blue-500/10 text-cyan-400 border border-blue-500/20";
-                if (item.estado.toLowerCase().includes("cerrado")) estadoBadge = "bg-slate-800 text-slate-500 border border-slate-700";
+                let estadoBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
+                if (item.estado) {
+                    const eNorm = item.estado.toLowerCase();
+                    if (eNorm.includes("abierto")) estadoBadge = "bg-blue-500/10 text-cyan-400 border border-blue-500/20";
+                    else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-800 text-slate-500 border border-slate-700";
+                    else estadoBadge = "bg-[#1d2d4d] text-slate-300 border border-borderBg";
+                }
 
                 tr.innerHTML = `
                     <td class="py-3 px-6 font-mono font-bold text-[#00E5FF]">${item.id}</td>
-                    <td class="py-3 px-6 font-extrabold text-white max-w-[200px] truncate">${item.nombre}</td>
-                    <td class="py-3 px-6">${item.lider}</td>
-                    <td class="py-3 px-6"><span class="bg-[#1d2d4d]/60 px-2 py-1 rounded text-[10px]">${item.gerencia}</span></td>
-                    <td class="py-3 px-6 text-center"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">${item.riesgo}</span></td>
+                    <td class="py-3 px-6 font-extrabold text-white max-w-[200px] truncate">${item.nombre || 'Sin nombre'}</td>
+                    <td class="py-3 px-6">${item.lider || 'No asignado'}</td>
+                    <td class="py-3 px-6"><span class="bg-[#1d2d4d]/60 px-2 py-1 rounded text-[10px]">${item.gerencia || 'Sin asignar'}</span></td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
+                            ${item.riesgo || 'N/A'}
+                        </span>
+                    </td>
                     <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
                     <td class="py-3 px-6 text-right font-bold text-emerald-400">${formatCurrency(item.ebitdaCapturado)}</td>
-                    <td class="py-3 px-6 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">${item.estado}</span></td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
+                            ${item.estado || 'N/A'}
+                        </span>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -815,7 +832,6 @@
                 ebitdaByGerencia[gerencia].capturado += item.ebitdaCapturado;
             });
 
-            // Ordenar de mayor a menor EBITDA potencial
             const sortedGerencias = Object.keys(ebitdaByGerencia).sort((a, b) => {
                 return ebitdaByGerencia[b].potencial - ebitdaByGerencia[a].potencial;
             });
@@ -863,7 +879,8 @@
             // 2. Chart Tipo Innovación (Doughnut)
             const tiposCount = {};
             filteredDataset.forEach(i => {
-                tiposCount[i.tipoInnovacion] = (tiposCount[i.tipoInnovacion] || 0) + 1;
+                const tipo = i.tipoInnovacion || "Sin tipo";
+                tiposCount[tipo] = (tiposCount[tipo] || 0) + 1;
             });
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
@@ -903,9 +920,12 @@
             const riesgoCount = { "Bajo": 0, "Medio": 0, "Alto": 0, "No definido": 0 };
             filteredDataset.forEach(i => {
                 let r = "No definido";
-                if (i.riesgo.toLowerCase().includes("bajo")) r = "Bajo";
-                else if (i.riesgo.toLowerCase().includes("medio")) r = "Medio";
-                else if (i.riesgo.toLowerCase().includes("alto")) r = "Alto";
+                if (i.riesgo) {
+                    const rNorm = i.riesgo.toLowerCase();
+                    if (rNorm.includes("bajo")) r = "Bajo";
+                    else if (rNorm.includes("medio")) r = "Medio";
+                    else if (rNorm.includes("alto")) r = "Alto";
+                }
                 riesgoCount[r]++;
             });
 
@@ -932,10 +952,11 @@
                 }
             });
 
-            // 4. Origen de Solución (Polar)
+            // 4. Origen de Solución (Pie)
             const origenCount = {};
             filteredDataset.forEach(i => {
-                origenCount[i.origenSolucion] = (origenCount[i.origenSolucion] || 0) + 1;
+                const origen = i.origenSolucion || "No especificado";
+                origenCount[origen] = (origenCount[origen] || 0) + 1;
             });
 
             const ctxOrigen = document.getElementById("chartOrigenSolucion").getContext("2d");
@@ -982,7 +1003,8 @@
 
             filteredDataset.forEach(i => {
                 const normalized = normalizeFunnelStage(i.funnel);
-                if (funnelCount[normalized] !== undefined) {
+                // Si está vacío, no suma en ninguna de las etapas oficiales de visualización
+                if (normalized && funnelCount[normalized] !== undefined) {
                     funnelCount[normalized]++;
                 }
             });
@@ -995,9 +1017,8 @@
             
             FUNNEL_STAGES.forEach(stage => {
                 const countVal = funnelCount[stage] || 0;
-                // Calculamos proporcionalidad para centrar y dimensionar las barras respecto al máximo valor
+                // Proporcionalidad para centrar y dimensionar las barras
                 const rawPercent = maxVal > 0 ? (countVal / maxVal) * 100 : 0;
-                // Seteamos un ancho mínimo estético (25%) si el conteo es mayor a 0 para que sea legible el número interior
                 const barWidth = countVal > 0 ? Math.max(25, rawPercent * 0.9) : 0;
 
                 funnelHTML += `
@@ -1014,7 +1035,7 @@
                                 </div>
                             ` : `
                                 <!-- Contenedor vacío o gris muy sutil en 0 para no desalinear -->
-                                <div class="w-[12%] bg-slate-800/20 text-slate-600 text-[10px] py-1 rounded text-center">
+                                <div class="w-[12%] bg-slate-800/10 text-slate-500 text-[10px] py-1 rounded text-center">
                                     0
                                 </div>
                             `}
@@ -1031,35 +1052,41 @@
         // VENTANA MODAL DETALLE E INICIATIVAS
         // ==========================================
         function openModal(item) {
-            document.getElementById("modalTitle").innerText = item.nombre;
-            document.getElementById("modalGerencia").innerText = item.gerencia;
-            document.getElementById("modalFunnel").innerText = item.funnel;
-            document.getElementById("modalDesc").innerText = item.descripcion;
-            document.getElementById("modalLeader").innerText = item.lider;
+            document.getElementById("modalTitle").innerText = item.nombre || "Sin nombre";
+            document.getElementById("modalGerencia").innerText = item.gerencia || "Sin asignar";
+            document.getElementById("modalFunnel").innerText = item.funnel || "No definida";
+            document.getElementById("modalDesc").innerText = item.descripcion || "Sin descripción detallada.";
+            document.getElementById("modalLeader").innerText = item.lider || "No asignado";
             document.getElementById("modalEmail").innerText = item.correo || "No registra correo";
             document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
-            document.getElementById("modalSponsor").innerText = item.sponsor;
-            document.getElementById("modalOrigen").innerText = item.origenSolucion;
-            document.getElementById("modalGovernance").innerText = `${item.tipoSolucion} (Escalamiento: ${item.escalamiento.toUpperCase()})`;
+            document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
+            document.getElementById("modalOrigen").innerText = item.origenSolucion || "No especificado";
+            document.getElementById("modalGovernance").innerText = item.tipoSolucion ? `${item.tipoSolucion} (Escalamiento: ${(item.escalamiento || 'no').toUpperCase()})` : "No especificado";
 
             // Velocímetro de riesgo animado
             const needle = document.getElementById("gaugeNeedle");
             const riskLabel = document.getElementById("modalRiskLabel");
             let rotation = 0;
 
-            const rNorm = item.riesgo.toLowerCase();
-            if (rNorm.includes("bajo")) {
-                rotation = -60;
-                riskLabel.innerText = "BAJO";
-                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-emerald-400";
-            } else if (rNorm.includes("alto")) {
-                rotation = 60;
-                riskLabel.innerText = "ALTO";
-                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-rose-500";
+            if (item.riesgo) {
+                const rNorm = item.riesgo.toLowerCase();
+                if (rNorm.includes("bajo")) {
+                    rotation = -60;
+                    riskLabel.innerText = "BAJO";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-emerald-400";
+                } else if (rNorm.includes("alto")) {
+                    rotation = 60;
+                    riskLabel.innerText = "ALTO";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-rose-500";
+                } else {
+                    rotation = 0;
+                    riskLabel.innerText = "MEDIO";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-amber-500";
+                }
             } else {
                 rotation = 0;
-                riskLabel.innerText = "MEDIO";
-                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-amber-500";
+                riskLabel.innerText = "N/A";
+                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
             }
 
             // Aplicar rotación a la aguja
