@@ -13,6 +13,22 @@
     <!-- PapaParse para leer archivos de datos CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
+    <!-- Evitar conflictos con cargadores de módulos (AMD/RequireJS) en la vista previa del iframe -->
+    <script>
+        if (window.define) {
+            window._temp_define = window.define;
+            window.define = undefined;
+        }
+    </script>
+    <!-- zip.js (versión sin Web Workers) para comprimir y encriptar en formato ZIP con contraseña directamente en entornos aislados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zip.js/2.7.34/zip-no-worker.min.js"></script>
+    <script>
+        if (window._temp_define) {
+            window.define = window._temp_define;
+            delete window._temp_define;
+        }
+    </script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -61,7 +77,7 @@
             <div class="flex items-center gap-3 border-l-4 border-cyan-400 pl-3">
                 <h1 class="text-2xl font-extrabold tracking-tight text-white">Portafolio de Innovación</h1>
             </div>
-            <p class="text-xs text-slate-400 pl-4 mt-1">Dashboard de seguimiento de proyectos</p>
+            <p class="text-xs text-slate-400 pl-4 mt-1">Dashboard de seguimiento de proyectos (Descarga Cifrada ZIP)</p>
         </div>
 
         <!-- Botones de Acción -->
@@ -84,10 +100,10 @@
             </label>
             <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
 
-            <!-- Botón Descargar Excel -->
-            <button onclick="downloadCSV()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-800 text-slate-200 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-md">
-                <i data-lucide="download" class="w-4 h-4 text-slate-300"></i>
-                <span>Descargar Excel</span>
+            <!-- Botón Descargar Excel ZIP Protegido -->
+            <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-800 text-slate-200 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-md" title="Descargar ZIP protegido con clave">
+                <i data-lucide="lock" class="w-4 h-4 text-amber-400 animate-pulse"></i>
+                <span>Descargar ZIP Protegido</span>
             </button>
 
             <!-- Botón de Recarga -->
@@ -412,7 +428,7 @@
         ];
 
         // ==========================================
-        // FORMATOS DE MONEDA Y PARSE NUMÉRICO RESILIENTE
+        // FORMATOS DE MONEDA E INT COMPATIBLES
         // ==========================================
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('es-CL', {
@@ -426,7 +442,6 @@
             if (val === undefined || val === null) return 0;
             if (typeof val === 'number') return val;
             let str = String(val).trim();
-            // Soporte para placeholders tipo " $- " o "-" en la planilla maestra chilena
             if (str.includes("-")) {
                 const cleanStr = str.replace(/[\$\s\u00A0\u200B\.]/g, "");
                 if (cleanStr === "-" || cleanStr === "") return 0;
@@ -447,7 +462,6 @@
         };
 
         // Mapeo ultra flexible para estandarizar las etapas del embudo de innovación
-        // Diseñado para ser inmune a problemas de codificación de caracteres rotos (ej: DiseÃ±o o EjecuciÃ³n)
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
             let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -464,11 +478,11 @@
             if ((s.includes("alternat") || s.includes("soluc")) && !s.includes("pilot") && !s.includes("disen") && !s.includes("dise") && !s.includes("ejec")) {
                 return "Alternativas de solución";
             }
-            // 4. Diseño pilotaje (busca coincidencias de 'dise' o 'disen' o 'pilot' sin 'ejec')
+            // 4. Diseño pilotaje
             if (s.includes("disen") || s.includes("dise") || (s.includes("pilot") && !s.includes("ejec") && !s.includes("exec"))) {
                 return "Diseño pilotaje";
             }
-            // 5. Ejecución pilotaje (busca 'ejec', 'exec' o 'pilot' combinado con ejecuciones)
+            // 5. Ejecución pilotaje
             if (s.includes("ejec") || s.includes("exec")) {
                 return "Ejecución pilotaje";
             }
@@ -481,11 +495,11 @@
                 return "Seguimiento";
             }
             
-            return ""; // Se mantiene vacío si no calza con ninguna etapa oficial
+            return "";
         };
 
         // ==========================================
-        // PROCESAMIENTO GENERAL DE FILAS CSV (Sin rellenos por defecto)
+        // PROCESAMIENTO GENERAL DE FILAS CSV
         // ==========================================
         function processCSVRows(rows) {
             if (!rows || rows.length === 0) return [];
@@ -504,7 +518,6 @@
                     for (const kw of keywords) {
                         if (normRow[kw] !== undefined && normRow[kw] !== null) {
                             const raw = String(normRow[kw]).trim();
-                            // Si el dato es simplemente vacío, no rellenar con fallbacks
                             return raw === "" ? "" : normRow[kw];
                         }
                     }
@@ -529,7 +542,6 @@
                 const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]);
                 const correo = findVal(["liderfuncionalcorreo", "correo", "email"]);
                 
-                // Mapeo y normalización resiliente de la columna EMBUDO
                 const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
                 const funnel = normalizeFunnelStage(rawFunnel);
                 
@@ -539,7 +551,6 @@
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadorealafechaclp", "ebitdacapturadoclp", "ebitdacapturado"]));
                 const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
                 
-                // Estado del proyecto: se lee directamente de la base sin rellenar por defecto
                 const estado = findVal(["estadoproyecto", "estado", "status"]);
                 const sponsor = findVal(["sponsor"]);
                 const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]);
@@ -599,7 +610,7 @@
         }
 
         // ==========================================
-        // BASE DE DATOS DE RESPALDO (Por si falla GitHub/CORS)
+        // BASE DE DATOS DE RESPALDO (Resiliente)
         // ==========================================
         function loadBackupDataset() {
             return [
@@ -811,7 +822,6 @@
                 tr.className = "border-b border-borderBg/30 hover:bg-slate-800/40 transition-colors text-xs text-slate-200";
                 tr.onclick = () => openModal(item);
 
-                // Colores de Riesgo (Sin rellenar por defecto si es vacío)
                 let riskBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
                 if (item.riesgo) {
                     const rNorm = item.riesgo.toLowerCase();
@@ -820,7 +830,6 @@
                     else if (rNorm.includes("alto")) riskBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
                 }
 
-                // Colores de Estado (Sin rellenar por defecto si es vacío)
                 let estadoBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
                 if (item.estado) {
                     const eNorm = item.estado.toLowerCase();
@@ -852,20 +861,27 @@
         }
 
         // ==========================================
-        // DISEÑO Y ACTUALIZACIÓN DE GRÁFICOS (Chart.js)
+        // CREACIÓN Y ACTUALIZACIÓN DE GRÁFICOS
         // ==========================================
         function initChartsContainer() {
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
         }
 
-        function renderCharts() {
-            // Destruir instancias previas
-            Object.keys(charts).forEach(key => {
-                if (charts[key]) charts[key].destroy();
-            });
+        // Declarar las variables de los gráficos globalmente para poder destruirlos correctamente
+        let chartEbitdaInstance = null;
+        let chartTipoInstance = null;
+        let chartRiesgoInstance = null;
+        let chartOrigenInstance = null;
 
-            // 1. Chart EBITDA Potencial vs Capturado por Unidad (Agrupado por gerencia)
+        function renderCharts() {
+            // Destruir instancias previas explícitamente para evitar leaks y bugs visuales de hover
+            if (chartEbitdaInstance) chartEbitdaInstance.destroy();
+            if (chartTipoInstance) chartTipoInstance.destroy();
+            if (chartRiesgoInstance) chartRiesgoInstance.destroy();
+            if (chartOrigenInstance) chartOrigenInstance.destroy();
+
+            // 1. Chart EBITDA Potencial vs Capturado por Unidad
             const ebitdaByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
@@ -881,7 +897,7 @@
             });
 
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
-            charts.ebitda = new Chart(ctxEbitda, {
+            chartEbitdaInstance = new Chart(ctxEbitda, {
                 type: 'bar',
                 data: {
                     labels: sortedGerencias,
@@ -928,7 +944,7 @@
             });
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
-            charts.tipo = new Chart(ctxTipo, {
+            chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(tiposCount),
@@ -946,7 +962,6 @@
                 }
             });
 
-            // Leyenda personalizada para Tipo Innovación
             const legendTipo = document.getElementById("legendTipoInno");
             legendTipo.innerHTML = "";
             Object.keys(tiposCount).forEach((tipo, index) => {
@@ -974,7 +989,7 @@
             });
 
             const ctxRiesgo = document.getElementById("chartRiesgo").getContext("2d");
-            charts.riesgo = new Chart(ctxRiesgo, {
+            chartRiesgoInstance = new Chart(ctxRiesgo, {
                 type: 'bar',
                 data: {
                     labels: ["Bajo", "Medio", "Alto", "No definido"],
@@ -1004,7 +1019,7 @@
             });
 
             const ctxOrigen = document.getElementById("chartOrigenSolucion").getContext("2d");
-            charts.origen = new Chart(ctxOrigen, {
+            chartOrigenInstance = new Chart(ctxOrigen, {
                 type: 'pie',
                 data: {
                     labels: Object.keys(origenCount),
@@ -1021,7 +1036,6 @@
                 }
             });
 
-            // Leyenda Origen Solución
             const legendOrigen = document.getElementById("legendOrigen");
             legendOrigen.innerHTML = "";
             Object.keys(origenCount).forEach((orig, index) => {
@@ -1035,7 +1049,7 @@
                 `;
             });
 
-            // 5. Etapas del Funnel Fijo y Centrado (Soportando la columna "EMBUDO")
+            // 5. Etapas del Funnel
             const funnelCount = {
                 "Archivados": 0,
                 "Problematización": 0,
@@ -1048,7 +1062,6 @@
 
             filteredDataset.forEach(i => {
                 const normalized = normalizeFunnelStage(i.funnel);
-                // Si la etapa de funnel está vacía, no sumará en el gráfico (sin auto-completar por defecto)
                 if (normalized && funnelCount[normalized] !== undefined) {
                     funnelCount[normalized]++;
                 }
@@ -1067,18 +1080,15 @@
 
                 funnelHTML += `
                     <div class="flex items-center w-full min-h-[28px]">
-                        <!-- Columna Izquierda: Etiqueta derecha alineada -->
                         <div class="w-[40%] text-right pr-4 text-[11px] font-semibold text-slate-300 leading-tight">
                             ${stage}
                         </div>
-                        <!-- Columna Derecha: Barra centrada de color morado sólido -->
                         <div class="w-[60%] flex justify-center items-center">
                             ${countVal > 0 ? `
                                 <div style="width: ${barWidth}%;" class="bg-[#7c3aed] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md shadow-purple-900/10">
                                     ${countVal}
                                 </div>
                             ` : `
-                                <!-- Contenedor vacío o gris muy sutil en 0 para no desalinear -->
                                 <div class="w-[12%] bg-slate-800/10 text-slate-500 text-[10px] py-1 rounded text-center">
                                     0
                                 </div>
@@ -1093,7 +1103,7 @@
         }
 
         // ==========================================
-        // VENTANA MODAL DETALLE E INICIATIVAS
+        // VENTANA MODAL DETALLE DE INICIATIVA
         // ==========================================
         function openModal(item) {
             document.getElementById("modalTitle").innerText = item.nombre || "Sin nombre";
@@ -1106,14 +1116,12 @@
             document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
             document.getElementById("modalOrigen").innerText = item.origenSolucion || "No especificado";
             
-            // Tipo de solución y Gobernanza TD
             let govText = item.tipoSolucion || "No especificado";
             if (item.requiereGobernanza) {
                 govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
             }
             document.getElementById("modalGovernance").innerText = govText;
 
-            // Mostrar comentarios o bitácora de control
             const commContainer = document.getElementById("modalCommentContainer");
             const commText = document.getElementById("modalComment");
             if (item.comentario && item.comentario.trim() !== "") {
@@ -1123,7 +1131,6 @@
                 commContainer.classList.add("hidden");
             }
 
-            // Velocímetro de riesgo animado (Sin rellenar por defecto)
             const needle = document.getElementById("gaugeNeedle");
             const riskLabel = document.getElementById("modalRiskLabel");
             let rotation = 0;
@@ -1153,26 +1160,65 @@
             document.getElementById("projectModal").classList.remove("hidden");
         }
 
-        // Cierre de ventana modal
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
 
         // ==========================================
-        // DESCARGA DE EXCEL (CSV Exportable)
+        // DESCARGA EN ZIP PROTEGIDO CON CONTRASEÑA
         // ==========================================
-        function downloadCSV() {
-            if (filteredDataset.length === 0) return;
-            const csv = Papa.unparse(filteredDataset);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `portafolio-filtrado-${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        async function downloadSecureZip() {
+            if (filteredDataset.length === 0) {
+                showConnectionStatus("error", "Error de exportación", "No hay datos filtrados para descargar.");
+                return;
+            }
+
+            try {
+                showConnectionStatus("loading", "Cifrando datos...", "Generando contenedor seguro con contraseña...");
+
+                // 1. Generar el contenido CSV utilizando PapaParse
+                const csvData = Papa.unparse(filteredDataset);
+                
+                // 2. Resolver referencia global de zip.js de forma segura para evitar ReferenceError
+                const zipLib = window.zip;
+                if (!zipLib) {
+                    throw new Error("La biblioteca de compresión secure-zip no se encuentra cargada en el navegador.");
+                }
+
+                // Desactivar explícitamente el uso de subprocesos (Web Workers) para prevenir errores CORS de origen cruzado en Canvas / iFrame
+                zipLib.configure({
+                    useWebWorkers: false
+                });
+
+                const blobWriter = new zipLib.BlobWriter("application/zip");
+                const zipWriter = new zipLib.ZipWriter(blobWriter, {
+                    password: "coipsa_2026", // Contraseña configurada
+                    zipCrypto: true          // Compatibilidad estándar nativa de descompresión
+                });
+
+                // 3. Insertar el archivo CSV interno
+                const fileName = `portafolio-innovacion-${new Date().toISOString().split('T')[0]}.csv`;
+                await zipWriter.add(fileName, new zipLib.TextReader(csvData));
+                
+                // 4. Cerrar la compresión y obtener el Blob
+                await zipWriter.close();
+                const zipBlob = await blobWriter.getData();
+
+                // 5. Gatillar la descarga
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(zipBlob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `portafolio-innovacion-protegido.zip`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showConnectionStatus("success", "Descarga Completada", "Archivo ZIP descargado con contraseña 'coipsa_2026'");
+            } catch (error) {
+                console.error("Error al cifrar el ZIP:", error);
+                showConnectionStatus("error", "Error al encriptar", `Error: ${error.message || "No se pudo generar el ZIP seguro. Intente de nuevo."}`);
+            }
         }
 
         // ==========================================
