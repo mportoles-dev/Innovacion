@@ -208,7 +208,7 @@
                         <p class="text-[10px] text-slate-400 mt-0.5" id="kpiTotalProjectsSubLeft">Abiertos: 0</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] text-slate-400" id="kpiTotalProjectsSubRight">Cerrados: 0</p>
+                        <p class="text-[10px] text-slate-400" id="kpiTotalProjectsSubRight">Otros / Cerrados: 0</p>
                     </div>
                 </div>
             </div>
@@ -328,6 +328,12 @@
                 <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg md:col-span-2">
                     <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
                     <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
+                    
+                    <!-- Comentarios / Notas adicionales si existen -->
+                    <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-borderBg/60 hidden">
+                        <h5 class="text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1">Comentario de Control</h5>
+                        <p id="modalComment" class="text-xs text-slate-400 italic leading-relaxed"></p>
+                    </div>
                 </div>
                 <!-- Velocímetro de Riesgo Estilizado -->
                 <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
@@ -377,7 +383,7 @@
                 </div>
 
                 <div class="space-y-1 border-t border-borderBg/60 pt-3">
-                    <span class="text-xs text-slate-500 font-medium">Tipo de Solución / Escalamiento</span>
+                    <span class="text-xs text-slate-500 font-medium">Tipo de Solución / Gobernanza TD</span>
                     <p id="modalGovernance" class="text-sm text-slate-300 font-semibold"></p>
                 </div>
             </div>
@@ -396,6 +402,7 @@
 
         // Estandarización fija para el Funnel de Innovación según image_dc1ea3.png
         const FUNNEL_STAGES = [
+            "Archivados",
             "Problematización",
             "Alternativas de solución",
             "Diseño pilotaje",
@@ -405,7 +412,7 @@
         ];
 
         // ==========================================
-        // FORMATOS DE MONEDA Y PARSE NUMÉRICO
+        // FORMATOS DE MONEDA Y PARSE NUMÉRICO RESILIENTE
         // ==========================================
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('es-CL', {
@@ -419,7 +426,12 @@
             if (val === undefined || val === null) return 0;
             if (typeof val === 'number') return val;
             let str = String(val).trim();
-            str = str.replace(/[\$\s\u00A0\u200B\.]/g, ""); // Remueve pesos y puntos de miles
+            // Soporte para placeholders tipo " $- " o "-" en la planilla maestra chilena
+            if (str.includes("-")) {
+                const cleanStr = str.replace(/[\$\s\u00A0\u200B\.]/g, "");
+                if (cleanStr === "-" || cleanStr === "") return 0;
+            }
+            str = str.replace(/[\$\s\u00A0\u200B\.]/g, ""); // Remueve pesos, espacios y puntos de miles
             str = str.replace(/,/g, "."); // Reemplaza comas de decimales
             if (str === "" || str === "-" || str === ".-" || str === ",-") return 0;
             const parsed = parseFloat(str);
@@ -434,17 +446,22 @@
                       .replace(/[^a-z0-9]/g, "");
         };
 
-        // Mapeo inteligente para estandarizar el funnel (sin rellenar si está vacío)
+        // Mapeo inteligente para estandarizar el funnel (sin rellenar por defecto si está vacío)
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
-            const s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            
+            // Elimina prefijos numéricos típicos como "08. Seguimiento" o "01. Problematización"
+            s = s.replace(/^\d+[\s\.\-\_]+/, ""); 
+            
+            if (s.includes("archivado") || s.includes("archivados")) return "Archivados";
             if (s.includes("problema") || s.includes("inicial")) return "Problematización";
             if (s.includes("alternativa") || s.includes("solucion")) return "Alternativas de solución";
-            if (s.includes("diseno") || (s.includes("pilotaje") && !s.includes("ejecucion"))) return "Diseño pilotaje";
+            if (s.includes("diseno") || (s.includes("pilot") && s.includes("diseno"))) return "Diseño pilotaje";
             if (s.includes("ejecucion") || s.includes("ejecutar")) return "Ejecución pilotaje";
             if (s.includes("implementa")) return "Implementación";
             if (s.includes("seguimiento") || s.includes("control") || s.includes("fase final")) return "Seguimiento";
-            return ""; // Mantener vacío si no calza con ninguna etapa oficial
+            return ""; // Se mantiene vacío si no calza con ninguna etapa oficial
         };
 
         // ==========================================
@@ -465,48 +482,57 @@
 
                 const findVal = (keywords) => {
                     for (const kw of keywords) {
-                        if (normRow[kw] !== undefined && normRow[kw] !== null) return normRow[kw];
+                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                            const raw = String(normRow[kw]).trim();
+                            // Si el dato es simplemente vacío, no rellenar con fallbacks
+                            return raw === "" ? "" : normRow[kw];
+                        }
                     }
                     for (const kw of keywords) {
                         for (const actualKey of Object.keys(normRow)) {
-                            if (actualKey.includes(kw)) return normRow[actualKey];
+                            if (actualKey.includes(kw)) {
+                                const raw = String(normRow[actualKey]).trim();
+                                return raw === "" ? "" : normRow[actualKey];
+                            }
                         }
                     }
-                    return undefined;
+                    return "";
                 };
 
                 const id = findVal(["id", "codigo", "key"]) || `PM-${String(index+1).padStart(3, '0')}`;
-                const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]) || "";
-                const anio = findVal(["anodecreacion", "anio", "ano", "creacion", "aniodecreacion"]) || "";
-                const descripcion = findVal(["descripcion", "detalle"]) || "";
-                const riesgo = findVal(["nivelderiesgo", "riesgo"]) || "";
-                const gerencia = findVal(["gerencia", "unidad", "unidadgerencia"]) || "";
-                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]) || "";
-                const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]) || "";
-                const correo = findVal(["liderfuncionalcorreo", "correo", "email"]) || "";
+                const nombre = findVal(["nombredelproyecto", "proyecto", "nombre"]);
+                const anio = findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]);
+                const descripcion = findVal(["descripcion", "detalle"]);
+                const riesgo = findVal(["nivelderiesgo", "riesgo"]);
+                const gerencia = findVal(["unidad", "gerencia", "unidadgerencia"]);
+                const tipoInnovacion = findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]);
+                const lider = findVal(["liderfuncionalnombre", "lider", "responsable"]);
+                const correo = findVal(["liderfuncionalcorreo", "correo", "email"]);
                 
-                // Normalización de funnel: si viene vacío, permanece vacío ""
-                const rawFunnel = findVal(["funnel", "fase", "etapa"]) || "";
+                // Nueva columna mapeada: EMBUDO
+                const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
                 const funnel = normalizeFunnelStage(rawFunnel);
                 
-                const inversion = parseNumeric(findVal(["inversion", "presupuesto"]));
-                const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialclp", "ebitdapotencial", "ebitda"]));
-                const valEbitdaPotencial = findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]) || "";
-                const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadoclp", "ebitdacapturado"]));
-                const hht = parseNumeric(findVal(["hhtpotencial", "hht", "horas"]));
+                const inversion = parseNumeric(findVal(["inversionejecutada", "inversion", "presupuesto"]));
+                const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialanualclp", "ebitdapotencialclp", "ebitdapotencial"]));
+                const valEbitdaPotencial = findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]);
+                const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadorealafechaclp", "ebitdacapturadoclp", "ebitdacapturado"]));
+                const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
                 
-                // Estado del proyecto: si viene vacío, permanece vacío ""
-                const estado = findVal(["estadoproyecto", "estado", "status"]) || "";
-                const sponsor = findVal(["sponsor"]) || "";
-                const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]) || "";
-                const tipoSolucion = findVal(["tipodesolucion", "solucion"]) || "";
-                const origenSolucion = findVal(["origensolucion", "origen"]) || "";
+                // Estado del proyecto: se lee directamente de la base sin rellenar por defecto
+                const estado = findVal(["estadoproyecto", "estado", "status"]);
+                const sponsor = findVal(["sponsor"]);
+                const escalamiento = findVal(["potencialdeescalamiento", "escalamiento"]);
+                const tipoSolucion = findVal(["tipodesolucion", "solucion"]);
+                const origenSolucion = findVal(["origensolucion", "origen"]);
+                const comentario = findVal(["comentario", "comentarios", "observacion"]);
+                const requiereGobernanza = findVal(["requieregobernanzatd", "gobernanza"]);
 
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
-                    escalamiento, tipoSolucion, origenSolucion
+                    escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza
                 };
             }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
         }
@@ -521,6 +547,7 @@
                 download: true,
                 header: true,
                 skipEmptyLines: true,
+                // El auto-detector de punto y coma se optimiza aquí para que sea compatible con exportaciones en español
                 complete: function(results) {
                     if (results.data && results.data.length > 0) {
                         masterDataset = processCSVRows(results.data);
@@ -528,7 +555,6 @@
                         
                         showConnectionStatus("success", "Base Maestra GitHub Conectada", `Se han cargado ${masterDataset.length} proyectos directamente de GitHub.`);
                         
-                        // Si el selector está en "maestra", renderizar inmediatamente
                         if (document.getElementById('portfolioSelector').value === 'maestra') {
                             currentDataset = [...masterDataset];
                             initializeDashboard();
@@ -546,7 +572,7 @@
 
         function handleGitHubError(errorDetail) {
             showConnectionStatus("error", "Error de conexión con GitHub", `No se pudo conectar al Raw. Usando Base Maestra de Respaldo Integrada.`);
-            masterDataset = loadBackupDataset(); // Cargar base estática elegante de respaldo
+            masterDataset = loadBackupDataset(); 
             if (document.getElementById('portfolioSelector').value === 'maestra') {
                 currentDataset = [...masterDataset];
                 initializeDashboard();
@@ -565,7 +591,7 @@
                     lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
                     inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 16500000, hht: 250, estado: "Abierto", sponsor: "Director de Operaciones",
-                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno"
+                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: ""
                 },
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
@@ -574,7 +600,7 @@
                     lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
                     inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 99000000, hht: 300, estado: "Cerrado", sponsor: "Director de Operaciones",
-                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder"
+                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: ""
                 },
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
@@ -583,7 +609,7 @@
                     lider: "Juan Carlos Muñoz", correo: "jc.munoz@empresa.cl", funnel: "Diseño pilotaje",
                     inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
                     ebitdaCapturado: 0, hht: 240, estado: "Abierto", sponsor: "Gerente de Planta",
-                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno"
+                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: ""
                 }
             ];
         }
@@ -605,7 +631,6 @@
                         localDataset = processCSVRows(results.data);
                         console.log("Archivo local procesado:", localDataset);
                         
-                        // Cambiar selector a base cargada automáticamente
                         document.getElementById('portfolioSelector').value = 'cargada';
                         currentDataset = [...localDataset];
                         
@@ -767,8 +792,8 @@
                 tr.className = "border-b border-borderBg/30 hover:bg-slate-800/40 transition-colors text-xs text-slate-200";
                 tr.onclick = () => openModal(item);
 
-                // Colores de Riesgo
-                let riskBadge = "bg-slate-800 text-slate-400 border border-slate-700/50";
+                // Colores de Riesgo (Sin rellenar por defecto si es vacío)
+                let riskBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
                 if (item.riesgo) {
                     const rNorm = item.riesgo.toLowerCase();
                     if (rNorm.includes("bajo")) riskBadge = "bg-emerald-500/10 text-[#00e676] border border-emerald-500/20";
@@ -776,7 +801,7 @@
                     else if (rNorm.includes("alto")) riskBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
                 }
 
-                // Colores de Estado
+                // Colores de Estado (Sin rellenar por defecto si es vacío)
                 let estadoBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
                 if (item.estado) {
                     const eNorm = item.estado.toLowerCase();
@@ -787,9 +812,9 @@
 
                 tr.innerHTML = `
                     <td class="py-3 px-6 font-mono font-bold text-[#00E5FF]">${item.id}</td>
-                    <td class="py-3 px-6 font-extrabold text-white max-w-[200px] truncate">${item.nombre || 'Sin nombre'}</td>
-                    <td class="py-3 px-6">${item.lider || 'No asignado'}</td>
-                    <td class="py-3 px-6"><span class="bg-[#1d2d4d]/60 px-2 py-1 rounded text-[10px]">${item.gerencia || 'Sin asignar'}</span></td>
+                    <td class="py-3 px-6 font-extrabold text-white max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
+                    <td class="py-3 px-6">${item.lider || 'N/A'}</td>
+                    <td class="py-3 px-6"><span class="bg-[#1d2d4d]/60 px-2 py-1 rounded text-[10px]">${item.gerencia || 'N/A'}</span></td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
                             ${item.riesgo || 'N/A'}
@@ -991,8 +1016,9 @@
                 `;
             });
 
-            // 5. Etapas del Funnel Fijo y Centrado (Alineación Horizontal de image_dc1ea3.png)
+            // 5. Etapas del Funnel Fijo y Centrado (Soportando la columna "EMBUDO")
             const funnelCount = {
+                "Archivados": 0,
                 "Problematización": 0,
                 "Alternativas de solución": 0,
                 "Diseño pilotaje": 0,
@@ -1003,7 +1029,7 @@
 
             filteredDataset.forEach(i => {
                 const normalized = normalizeFunnelStage(i.funnel);
-                // Si está vacío, no suma en ninguna de las etapas oficiales de visualización
+                // Si la etapa de funnel está vacía, no sumará en el gráfico (sin auto-completar por defecto)
                 if (normalized && funnelCount[normalized] !== undefined) {
                     funnelCount[normalized]++;
                 }
@@ -1017,12 +1043,11 @@
             
             FUNNEL_STAGES.forEach(stage => {
                 const countVal = funnelCount[stage] || 0;
-                // Proporcionalidad para centrar y dimensionar las barras
                 const rawPercent = maxVal > 0 ? (countVal / maxVal) * 100 : 0;
                 const barWidth = countVal > 0 ? Math.max(25, rawPercent * 0.9) : 0;
 
                 funnelHTML += `
-                    <div class="flex items-center w-full min-h-[36px]">
+                    <div class="flex items-center w-full min-h-[28px]">
                         <!-- Columna Izquierda: Etiqueta derecha alineada -->
                         <div class="w-[40%] text-right pr-4 text-[11px] font-semibold text-slate-300 leading-tight">
                             ${stage}
@@ -1061,9 +1086,25 @@
             document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
             document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
             document.getElementById("modalOrigen").innerText = item.origenSolucion || "No especificado";
-            document.getElementById("modalGovernance").innerText = item.tipoSolucion ? `${item.tipoSolucion} (Escalamiento: ${(item.escalamiento || 'no').toUpperCase()})` : "No especificado";
+            
+            // Tipo de solución y Gobernanza TD
+            let govText = item.tipoSolucion || "No especificado";
+            if (item.requiereGobernanza) {
+                govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
+            }
+            document.getElementById("modalGovernance").innerText = govText;
 
-            // Velocímetro de riesgo animado
+            // Mostrar comentarios o bitácora de control
+            const commContainer = document.getElementById("modalCommentContainer");
+            const commText = document.getElementById("modalComment");
+            if (item.comentario && item.comentario.trim() !== "") {
+                commText.innerText = item.comentario;
+                commContainer.classList.remove("hidden");
+            } else {
+                commContainer.classList.add("hidden");
+            }
+
+            // Velocímetro de riesgo animado (Sin rellenar por defecto)
             const needle = document.getElementById("gaugeNeedle");
             const riskLabel = document.getElementById("modalRiskLabel");
             let rotation = 0;
@@ -1089,9 +1130,7 @@
                 riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
             }
 
-            // Aplicar rotación a la aguja
             needle.setAttribute("transform", `rotate(${rotation}, 50, 50)`);
-
             document.getElementById("projectModal").classList.remove("hidden");
         }
 
@@ -1132,11 +1171,9 @@
             document.getElementById("filterSponsor").value = "";
             document.getElementById("filterLider").value = "";
             
-            // Re-vincular de nuevo con GitHub
             connectToGitHubCSV();
         }
 
-        // Al iniciar la ventana
         window.onload = function() {
             initChartsContainer();
             connectToGitHubCSV();
