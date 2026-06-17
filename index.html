@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-[#0b1329]">
+<html lang="es" class="h-full bg-[#f4f6f9]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,14 +18,21 @@
             theme: {
                 extend: {
                     colors: {
-                        mockupBg: '#0c1524', // Fondo general oscuro
-                        cardBg: '#111d35',   // Fondo de tarjetas
-                        borderBg: '#1d2d4d', // Bordes de tarjetas e inputs
-                        neonGreen: '#00e676', // Botón "Subir Excel"
-                        neonCyan: '#00E5FF',  // Acento Cian
-                        neonBlue: '#2979ff',  // Acento Azul
-                        neonPurple: '#a855f7',// Acento Púrpura
-                        neonAmber: '#f59e0b', // Acento Ámbar
+                        mockupBg: '#f4f6f9',    // Fondo principal claro de alta gama
+                        cardBg: '#ffffff',      // Fondo blanco para tarjetas y contenedores
+                        borderBg: '#e2e8f0',    // Bordes suaves y limpios
+                        palLime: '#9bca3c',     // Verde Limón brillante (Primera franja de la paleta)
+                        palForest: '#0f6f46',   // Verde Bosque profundo (Segunda franja - Bajo)
+                        palYellow: '#facc15',   // Amarillo brillante (Medio)
+                        palOrange: '#f15a24',   // Naranja Coral vibrante (Tercera franja - Alto)
+                        palPurple: '#956eb6',   // Púrpura Amatista (Quinta franja)
+                        palGray: '#6b7c85',     // Gris Pizarra elegante (Séptima franja)
+                        // Mapeos adaptativos para conservar compatibilidad estructural
+                        neonGreen: '#9bca3c',
+                        neonCyan: '#9bca3c',
+                        neonBlue: '#956eb6',
+                        neonPurple: '#956eb6',
+                        neonAmber: '#f15a24',
                     }
                 }
             }
@@ -35,65 +42,70 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0c1524;
+            background-color: #f4f6f9;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(12, 21, 36, 0.6);
+            background: rgba(244, 246, 249, 0.8);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(41, 121, 255, 0.2);
+            background: rgba(107, 124, 133, 0.25);
             border-radius: 99px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(41, 121, 255, 0.4);
+            background: rgba(107, 124, 133, 0.45);
         }
     </style>
 </head>
-<body class="h-full text-slate-100 overflow-y-auto custom-scrollbar flex flex-col pb-12">
+<body class="h-full text-slate-800 overflow-y-auto custom-scrollbar flex flex-col pb-12">
 
     <!-- HEADER DEL PORTAFOLIO -->
     <header class="px-8 py-6 max-w-[1600px] w-full mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <div class="flex items-center gap-3 border-l-4 border-cyan-400 pl-3">
-                <h1 class="text-2xl font-extrabold tracking-tight text-white">Portafolio de Innovación</h1>
+            <div class="flex items-center gap-3 border-l-4 border-palLime pl-3">
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Portafolio de Innovación</h1>
             </div>
-            <p class="text-xs text-slate-400 pl-4 mt-1">Dashboard de seguimiento de proyectos (Descarga Cifrada ZIP)</p>
+            <p class="text-xs text-slate-500 pl-4 mt-1">Dashboard de seguimiento de proyectos y metas</p>
         </div>
 
-        <!-- Botones de Acción -->
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+        <!-- Botones de Acción e Isotipo -->
+        <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
             <!-- Selector de Portafolio -->
             <div class="relative">
-                <select id="portfolioSelector" onchange="handlePortfolioChange()" class="appearance-none pl-4 pr-10 py-2 bg-cardBg border border-borderBg hover:border-slate-500 text-xs text-slate-200 rounded-xl cursor-pointer focus:outline-none transition-all">
+                <select id="portfolioSelector" onchange="handlePortfolioChange()" class="appearance-none pl-4 pr-10 py-2 bg-cardBg border border-borderBg hover:border-palLime text-xs text-slate-700 rounded-xl cursor-pointer focus:outline-none transition-all shadow-sm">
                     <option value="maestra">Portafolio Base Maestra (GitHub)</option>
                     <option value="cargada">Portafolio Base Cargada (Local)</option>
                 </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
                     <i data-lucide="chevron-down" class="w-4 h-4"></i>
                 </div>
             </div>
 
             <!-- Botón Subir Excel -->
-            <label for="csvFileInput" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-neonGreen hover:bg-[#00c853] text-slate-950 rounded-xl cursor-pointer transition-all text-xs font-bold shadow-md shadow-neonGreen/10">
+            <label for="csvFileInput" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-palLime hover:bg-[#8bb535] text-slate-950 rounded-xl cursor-pointer transition-all text-xs font-bold shadow-md shadow-palLime/10">
                 <i data-lucide="upload-cloud" class="w-4 h-4 text-slate-950"></i>
                 <span>Subir Excel/CSV</span>
             </label>
             <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
 
             <!-- Botón Descargar Excel ZIP Protegido -->
-            <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-800 text-slate-200 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-md" title="Descargar ZIP protegido con clave">
-                <i data-lucide="lock" class="w-4 h-4 text-amber-400 animate-pulse"></i>
+            <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-50 text-slate-700 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-sm" title="Descargar ZIP protegido con clave">
+                <i data-lucide="lock" class="w-4 h-4 text-palOrange animate-pulse"></i>
                 <span>Descargar ZIP Protegido</span>
             </button>
 
             <!-- Botón de Recarga -->
-            <button onclick="resetData()" class="p-2 bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 hover:text-white rounded-xl transition-all" title="Resetear / Conectar de nuevo">
+            <button onclick="resetData()" class="p-2 bg-cardBg hover:bg-slate-50 border border-borderBg text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm" title="Resetear / Conectar de nuevo">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
+
+            <!-- Isotipo Corporativo Coipsa -->
+            <div class="border-l border-slate-200 pl-4 h-12 flex items-center shrink-0">
+                <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_Isotipo%20Coipsa.png" alt="Isotipo Coipsa" class="h-12 w-auto object-contain" onerror="console.warn('No se pudo cargar el isotipo local. Asegúrate de tener el archivo 00_Isotipo Coipsa.png en el mismo directorio.');" />
+            </div>
         </div>
     </header>
 
@@ -101,114 +113,114 @@
     <main class="flex-1 px-8 space-y-6 max-w-[1600px] w-full mx-auto">
         
         <!-- Alerta de Conexión y Estado -->
-        <div id="connectionAlert" class="bg-blue-950/40 border border-blue-500/30 text-blue-200 px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300">
-            <i data-lucide="info" id="alertIcon" class="w-4 h-4 text-[#00E5FF] shrink-0 mt-0.5 animate-spin"></i>
+        <div id="connectionAlert" class="bg-cardBg border border-palLime/40 text-slate-800 px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs shadow-sm transition-all duration-300">
+            <i data-lucide="info" id="alertIcon" class="w-4 h-4 text-palLime shrink-0 mt-0.5 animate-spin"></i>
             <div>
-                <span id="alertTitle" class="font-bold text-white">Conectando con base maestra...</span> 
-                <span id="alertMessage" class="block text-slate-400 mt-1">Obteniendo el portafolio actualizado desde GitHub.</span>
+                <span id="alertTitle" class="font-bold text-slate-900">Conectando con base maestra y metas...</span> 
+                <span id="alertMessage" class="block text-slate-500 mt-1">Obteniendo el portafolio y los objetivos actualizados desde GitHub.</span>
             </div>
         </div>
 
         <!-- SECCIÓN DE FILTROS -->
-        <div class="bg-cardBg border border-borderBg/80 p-4 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
+        <div class="bg-cardBg border border-borderBg p-4 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm">
             <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 border-r border-slate-700/60 pr-6">Filtros</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
                 
                 <div class="flex flex-wrap items-center gap-4 text-xs">
                     <!-- Año -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400">Año:</span>
-                        <select id="filterAnio" onchange="applyFilters()" class="bg-[#0c1524] border border-borderBg rounded-lg px-2 py-1.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-slate-500">Año:</span>
+                        <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
                             <option value="">Todos</option>
                         </select>
                     </div>
 
                     <!-- Unidad / Gerencia -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400">Unidad:</span>
-                        <select id="filterGerencia" onchange="applyFilters()" class="bg-[#0c1524] border border-borderBg rounded-lg px-2 py-1.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-slate-500">Unidad:</span>
+                        <select id="filterGerencia" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
                             <option value="">Todos</option>
                         </select>
                     </div>
 
                     <!-- Tipo de Innovación -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400">Tipo de innovación:</span>
-                        <select id="filterTipo" onchange="applyFilters()" class="bg-[#0c1524] border border-borderBg rounded-lg px-2 py-1.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-slate-500">Tipo de innovación:</span>
+                        <select id="filterTipo" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
                             <option value="">Todos</option>
                         </select>
                     </div>
 
                     <!-- Sponsor -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400">Sponsor:</span>
-                        <select id="filterSponsor" onchange="applyFilters()" class="bg-[#0c1524] border border-borderBg rounded-lg px-2 py-1.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-slate-500">Sponsor:</span>
+                        <select id="filterSponsor" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
                             <option value="">Todos</option>
                         </select>
                     </div>
 
                     <!-- Líder del proyecto -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400">Líder:</span>
-                        <select id="filterLider" onchange="applyFilters()" class="bg-[#0c1524] border border-borderBg rounded-lg px-2 py-1.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-slate-500">Líder:</span>
+                        <select id="filterLider" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
                             <option value="">Todos</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="text-xs text-slate-400 shrink-0 font-medium">
-                <span id="projectCountLabel" class="text-white font-extrabold text-sm mr-1">0</span> proyectos filtrados
+            <div class="text-xs text-slate-500 shrink-0 font-medium">
+                <span id="projectCountLabel" class="text-slate-900 font-extrabold text-sm mr-1">0</span> proyectos filtrados
             </div>
         </div>
 
         <!-- KPI METRICS GRID -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <!-- EBITDA Capturado -->
-            <div class="bg-cardBg border border-borderBg/80 border-l-[5px] border-l-amber-500 p-5 rounded-xl flex flex-col justify-between h-32 shadow-lg shadow-slate-950/20">
+            <!-- EBITDA Capturado (Verde Bosque) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight" id="kpiEbitdaCapturado">$0M</span>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
                 </div>
                 <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-200">EBITDA Capturado</h3>
-                    <p class="text-[10px] text-amber-500 mt-0.5" id="kpiEbitdaCapturadoSub">0% del potencial</p>
+                    <h3 class="text-xs font-bold text-slate-700">EBITDA Capturado Real</h3>
+                    <p class="text-[10px] text-palForest font-semibold mt-0.5" id="kpiEbitdaCapturadoSub">Meta: $0 (0%)</p>
                 </div>
             </div>
 
-            <!-- EBITDA Potencial -->
-            <div class="bg-cardBg border border-borderBg/80 border-l-[5px] border-l-purple-500 p-5 rounded-xl flex flex-col justify-between h-32 shadow-lg shadow-slate-950/20">
+            <!-- EBITDA Potencial (Púrpura Amatista) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight" id="kpiEbitdaPotencial">$0M</span>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaPotencial">$0M</span>
                 </div>
                 <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-200">EBITDA Potencial</h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">CLP estimado total</p>
+                    <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
+                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Validado: $0 (0%)</p>
                 </div>
             </div>
 
-            <!-- HHT Potencial -->
-            <div class="bg-cardBg border border-borderBg/80 border-l-[5px] border-l-blue-500 p-5 rounded-xl flex flex-col justify-between h-32 shadow-lg shadow-slate-950/20">
+            <!-- HHT Capturado Real (Naranja Coral) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight" id="kpiHht">0</span>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
                 </div>
                 <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-200">HHT Potencial</h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">Horas Hombre estimadas</p>
+                    <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
+                    <p class="text-[10px] text-palOrange font-semibold mt-0.5" id="kpiHhtSub">Meta: 0 (0%)</p>
                 </div>
             </div>
 
-            <!-- Total Proyectos -->
-            <div class="bg-cardBg border border-borderBg/80 border-l-[5px] border-l-cyan-400 p-5 rounded-xl flex flex-col justify-between h-32 shadow-lg shadow-slate-950/20">
+            <!-- Total Proyectos (Verde Limón) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight" id="kpiTotalProjects">0</span>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
                 </div>
                 <div class="flex justify-between items-end mt-2">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-200">Total Proyectos</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5" id="kpiTotalProjectsSubLeft">Abiertos: 0</p>
+                        <h3 class="text-xs font-bold text-slate-700">Total Proyectos</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5" id="kpiTotalProjectsSubLeft">Abiertos: 0</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] text-slate-400" id="kpiTotalProjectsSubRight">Otros / Cerrados: 0</p>
+                        <p class="text-[10px] text-slate-500" id="kpiTotalProjectsSubRight">Otros / Cerrados: 0</p>
                     </div>
                 </div>
             </div>
@@ -217,67 +229,105 @@
         <!-- ROW 1 DE GRÁFICOS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- EBITDA POR UNIDAD -->
-            <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-lg">
+            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
                 </div>
                 <div class="flex-1 min-h-0 relative">
                     <canvas id="chartEbitdaProyecto"></canvas>
                 </div>
             </div>
 
-            <!-- TIPO DE INNOVACIÓN -->
-            <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-lg justify-between">
+            <!-- PROYECTOS POR UNIDAD / GERENCIA -->
+            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-sm justify-between">
                 <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">TIPO DE INNOVACIÓN</h3>
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Proyectos por Unidad / Gerencia</h3>
                 </div>
-                <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[250px]">
-                    <canvas id="chartTipoInno"></canvas>
+                <div class="flex-1 relative min-h-0">
+                    <canvas id="chartProyectosUnidad"></canvas>
                 </div>
-                <div class="flex justify-center gap-6 text-[10px] text-slate-400 mt-2" id="legendTipoInno"></div>
             </div>
         </div>
 
         <!-- ROW 2 DE GRÁFICOS -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- NIVEL DE RIESGO -->
-            <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[360px] shadow-lg">
-                <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">NIVEL DE RIESGO</h3>
+            <!-- TIPO DE INNOVACIÓN -->
+            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
+                <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
                 </div>
-                <div class="flex-1 min-h-0 relative">
-                    <canvas id="chartRiesgo"></canvas>
+                <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
+                    <canvas id="chartTipoInno"></canvas>
                 </div>
+                <div class="flex justify-center gap-6 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
             </div>
 
             <!-- ETAPA EN EL FUNNEL -->
-            <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[360px] shadow-lg">
+            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">ETAPA EN EL FUNNEL</h3>
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA EN EL FUNNEL</h3>
                 </div>
                 <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
             </div>
 
-            <!-- ORIGEN DE SOLUCIÓN -->
-            <div class="bg-cardBg border border-borderBg/60 p-5 rounded-xl flex flex-col h-[360px] shadow-lg justify-between">
+            <!-- RIESGO PROMEDIO DEL PORTAFOLIO (Reemplaza Origen de Solución) -->
+            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
                 <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">ORIGEN DE SOLUCIÓN</h3>
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
                 </div>
-                <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
-                    <canvas id="chartOrigenSolucion"></canvas>
+                <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
+                    <!-- SVG Velocímetro del Portafolio -->
+                    <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
+                        <svg class="w-48 h-24" viewBox="0 0 100 50">
+                            <!-- Arco base gris de fondo -->
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
+                            <!-- Segmento Bajo (Verde Bosque) -->
+                            <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
+                            <!-- Segmento Medio (Amarillo) -->
+                            <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
+                            <!-- Segmento Alto (Naranja Coral) -->
+                            <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
+                            
+                            <!-- Grupo de Aguja -->
+                            <g id="portfolioNeedleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                                <polygon points="49,50 51,50 50,14" fill="#1e293b" />
+                            </g>
+                            
+                            <!-- Eje Central -->
+                            <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <!-- Etiqueta de Texto Restaurada (Sin el promedio numérico) -->
+                    <div class="text-center mt-3">
+                        <span id="portfolioRiskLabel" class="text-xs font-extrabold uppercase tracking-widest text-slate-500">N/A</span>
+                    </div>
                 </div>
-                <div class="flex flex-wrap justify-center gap-3 text-[9px] text-slate-400 mt-2" id="legendOrigen"></div>
+                <!-- Leyenda de Riesgo Promedio (Sin valores numéricos ponderadores) -->
+                <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #0f6f46;"></span>
+                        <span class="font-bold text-slate-700">Bajo</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #facc15;"></span>
+                        <span class="font-bold text-slate-700">Medio</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #f15a24;"></span>
+                        <span class="font-bold text-slate-700">Alto</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- TABLA DE INICIATIVAS -->
-        <div class="bg-cardBg border border-borderBg/60 rounded-xl overflow-hidden flex flex-col shadow-xl">
-            <div class="p-5 border-b border-borderBg/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
+            <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-sm text-slate-200">Iniciativas Registradas</h3>
-                    <p class="text-xs text-slate-500 mt-1">Haz clic sobre cualquier iniciativa para desplegar la ficha detallada y el velocímetro de riesgo.</p>
+                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
+                    <p class="text-xs text-slate-500 mt-1">Haz clic sobre cualquier iniciativa para desplegar la ficha detallada.</p>
                 </div>
-                <span class="text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
+                <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
                     Mostrando 0 registros
                 </span>
             </div>
@@ -286,133 +336,134 @@
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
-                        <tr class="border-b border-borderBg bg-[#0c1524]/60 text-xs font-bold uppercase tracking-wider text-slate-400">
+                        <tr class="border-b border-borderBg bg-[#f8fafc] text-xs font-bold uppercase tracking-wider text-slate-500">
                             <th class="py-4 px-6">ID</th>
                             <th class="py-4 px-6">Proyecto</th>
                             <th class="py-4 px-6">Líder</th>
                             <th class="py-4 px-6">Gerencia / Unidad</th>
                             <th class="py-4 px-6 text-center">Riesgo</th>
+                            <th class="py-4 px-6 text-right">Inversión Ejec.</th>
                             <th class="py-4 px-6 text-right">EBITDA Potencial</th>
                             <th class="py-4 px-6 text-right">EBITDA Capturado</th>
                             <th class="py-4 px-6 text-center">Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm divide-y divide-borderBg/40 cursor-pointer"></tbody>
+                    <tbody id="tableBody" class="text-sm divide-y divide-slate-100 cursor-pointer"></tbody>
                 </table>
             </div>
             
             <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
-                <i data-lucide="ban" class="w-10 h-10 text-slate-600"></i>
+                <i data-lucide="ban" class="w-10 h-10 text-slate-400"></i>
                 <p>No se encontraron proyectos con los filtros seleccionados.</p>
             </div>
         </div>
     </main>
 
     <!-- Modal Detalle Proyecto -->
-    <div id="projectModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-[#111d35] border border-borderBg rounded-3xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
+    <div id="projectModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800">
+            <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             
             <div class="space-y-2 pr-8">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span id="modalGerencia" class="text-[11px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-bold"></span>
-                    <span id="modalFunnel" class="text-[11px] bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-full font-bold"></span>
+                    <span id="modalGerencia" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full font-bold"></span>
+                    <span id="modalFunnel" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full font-bold"></span>
                 </div>
-                <h3 id="modalTitle" class="text-xl font-extrabold text-white leading-tight"></h3>
+                <h3 id="modalTitle" class="text-xl font-extrabold text-slate-900 leading-tight"></h3>
             </div>
 
             <!-- Fila Descripción y Velocímetro de Riesgo -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg md:col-span-2 flex flex-col justify-between">
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg md:col-span-2 flex flex-col justify-between">
                     <div>
-                        <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Descripción</h4>
-                        <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
+                        <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Descripción</h4>
+                        <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed"></p>
                     </div>
                     
                     <!-- Comentarios / Notas adicionales si existen -->
-                    <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-borderBg/60 hidden">
-                        <h5 class="text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1">Comentario de Control</h5>
-                        <p id="modalComment" class="text-xs text-slate-400 italic leading-relaxed"></p>
+                    <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-slate-200 hidden">
+                        <h5 class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1">Comentario de Control</h5>
+                        <p id="modalComment" class="text-xs text-slate-600 italic leading-relaxed"></p>
                     </div>
                 </div>
                 
-                <!-- Velocímetro de Riesgo Estilizado (SVG con overflow corregido) -->
-                <div class="bg-[#0c1524]/40 p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
-                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">Nivel de Riesgo</h4>
+                <!-- Velocímetro de Riesgo Estilizado (SVG integrado con la paleta de image_447465.png) -->
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
+                    <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Nivel de Riesgo</h4>
                     <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 80px;">
                         <svg class="w-32 h-16" viewBox="0 0 100 50">
                             <!-- Arco base gris de fondo -->
-                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Bajo (Verde) -->
-                            <path d="M 10 50 A 40 40 0 0 1 36.6 26.6" fill="none" stroke="#10b981" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Medio (Naranja) -->
-                            <path d="M 36.6 26.6 A 40 40 0 0 1 63.4 26.6" fill="none" stroke="#f59e0b" stroke-width="12" />
-                            <!-- Segmento Alto (Rojo) -->
-                            <path d="M 63.4 26.6 A 40 40 0 0 1 90 50" fill="none" stroke="#ef4444" stroke-width="12" stroke-linecap="round" />
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
+                            <!-- Segmento Bajo (Verde Bosque) -->
+                            <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
+                            <!-- Segmento Medio (Amarillo) -->
+                            <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
+                            <!-- Segmento Alto (Naranja Coral) -->
+                            <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
                             
-                            <!-- Grupo de Aguja con transform-box: view-box corregido para evitar fugas -->
+                            <!-- Grupo de Aguja -->
                             <g id="needleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
-                                <polygon points="49,50 51,50 50,14" fill="#f8fafc" />
+                                <polygon points="49,50 51,50 50,14" fill="#1e293b" />
                             </g>
                             
                             <!-- Eje Central -->
-                            <circle cx="50" cy="50" r="5" fill="#2979ff" stroke="#13223f" stroke-width="1" />
+                            <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                         </svg>
                     </div>
                     <span id="modalRiskLabel" class="text-xs font-extrabold uppercase tracking-widest mt-1">MEDIO</span>
                 </div>
             </div>
 
-            <!-- Detalles de la iniciativa (Estructura expandida con KR y Responsable de innovación) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-borderBg/60 pt-4">
+            <!-- Detalles de la iniciativa -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-slate-200 pt-4">
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500 font-medium">Líder Funcional</span>
-                    <p class="text-sm text-slate-200 flex items-center gap-2">
-                        <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-                        <span id="modalLeader"></span>
+                    <p class="text-sm text-slate-800 flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4 text-slate-500"></i>
+                        <span id="modalLeader" class="font-semibold text-slate-900"></span>
                     </p>
-                    <a id="modalEmail" href="#" class="text-xs text-blue-400 block pl-6 hover:underline"></a>
+                    <a id="modalEmail" href="#" class="text-xs text-palForest font-bold block pl-6 hover:underline"></a>
                 </div>
 
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500 font-medium">Responsable de Innovación</span>
-                    <p class="text-sm text-slate-200 flex items-center gap-2">
-                        <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
-                        <span id="modalRespInnovacion"></span>
+                    <p class="text-sm text-slate-800 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4 text-slate-500"></i>
+                        <span id="modalRespInnovacion" class="font-semibold text-slate-900"></span>
                     </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/40 sm:border-t-0 pt-3 sm:pt-0">
+                <div class="space-y-1 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
                     <span class="text-xs text-slate-500 font-medium">Sponsor del Proyecto</span>
-                    <p class="text-sm text-slate-200 flex items-center gap-2">
-                        <i data-lucide="award" class="w-4 h-4 text-slate-400"></i>
-                        <span id="modalSponsor"></span>
+                    <p class="text-sm text-slate-800 flex items-center gap-2">
+                        <i data-lucide="award" class="w-4 h-4 text-slate-500"></i>
+                        <span id="modalSponsor" class="font-semibold text-slate-900"></span>
                     </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/40 sm:border-t-0 pt-3 sm:pt-0">
+                <div class="space-y-1 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
                     <span class="text-xs text-slate-500 font-medium">Origen de Solución</span>
-                    <p id="modalOrigen" class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                        <i data-lucide="lightbulb" class="w-4 h-4 text-slate-400"></i>
-                        <span></span>
+                    <p id="modalOrigen" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-slate-500"></i>
+                        <span class="text-slate-900 font-semibold"></span>
                     </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/40 pt-3">
+                <div class="space-y-1 border-t border-slate-100 pt-3">
                     <span class="text-xs text-slate-500 font-medium">Tipo de Solución / Gobernanza TD</span>
-                    <p id="modalGovernance" class="text-sm text-slate-300 font-semibold flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-4 h-4 text-slate-400"></i>
-                        <span></span>
+                    <p id="modalGovernance" class="text-sm text-slate-800 font-semibold flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-4 h-4 text-slate-500"></i>
+                        <span class="text-slate-900 font-semibold"></span>
                     </p>
                 </div>
 
-                <div class="space-y-1 border-t border-borderBg/40 pt-3">
+                <div class="space-y-1 border-t border-slate-100 pt-3">
                     <span class="text-xs text-slate-500 font-medium">KR (Key Result)</span>
-                    <p id="modalKR" class="text-sm text-slate-300 font-semibold flex items-center gap-2">
-                        <i data-lucide="target" class="w-4 h-4 text-slate-400"></i>
-                        <span></span>
+                    <p id="modalKR" class="text-sm text-slate-800 font-semibold flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4 text-slate-500"></i>
+                        <span class="text-slate-900 font-semibold"></span>
                     </p>
                 </div>
             </div>
@@ -422,12 +473,14 @@
     <script>
         // URL Base de conexión directa solicitada
         const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv";
+        const METAS_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/metas-innovacion.csv";
 
         // Almacenamiento global de bases de datos
-        let masterDataset = []; // Base Maestra desde GitHub
-        let localDataset = [];  // Base de datos cargada localmente mediante "Subir Excel"
+        let masterDataset = [];  // Base Maestra desde GitHub
+        let localDataset = [];   // Base de datos cargada localmente mediante "Subir Excel"
         let currentDataset = []; // Dataset activo en pantalla
-        let charts = {}; // Instancias de Chart.js
+        let globalMetas = [];    // Metas de EBITDA y HHT desde metas-innovacion.csv
+        let charts = {};         // Instancias de Chart.js
 
         // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
@@ -453,7 +506,6 @@
                 try {
                     return decodeURIComponent(escape(s));
                 } catch (e) {
-                    // Si falla, continuar con mapeo manual selectivo
                     const map = {
                         'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
                         'Ã±': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
@@ -468,7 +520,7 @@
                 }
             }
 
-            // Reemplazar caracteres de reemplazo "" comunes por su vocal correcta según contexto en español
+            // Reemplazar caracteres de reemplazo comunes por su vocal correcta según contexto en español
             s = s.replace(/Gonzlez/g, "González");
             s = s.replace(/Innovacin/g, "Innovación");
             s = s.replace(/Diseo/g, "Diseño");
@@ -540,7 +592,7 @@
         };
 
         // ==========================================
-        // PROCESAMIENTO GENERAL DE FILAS CSV
+        // PROCESAMIENTO GENERAL DE FILAS CSV (PORTAFOLIO)
         // ==========================================
         function processCSVRows(rows) {
             if (!rows || rows.length === 0) return [];
@@ -573,7 +625,6 @@
                     return "";
                 };
 
-                // Limpiar codificación en todos los valores textuales leídos del CSV
                 const id = cleanEncoding(findVal(["id", "codigo", "key"])) || `PM-${String(index+1).padStart(3, '0')}`;
                 const nombre = cleanEncoding(findVal(["nombredelproyecto", "proyecto", "nombre"]));
                 const anio = cleanEncoding(findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]));
@@ -591,7 +642,10 @@
                 const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialanualclp", "ebitdapotencialclp", "ebitdapotencial"]));
                 const valEbitdaPotencial = cleanEncoding(findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]));
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadorealafechaclp", "ebitdacapturadoclp", "ebitdacapturado"]));
+                
+                // HHT Potencial y HHT Real capturado
                 const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
+                const hhtCapturado = parseNumeric(findVal(["hhtcapturadorealafechahoras", "hhtcapturadorealafecha", "hhtcapturado", "hhtreal", "hhtcapturadas", "hht_capturado"]));
                 
                 const estado = cleanEncoding(findVal(["estadoproyecto", "estado", "status"]));
                 const sponsor = cleanEncoding(findVal(["sponsor"]));
@@ -601,14 +655,13 @@
                 const comentario = cleanEncoding(findVal(["comentario", "comentarios", "observacion"]));
                 const requiereGobernanza = cleanEncoding(findVal(["requieregobernanzatd", "gobernanza"]));
                 
-                // Nuevos campos solicitados
                 const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
                 const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
 
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
-                    valEbitdaPotencial, ebitdaCapturado, hht, estado, sponsor,
+                    valEbitdaPotencial, ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
                     kr, respInnovacion
                 };
@@ -616,53 +669,107 @@
         }
 
         // ==========================================
-        // CARGA DIRECTA Y DECODIFICACIÓN BINARIA DETECTIVA
+        // PROCESAMIENTO DE FILAS CSV (METAS)
+        // ==========================================
+        function processMetasRows(rows) {
+            if (!rows || rows.length === 0) return [];
+            return rows.map(row => {
+                const normRow = {};
+                Object.keys(row).forEach(k => {
+                    if (k !== undefined && k !== null) {
+                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
+                    }
+                });
+
+                const findVal = (keywords) => {
+                    for (const kw of keywords) {
+                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                            return row[Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw)];
+                        }
+                    }
+                    for (const kw of keywords) {
+                        for (const actualKey of Object.keys(normRow)) {
+                            if (actualKey.includes(kw)) {
+                                return row[Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === actualKey)];
+                            }
+                        }
+                    }
+                    return "";
+                };
+
+                const indicador = cleanEncoding(findVal(["indicador", "ind", "name"]));
+                const anio = cleanEncoding(findVal(["ano", "anio", "year"]));
+                const meta = parseNumeric(findVal(["meta", "valor", "goal"]));
+
+                return { indicador, anio, meta };
+            }).filter(item => item.indicador !== "");
+        }
+
+        // ==========================================
+        // CARGA ASÍNCRONA MULTIPORTAFOLIO Y METAS DESDE GITHUB
         // ==========================================
         function connectToGitHubCSV() {
-            showConnectionStatus("loading", "Conectando con base maestra...", "Obteniendo datos de portafolio actualizados desde GitHub.");
+            showConnectionStatus("loading", "Sincronizando...", "Obteniendo datos del portafolio y metas desde GitHub.");
             
-            fetch(GITHUB_CSV_URL)
-                .then(response => {
-                    if (!response.ok) throw new Error("Fallo de red HTTP al solicitar el archivo.");
-                    return response.arrayBuffer();
-                })
-                .then(arrayBuffer => {
-                    let decodedText;
+            const fetchPortafolio = fetch(GITHUB_CSV_URL).then(res => {
+                if (!res.ok) throw new Error("No se pudo obtener el portafolio de proyectos.");
+                return res.arrayBuffer();
+            });
+
+            const fetchMetas = fetch(METAS_CSV_URL).then(res => {
+                if (!res.ok) throw new Error("No se pudieron obtener las metas.");
+                return res.arrayBuffer();
+            });
+
+            Promise.all([fetchPortafolio, fetchMetas])
+                .then(([portafolioBuffer, metasBuffer]) => {
+                    // Decodificar portafolio
+                    let portafolioText;
                     try {
-                        // Forzamos la comprobación fatal en UTF-8. Si no es UTF-8 (ej. Windows-1252), arrojará error
-                        const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
-                        decodedText = utf8Decoder.decode(arrayBuffer);
-                    } catch (err) {
-                        console.log("Fallo de decodificación UTF-8 (fatal: true). Decodificando con Windows-1252...");
-                        const latin1Decoder = new TextDecoder("windows-1252");
-                        decodedText = latin1Decoder.decode(arrayBuffer);
+                        portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer);
+                    } catch (e) {
+                        portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer);
                     }
 
-                    Papa.parse(decodedText, {
+                    // Decodificar metas
+                    let metasText;
+                    try {
+                        metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer);
+                    } catch (e) {
+                        metasText = new TextDecoder("windows-1252").decode(metasBuffer);
+                    }
+
+                    // Procesar portafolio
+                    Papa.parse(portafolioText, {
                         header: true,
                         skipEmptyLines: true,
-                        complete: function(results) {
-                            if (results.data && results.data.length > 0) {
-                                masterDataset = processCSVRows(results.data);
-                                console.log("Datos de GitHub cargados:", masterDataset);
-                                
-                                showConnectionStatus("success", "Base Maestra GitHub Conectada", `Se han cargado ${masterDataset.length} proyectos directamente de GitHub.`);
-                                
-                                if (document.getElementById('portfolioSelector').value === 'maestra') {
-                                    currentDataset = [...masterDataset];
-                                    initializeDashboard();
+                        complete: function(portResults) {
+                            masterDataset = processCSVRows(portResults.data);
+
+                            // Procesar metas
+                            Papa.parse(metasText, {
+                                header: true,
+                                skipEmptyLines: true,
+                                complete: function(metaResults) {
+                                    globalMetas = processMetasRows(metaResults.data);
+                                    console.log("Metas unificadas cargadas:", globalMetas);
+
+                                    showConnectionStatus("success", "Datos Sincronizados", `Se cargaron ${masterDataset.length} proyectos y metas desde GitHub.`);
+                                    
+                                    if (document.getElementById('portfolioSelector').value === 'maestra') {
+                                        currentDataset = [...masterDataset];
+                                        initializeDashboard();
+                                    }
                                 }
-                            } else {
-                                handleGitHubError("Estructura vacía de datos en GitHub.");
-                            }
+                            });
                         },
                         error: function(err) {
-                            handleGitHubError(err.message || "Error al procesar el parser.");
+                            handleGitHubError(err.message || "Error al procesar el portafolio.");
                         }
                     });
                 })
                 .catch(err => {
-                    console.warn("Fallo de conexión a GitHub, usando respaldo.", err);
+                    console.warn("Fallo de conexión a GitHub, cargando respaldo integrado.", err);
                     handleGitHubError(err.message || "Error de red");
                 });
         }
@@ -674,44 +781,6 @@
                 currentDataset = [...masterDataset];
                 initializeDashboard();
             }
-        }
-
-        // ==========================================
-        // BASE DE DATOS DE RESPALDO (Resiliente)
-        // ==========================================
-        function loadBackupDataset() {
-            return [
-                {
-                    id: "PM-001", nombre: "Recuperación de Fibra", anio: "2025",
-                    descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
-                    riesgo: "Bajo", gerencia: "Logística", tipoInnovacion: "Incremental",
-                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
-                    inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
-                    ebitdaCapturado: 16500000, hht: 250, estado: "Abierto", sponsor: "Director de Operaciones",
-                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés"
-                },
-                {
-                    id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
-                    descripcion: "Reestructuración del flujo logístico para devoluciones y empaques circulares reduciendo tiempos.",
-                    riesgo: "Medio", gerencia: "Logística", tipoInnovacion: "Adyacente",
-                    lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
-                    inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
-                    ebitdaCapturado: 99000000, hht: 300, estado: "Cerrado", sponsor: "Director de Operaciones",
-                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
-                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende"
-                },
-                {
-                    id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
-                    descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
-                    riesgo: "Alto", gerencia: "Operaciones", tipoInnovacion: "Adyacente",
-                    lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Diseño pilotaje",
-                    inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
-                    ebitdaCapturado: 0, hht: 240, estado: "Abierto", sponsor: "Gerente de Planta",
-                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
-                }
-            ];
         }
 
         // ==========================================
@@ -728,13 +797,9 @@
                 const arrayBuffer = e.target.result;
                 let decodedText;
                 try {
-                    // Forzamos la comprobación fatal en UTF-8. Si no es UTF-8 (ej. Windows-1252), arrojará error
-                    const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
-                    decodedText = utf8Decoder.decode(arrayBuffer);
+                    decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer);
                 } catch (err) {
-                    console.log("Fallo de decodificación UTF-8 en archivo local. Probando Windows-1252...");
-                    const latin1Decoder = new TextDecoder("windows-1252");
-                    decodedText = latin1Decoder.decode(arrayBuffer);
+                    decodedText = new TextDecoder("windows-1252").decode(arrayBuffer);
                 }
 
                 Papa.parse(decodedText, {
@@ -762,7 +827,7 @@
         }
 
         // ==========================================
-        // GESTIÓN DE INTERFAZ DE ESTADO
+        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
         // ==========================================
         function showConnectionStatus(status, title, message) {
             const alert = document.getElementById("connectionAlert");
@@ -773,16 +838,16 @@
             alert.className = "px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300 animate-fadeIn border ";
 
             if (status === "loading") {
-                alert.classList.add("bg-blue-950/40", "border-blue-500/30", "text-blue-200");
-                icon.className = "w-4 h-4 text-cyan-400 shrink-0 mt-0.5 animate-spin";
+                alert.classList.add("bg-cardBg", "border-palOrange/30", "text-slate-800");
+                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5 animate-spin";
                 icon.setAttribute("data-lucide", "refresh-cw");
             } else if (status === "success") {
-                alert.classList.add("bg-emerald-950/40", "border-emerald-500/30", "text-emerald-200");
-                icon.className = "w-4 h-4 text-[#00e676] shrink-0 mt-0.5";
+                alert.classList.add("bg-cardBg", "border-palLime/50", "text-slate-800");
+                icon.className = "w-4 h-4 text-palForest shrink-0 mt-0.5";
                 icon.setAttribute("data-lucide", "check-circle");
             } else if (status === "error") {
-                alert.classList.add("bg-rose-950/40", "border-rose-500/30", "text-rose-200");
-                icon.className = "w-4 h-4 text-rose-500 shrink-0 mt-0.5";
+                alert.classList.add("bg-cardBg", "border-palOrange/50", "text-slate-800");
+                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5";
                 icon.setAttribute("data-lucide", "alert-triangle");
             }
 
@@ -792,6 +857,9 @@
             lucide.createIcons();
         }
 
+        // ==========================================
+        // SELECTOR DE PORTAFOLIOS
+        // ==========================================
         function handlePortfolioChange() {
             const selected = document.getElementById('portfolioSelector').value;
             if (selected === 'maestra') {
@@ -810,7 +878,7 @@
         }
 
         // ==========================================
-        // SISTEMA DE FILTRADO DINÁMICO
+        // FILTRADO DINÁMICO
         // ==========================================
         let filteredDataset = [];
 
@@ -863,24 +931,74 @@
         }
 
         // ==========================================
-        // CÁLCULO DE MÉTRICAS (KPIs)
+        // CÁLCULO DE MÉTRICAS (KPIs) Y COMPARACIÓN CON METAS
         // ==========================================
         function updateKPIs() {
+            const fAnio = document.getElementById("filterAnio").value;
+
             const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
             const sumEbitdaCapturado = filteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
-            const sumHht = filteredDataset.reduce((sum, item) => sum + item.hht, 0);
+            const sumHhtCapturado = filteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
             
+            // EBITDA potencial donde el estado de validación sea "Validado"
+            const sumEbitdaValidado = filteredDataset.reduce((sum, item) => {
+                if (item.valEbitdaPotencial && item.valEbitdaPotencial.toLowerCase().trim() === "validado") {
+                    return sum + item.ebitdaPotencial;
+                }
+                return sum;
+            }, 0);
+
+            // Obtener metas para EBITDA capturado y HHT Capturada según filtros de año
+            let targetEbitda = 0;
+            let targetHht = 0;
+
+            if (fAnio) {
+                // Filtro anual específico
+                const matchEbitda = globalMetas.find(m => 
+                    normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio)
+                );
+                const matchHht = globalMetas.find(m => 
+                    (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio)
+                );
+                targetEbitda = matchEbitda ? matchEbitda.meta : 0;
+                targetHht = matchHht ? matchHht.meta : 0;
+            } else {
+                // Consolidar metas de todos los años representados en el dataset actual
+                const uniqueYears = [...new Set(filteredDataset.map(item => String(item.anio)))].filter(Boolean);
+                uniqueYears.forEach(yr => {
+                    const matchEbitda = globalMetas.find(m => 
+                        normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(yr)
+                    );
+                    const matchHht = globalMetas.find(m => 
+                        (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(yr)
+                    );
+                    if (matchEbitda) targetEbitda += matchEbitda.meta;
+                    if (matchHht) targetHht += matchHht.meta;
+                });
+            }
+
             const totalProjects = filteredDataset.length;
             const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
             const cerrados = totalProjects - abiertos;
 
+            // Renderizado de valores en KPI
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
-            document.getElementById("kpiHht").innerText = sumHht.toLocaleString("es-CL");
+            document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
-            const percentage = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaCapturado / sumEbitdaPotencial) * 100) : 0;
-            document.getElementById("kpiEbitdaCapturadoSub").innerText = `${percentage}% del potencial capturado`;
+            // Comparativa EBITDA Capturado vs Meta
+            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaCapturado / targetEbitda) * 100) : 0;
+            document.getElementById("kpiEbitdaCapturadoSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
+            
+            // Porcentaje del EBITDA validado respecto al potencial total
+            const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
+            document.getElementById("kpiEbitdaPotencialSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
+
+            // Comparativa HHT Capturado Real vs Meta
+            const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
+            document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
+
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
             document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
         }
@@ -903,37 +1021,38 @@
 
             filteredDataset.forEach(item => {
                 const tr = document.createElement("tr");
-                tr.className = "border-b border-borderBg/30 hover:bg-slate-800/40 transition-colors text-xs text-slate-200";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700";
                 tr.onclick = () => openModal(item);
 
-                let riskBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
+                let riskBadge = "bg-slate-100 text-slate-600 border border-slate-200";
                 if (item.riesgo) {
                     const rNorm = item.riesgo.toLowerCase();
-                    if (rNorm.includes("bajo")) riskBadge = "bg-emerald-500/10 text-[#00e676] border border-emerald-500/20";
-                    else if (rNorm.includes("medio")) riskBadge = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                    else if (rNorm.includes("alto")) riskBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                    if (rNorm.includes("bajo")) riskBadge = "bg-emerald-50 text-palForest border border-palForest/20";
+                    else if (rNorm.includes("medio")) riskBadge = "bg-yellow-50 text-[#d97706] border border-palYellow/30"; // Texto adaptado para contraste y legibilidad
+                    else if (rNorm.includes("alto")) riskBadge = "bg-orange-50 text-palOrange border border-palOrange/20";
                 }
 
-                let estadoBadge = "bg-slate-800/40 text-slate-400 border border-slate-700/50";
+                let estadoBadge = "bg-slate-100 text-slate-500 border border-slate-200";
                 if (item.estado) {
                     const eNorm = item.estado.toLowerCase();
-                    if (eNorm.includes("abierto")) estadoBadge = "bg-blue-500/10 text-cyan-400 border border-blue-500/20";
-                    else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-800 text-slate-500 border border-slate-700";
-                    else estadoBadge = "bg-[#1d2d4d] text-slate-300 border border-borderBg";
+                    if (eNorm.includes("abierto")) estadoBadge = "bg-lime-50 text-lime-800 border border-lime-200";
+                    else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
+                    else estadoBadge = "bg-slate-100 text-slate-600 border border-slate-200";
                 }
 
                 tr.innerHTML = `
-                    <td class="py-3 px-6 font-mono font-bold text-[#00E5FF]">${item.id}</td>
-                    <td class="py-3 px-6 font-extrabold text-white max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
+                    <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
+                    <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
                     <td class="py-3 px-6">${item.lider || 'N/A'}</td>
-                    <td class="py-3 px-6"><span class="bg-[#1d2d4d]/60 px-2 py-1 rounded text-[10px]">${item.gerencia || 'N/A'}</span></td>
+                    <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
                             ${item.riesgo || 'N/A'}
                         </span>
                     </td>
+                    <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.inversion)}</td>
                     <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
-                    <td class="py-3 px-6 text-right font-bold text-emerald-400">${formatCurrency(item.ebitdaCapturado)}</td>
+                    <td class="py-3 px-6 text-right font-bold text-palForest">${formatCurrency(item.ebitdaCapturado)}</td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
                             ${item.estado || 'N/A'}
@@ -948,20 +1067,19 @@
         // CREACIÓN Y ACTUALIZACIÓN DE GRÁFICOS
         // ==========================================
         function initChartsContainer() {
-            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.color = '#475569'; // Gris oscuro para textos en modo claro
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
+            Chart.defaults.borderColor = '#e2e8f0'; // Rejillas claras de fondo
         }
 
         let chartEbitdaInstance = null;
+        let chartProyectosUnidadInstance = null;
         let chartTipoInstance = null;
-        let chartRiesgoInstance = null;
-        let chartOrigenInstance = null;
 
         function renderCharts() {
             if (chartEbitdaInstance) chartEbitdaInstance.destroy();
+            if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
-            if (chartRiesgoInstance) chartRiesgoInstance.destroy();
-            if (chartOrigenInstance) chartOrigenInstance.destroy();
 
             // 1. Chart EBITDA Potencial vs Capturado por Unidad
             const ebitdaByGerencia = {};
@@ -987,16 +1105,16 @@
                         {
                             label: 'EBITDA Potencial',
                             data: sortedGerencias.map(g => ebitdaByGerencia[g].potencial),
-                            backgroundColor: 'rgba(168, 85, 247, 0.65)',
-                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(149, 110, 178, 0.85)', // palPurple
+                            borderColor: '#956eb6',
                             borderWidth: 1,
                             borderRadius: 6
                         },
                         {
                             label: 'EBITDA Capturado',
                             data: sortedGerencias.map(g => ebitdaByGerencia[g].capturado),
-                            backgroundColor: 'rgba(0, 230, 118, 0.75)',
-                            borderColor: '#00e676',
+                            backgroundColor: 'rgba(15, 111, 70, 0.9)', // palForest
+                            borderColor: '#0f6f46',
                             borderWidth: 1,
                             borderRadius: 6
                         }
@@ -1011,14 +1129,59 @@
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
-                            grid: { color: 'rgba(29, 45, 77, 0.2)' },
+                            grid: { color: 'rgba(107, 124, 133, 0.12)' },
                             ticks: { font: { size: 9 }, callback: (v) => '$' + (v / 1e6) + 'M' }
                         }
                     }
                 }
             });
 
-            // 2. Chart Tipo Innovación (Doughnut)
+            // 2. Gráfico Proyectos por Unidad (Barras Horizontales con palLime)
+            const proyectosByGerencia = {};
+            filteredDataset.forEach(item => {
+                const gerencia = item.gerencia || "Sin asignar";
+                proyectosByGerencia[gerencia] = (proyectosByGerencia[gerencia] || 0) + 1;
+            });
+
+            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => {
+                return proyectosByGerencia[b] - proyectosByGerencia[a];
+            });
+
+            const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
+            chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
+                type: 'bar',
+                data: {
+                    labels: sortedProyectosGerencias,
+                    datasets: [{
+                        label: 'Proyectos',
+                        data: sortedProyectosGerencias.map(g => proyectosByGerencia[g]),
+                        backgroundColor: 'rgba(155, 202, 60, 0.85)', // palLime
+                        borderColor: '#9bca3c',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Barras horizontales
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(107, 124, 133, 0.12)' },
+                            ticks: { precision: 0, font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 3. Chart Tipo Innovación (Doughnut con palLime, palForest, palOrange, palPurple, palGray)
             const tiposCount = {};
             filteredDataset.forEach(i => {
                 const tipo = i.tipoInnovacion || "Sin tipo";
@@ -1032,7 +1195,7 @@
                     labels: Object.keys(tiposCount),
                     datasets: [{
                         data: Object.values(tiposCount),
-                        backgroundColor: ['#2979ff', '#00E5FF', '#a855f7', '#f59e0b', '#ec4899'],
+                        backgroundColor: ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'],
                         borderWidth: 0
                     }]
                 },
@@ -1047,91 +1210,17 @@
             const legendTipo = document.getElementById("legendTipoInno");
             legendTipo.innerHTML = "";
             Object.keys(tiposCount).forEach((tipo, index) => {
-                const colors = ['#2979ff', '#00E5FF', '#a855f7', '#f59e0b', '#ec4899'];
+                const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'];
                 legendTipo.innerHTML += `
                     <div class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
-                        <span class="font-bold text-slate-300">${tipo}</span>
+                        <span class="font-bold text-slate-700">${tipo}</span>
                         <span class="text-slate-500">(${tiposCount[tipo]})</span>
                     </div>
                 `;
             });
 
-            // 3. Nivel de Riesgo (Bar Vertical)
-            const riesgoCount = { "Bajo": 0, "Medio": 0, "Alto": 0, "No definido": 0 };
-            filteredDataset.forEach(i => {
-                let r = "No definido";
-                if (i.riesgo) {
-                    const rNorm = i.riesgo.toLowerCase();
-                    if (rNorm.includes("bajo")) r = "Bajo";
-                    else if (rNorm.includes("medio")) r = "Medio";
-                    else if (rNorm.includes("alto")) r = "Alto";
-                }
-                riesgoCount[r]++;
-            });
-
-            const ctxRiesgo = document.getElementById("chartRiesgo").getContext("2d");
-            chartRiesgoInstance = new Chart(ctxRiesgo, {
-                type: 'bar',
-                data: {
-                    labels: ["Bajo", "Medio", "Alto", "No definido"],
-                    datasets: [{
-                        label: 'Proyectos',
-                        data: [riesgoCount["Bajo"], riesgoCount["Medio"], riesgoCount["Alto"], riesgoCount["No definido"]],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#475569'],
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { grid: { color: 'rgba(29, 45, 77, 0.2)' }, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-
-            // 4. Origen de Solución (Pie)
-            const origenCount = {};
-            filteredDataset.forEach(i => {
-                const origen = i.origenSolucion || "No especificado";
-                origenCount[origen] = (origenCount[origen] || 0) + 1;
-            });
-
-            const ctxOrigen = document.getElementById("chartOrigenSolucion").getContext("2d");
-            chartOrigenInstance = new Chart(ctxOrigen, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(origenCount),
-                    datasets: [{
-                        data: Object.values(origenCount),
-                        backgroundColor: ['#10b981', '#2979ff', '#f59e0b', '#e11d48', '#8b5cf6'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            const legendOrigen = document.getElementById("legendOrigen");
-            legendOrigen.innerHTML = "";
-            Object.keys(origenCount).forEach((orig, index) => {
-                const colors = ['#10b981', '#2979ff', '#f59e0b', '#e11d48', '#8b5cf6'];
-                legendOrigen.innerHTML += `
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
-                        <span class="text-slate-300 font-bold">${orig}</span>
-                        <span class="text-slate-500">(${origenCount[orig]})</span>
-                    </div>
-                `;
-            });
-
-            // 5. Etapas del Funnel
+            // 4. Etapas del Funnel
             const funnelCount = {
                 "Archivados": 0,
                 "Problematización": 0,
@@ -1162,16 +1251,16 @@
 
                 funnelHTML += `
                     <div class="flex items-center w-full min-h-[28px]">
-                        <div class="w-[40%] text-right pr-4 text-[11px] font-semibold text-slate-300 leading-tight">
+                        <div class="w-[40%] text-right pr-4 text-[11px] font-semibold text-slate-600 leading-tight">
                             ${stage}
                         </div>
                         <div class="w-[60%] flex justify-center items-center">
                             ${countVal > 0 ? `
-                                <div style="width: ${barWidth}%;" class="bg-[#7c3aed] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md shadow-purple-900/10">
+                                <div style="width: ${barWidth}%;" class="bg-[#956eb6] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md shadow-purple-900/10">
                                     ${countVal}
                                 </div>
                             ` : `
-                                <div class="w-[12%] bg-slate-800/10 text-slate-500 text-[10px] py-1 rounded text-center">
+                                <div class="w-[12%] bg-slate-100 text-slate-400 text-[10px] py-1 rounded text-center border border-slate-200">
                                     0
                                 </div>
                             `}
@@ -1182,10 +1271,57 @@
             
             funnelHTML += `</div>`;
             funnelContainer.innerHTML = funnelHTML;
+
+            // 5. Cálculo y Actualización de Velocímetro de Riesgo Promedio del Portafolio
+            let totalRiskVal = 0;
+            let countWithRisk = 0;
+
+            filteredDataset.forEach(item => {
+                if (item.riesgo) {
+                    const rNorm = item.riesgo.toLowerCase();
+                    if (rNorm.includes("bajo")) {
+                        totalRiskVal += 0.0;
+                        countWithRisk++;
+                    } else if (rNorm.includes("medio")) {
+                        totalRiskVal += 0.5;
+                        countWithRisk++;
+                    } else if (rNorm.includes("alto")) {
+                        totalRiskVal += 1.0;
+                        countWithRisk++;
+                    }
+                }
+            });
+
+            const avgRisk = countWithRisk > 0 ? (totalRiskVal / countWithRisk) : 0;
+            const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
+            const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
+
+            // Actualiza la etiqueta textual del portafolio (N/A, BAJO, MEDIO, ALTO)
+            if (portfolioRiskLabelEl) {
+                if (countWithRisk === 0) {
+                    portfolioRiskLabelEl.innerText = "N/A";
+                    portfolioRiskLabelEl.className = "text-xs font-bold uppercase tracking-widest text-slate-400";
+                } else if (avgRisk < 0.33) {
+                    portfolioRiskLabelEl.innerText = "BAJO";
+                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#0f6f46]";
+                } else if (avgRisk < 0.66) {
+                    portfolioRiskLabelEl.innerText = "MEDIO";
+                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#d97706]";
+                } else {
+                    portfolioRiskLabelEl.innerText = "ALTO";
+                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#f15a24]";
+                }
+            }
+
+            // Gira la aguja vectorialmente
+            if (portfolioNeedleGroup) {
+                const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
+                portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
+            }
         }
 
         // ==========================================
-        // VENTANA MODAL DETALLE DE INICIATIVA (Con KR y Responsable)
+        // VENTANA MODAL DETALLE DE INICIATIVA
         // ==========================================
         function openModal(item) {
             document.getElementById("modalTitle").innerText = item.nombre || "Sin nombre";
@@ -1197,10 +1333,7 @@
             document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
             document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
             
-            // Origen de la solución
             document.querySelector("#modalOrigen span").innerText = item.origenSolucion || "No especificado";
-            
-            // Nuevos datos integrados
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
@@ -1219,7 +1352,6 @@
                 commContainer.classList.add("hidden");
             }
 
-            // Rotación segura de la aguja con transform-box de view-box
             const needleGroup = document.getElementById("needleGroup");
             const riskLabel = document.getElementById("modalRiskLabel");
             let rotation = 0;
@@ -1229,15 +1361,15 @@
                 if (rNorm.includes("bajo")) {
                     rotation = -60;
                     riskLabel.innerText = "BAJO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-emerald-400";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-palForest";
                 } else if (rNorm.includes("alto")) {
                     rotation = 60;
                     riskLabel.innerText = "ALTO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-rose-500";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-palOrange";
                 } else {
                     rotation = 0;
                     riskLabel.innerText = "MEDIO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-amber-500";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-[#d97706]";
                 }
             } else {
                 rotation = 0;
@@ -1250,7 +1382,44 @@
             lucide.createIcons();
         }
 
-        // Cierre de ventana modal
+        // ==========================================
+        // BASE DE DATOS DE RESPALDO (Resiliente)
+        // ==========================================
+        function loadBackupDataset() {
+            return [
+                {
+                    id: "PM-001", nombre: "Recuperación de Fibra", anio: "2025",
+                    descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
+                    riesgo: "Bajo", gerencia: "Logística", tipoInnovacion: "Incremental",
+                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
+                    inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
+                    ebitdaCapturado: 16500000, hht: 250, hhtCapturado: 190, estado: "Abierto", sponsor: "Director de Operaciones",
+                    escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
+                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés"
+                },
+                {
+                    id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
+                    descripcion: "Reestructuración del flujo logístico para devoluciones y empaques circulares reduciendo tiempos.",
+                    riesgo: "Medio", gerencia: "Logística", tipoInnovacion: "Adyacente",
+                    lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
+                    inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
+                    ebitdaCapturado: 99000000, hht: 300, hhtCapturado: 270, estado: "Cerrado", sponsor: "Director de Operaciones",
+                    escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
+                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende"
+                },
+                {
+                    id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
+                    descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
+                    riesgo: "Alto", gerencia: "Operaciones", tipoInnovacion: "Adyacente",
+                    lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Diseño pilotaje",
+                    inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
+                    ebitdaCapturado: 0, hht: 240, hhtCapturado: 0, estado: "Abierto", sponsor: "Gerente de Planta",
+                    escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
+                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
+                }
+            ];
+        }
+
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
