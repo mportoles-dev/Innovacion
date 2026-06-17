@@ -270,7 +270,7 @@
                 <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
             </div>
 
-            <!-- RIESGO PROMEDIO DEL PORTAFOLIO (Reemplaza Origen de Solución) -->
+            <!-- RIESGO PROMEDIO DEL PORTAFOLIO -->
             <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
                 <div class="flex items-center gap-2 mb-2">
                     <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
@@ -297,12 +297,10 @@
                             <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                         </svg>
                     </div>
-                    <!-- Etiqueta de Texto Restaurada (Sin el promedio numérico) -->
                     <div class="text-center mt-3">
                         <span id="portfolioRiskLabel" class="text-xs font-extrabold uppercase tracking-widest text-slate-500">N/A</span>
                     </div>
                 </div>
-                <!-- Leyenda de Riesgo Promedio (Sin valores numéricos ponderadores) -->
                 <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
                     <div class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: #0f6f46;"></span>
@@ -361,7 +359,7 @@
 
     <!-- Modal Detalle Proyecto -->
     <div id="projectModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800">
+        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-4xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800 animate-fadeIn">
             <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -382,25 +380,20 @@
                         <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed"></p>
                     </div>
                     
-                    <!-- Comentarios / Notas adicionales si existen -->
                     <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-slate-200 hidden">
                         <h5 class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1">Comentario de Control</h5>
                         <p id="modalComment" class="text-xs text-slate-600 italic leading-relaxed"></p>
                     </div>
                 </div>
                 
-                <!-- Velocímetro de Riesgo Estilizado (SVG integrado con la paleta de image_447465.png) -->
+                <!-- Nivel de Riesgo -->
                 <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
                     <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Nivel de Riesgo</h4>
                     <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 80px;">
                         <svg class="w-32 h-16" viewBox="0 0 100 50">
-                            <!-- Arco base gris de fondo -->
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Bajo (Verde Bosque) -->
                             <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Medio (Amarillo) -->
                             <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
-                            <!-- Segmento Alto (Naranja Coral) -->
                             <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
                             
                             <!-- Grupo de Aguja -->
@@ -467,11 +460,46 @@
                     </p>
                 </div>
             </div>
+
+            <!-- CARTA GANTT DE SEGUIMIENTO -->
+            <div id="modalGanttContainer" class="border-t border-slate-200 pt-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+                        <i data-lucide="calendar-range" class="w-4 h-4 text-palPurple"></i>
+                        Cronograma y Carta Gantt (Estructurado por Objetivo)
+                    </span>
+                    <span id="ganttStatus" class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"></span>
+                </div>
+                
+                <!-- Animación de carga -->
+                <div id="ganttLoading" class="hidden text-center py-8 text-xs text-slate-400">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-palPurple mx-auto mb-2"></div>
+                    Sincronizando cronograma del proyecto...
+                </div>
+
+                <!-- Estado sin archivo (Explicativo) -->
+                <div id="ganttEmpty" class="hidden bg-[#f8fafc] border border-dashed border-slate-200 rounded-2xl p-4 text-center space-y-2">
+                    <div class="flex items-center justify-center gap-2 text-amber-600 text-xs font-bold">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        <span>Sincronización Real Pendiente</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed max-w-lg mx-auto">
+                        Para activar este flujo, guarda tu archivo <span class="font-bold text-slate-700">"Hoja de Ruta - Nombre de proyecto.xlsx"</span> en formato CSV como <span id="ganttExpectedFile" class="font-mono bg-slate-200 text-slate-700 px-1 py-0.5 rounded font-bold"></span> e insértalo dentro de la carpeta <span class="font-mono bg-slate-200 text-slate-700 px-1 py-0.5 rounded">hojas-de-ruta</span> en tu repositorio.
+                    </p>
+                </div>
+
+                <!-- Renderizador de Gráfico Gantt Vectorial/CSS -->
+                <div id="ganttChartWrapper" class="hidden overflow-x-auto border border-slate-100 rounded-2xl bg-[#f8fafc] custom-scrollbar">
+                    <div class="min-w-[760px] p-5 text-xs space-y-4" id="ganttTimelineContent">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // URL Base de conexión directa solicitada
+        // URL Base de conexión directa
         const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv";
         const METAS_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/metas-innovacion.csv";
 
@@ -484,14 +512,42 @@
 
         // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
-            "Archivados",
-            "Problematización",
-            "Alternativas de solución",
-            "Diseño pilotaje",
-            "Ejecución pilotaje",
-            "Implementación",
-            "Seguimiento"
+            "Archivados", "Problematización", "Alternativas de solución",
+            "Diseño pilotaje", "Ejecución pilotaje", "Implementación", "Seguimiento"
         ];
+
+        // ==========================================
+        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
+        // ==========================================
+        function showConnectionStatus(status, title, message) {
+            const alert = document.getElementById("connectionAlert");
+            const icon = document.getElementById("alertIcon");
+            const aTitle = document.getElementById("alertTitle");
+            const aMessage = document.getElementById("alertMessage");
+
+            if (!alert || !icon || !aTitle || !aMessage) return;
+
+            alert.className = "px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300 animate-fadeIn border ";
+
+            if (status === "loading") {
+                alert.classList.add("bg-cardBg", "border-palOrange/30", "text-slate-800");
+                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5 animate-spin";
+                icon.setAttribute("data-lucide", "refresh-cw");
+            } else if (status === "success") {
+                alert.classList.add("bg-cardBg", "border-palLime/50", "text-slate-800");
+                icon.className = "w-4 h-4 text-palForest shrink-0 mt-0.5";
+                icon.setAttribute("data-lucide", "check-circle");
+            } else if (status === "error") {
+                alert.classList.add("bg-cardBg", "border-palOrange/50", "text-slate-800");
+                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5";
+                icon.setAttribute("data-lucide", "alert-triangle");
+            }
+
+            aTitle.innerText = title;
+            aMessage.innerText = message;
+            alert.classList.remove("hidden");
+            lucide.createIcons();
+        }
 
         // ==========================================
         // SANITIZADOR Y DECODIFICADOR DE CARACTERES
@@ -501,7 +557,6 @@
             let s = String(str).trim();
             if (!s) return "";
 
-            // Intento 1: Decodificar codificaciones dobles UTF-8 comunes si contiene patrones característicos
             if (s.includes("Ã")) {
                 try {
                     return decodeURIComponent(escape(s));
@@ -520,7 +575,6 @@
                 }
             }
 
-            // Reemplazar caracteres de reemplazo comunes por su vocal correcta según contexto en español
             s = s.replace(/Gonzlez/g, "González");
             s = s.replace(/Innovacin/g, "Innovación");
             s = s.replace(/Diseo/g, "Diseño");
@@ -538,8 +592,37 @@
         };
 
         // ==========================================
-        // FORMATOS DE MONEDA E INT COMPATIBLES
+        // PARSEO DE FECHAS EN FORMATO DD-MM-YYYY
         // ==========================================
+        function parseDateDDMMYYYY(str) {
+            if (!str) return null;
+            let s = String(str).trim();
+            if (!s) return null;
+            
+            const parts = s.split(/[^0-9]/).filter(Boolean);
+            if (parts.length >= 3) {
+                let day, month, year;
+                if (parts[0].length === 4) {
+                    // Formato alternativo YYYY-MM-DD
+                    year = parseInt(parts[0], 10);
+                    month = parseInt(parts[1], 10) - 1;
+                    day = parseInt(parts[2], 10);
+                } else {
+                    // Formato prioritario DD-MM-YYYY
+                    day = parseInt(parts[0], 10);
+                    month = parseInt(parts[1], 10) - 1; // Base cero para Date
+                    year = parseInt(parts[2], 10);
+                }
+                
+                if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                    // Evitar desfase horario configurándolo a mediodía local
+                    return new Date(year, month, day, 12, 0, 0);
+                }
+            }
+            const fallback = new Date(s);
+            return isNaN(fallback.getTime()) ? null : fallback;
+        }
+
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('es-CL', {
                 style: 'currency',
@@ -556,8 +639,8 @@
                 const cleanStr = str.replace(/[\$\s\u00A0\u200B\.]/g, "");
                 if (cleanStr === "-" || cleanStr === "") return 0;
             }
-            str = str.replace(/[\$\s\u00A0\u200B\.]/g, ""); // Remueve pesos, espacios y puntos de miles
-            str = str.replace(/,/g, "."); // Reemplaza comas de decimales
+            str = str.replace(/[\$\s\u00A0\u200B\.]/g, "");
+            str = str.replace(/,/g, ".");
             if (str === "" || str === "-" || str === ".-" || str === ",-") return 0;
             const parsed = parseFloat(str);
             return isNaN(parsed) ? 0 : parsed;
@@ -571,7 +654,6 @@
                       .replace(/[^a-z0-9]/g, "");
         };
 
-        // Mapeo ultra flexible para estandarizar las etapas del embudo de innovación
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
             let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -643,7 +725,6 @@
                 const valEbitdaPotencial = cleanEncoding(findVal(["estadodevalidacionebitdapotencial", "validacionebitda"]));
                 const ebitdaCapturado = parseNumeric(findVal(["ebitdacapturadorealafechaclp", "ebitdacapturadoclp", "ebitdacapturado"]));
                 
-                // HHT Potencial y HHT Real capturado
                 const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
                 const hhtCapturado = parseNumeric(findVal(["hhtcapturadorealafechahoras", "hhtcapturadorealafecha", "hhtcapturado", "hhtreal", "hhtcapturadas", "hht_capturado"]));
                 
@@ -706,13 +787,13 @@
         }
 
         // ==========================================
-        // CARGA ASÍNCRONA MULTIPORTAFOLIO Y METAS DESDE GITHUB
+        // CARGA ASÍNCRONA DESDE GITHUB
         // ==========================================
         function connectToGitHubCSV() {
             showConnectionStatus("loading", "Sincronizando...", "Obteniendo datos del portafolio y metas desde GitHub.");
             
             const fetchPortafolio = fetch(GITHUB_CSV_URL).then(res => {
-                if (!res.ok) throw new Error("No se pudo obtener el portafolio de proyectos.");
+                if (!res.ok) throw new Error("No se pudo obtener el portafolio.");
                 return res.arrayBuffer();
             });
 
@@ -723,30 +804,20 @@
 
             Promise.all([fetchPortafolio, fetchMetas])
                 .then(([portafolioBuffer, metasBuffer]) => {
-                    // Decodificar portafolio
                     let portafolioText;
-                    try {
-                        portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer);
-                    } catch (e) {
-                        portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer);
-                    }
+                    try { portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer); } 
+                    catch (e) { portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer); }
 
-                    // Decodificar metas
                     let metasText;
-                    try {
-                        metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer);
-                    } catch (e) {
-                        metasText = new TextDecoder("windows-1252").decode(metasBuffer);
-                    }
+                    try { metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer); } 
+                    catch (e) { metasText = new TextDecoder("windows-1252").decode(metasBuffer); }
 
-                    // Procesar portafolio
                     Papa.parse(portafolioText, {
                         header: true,
                         skipEmptyLines: true,
                         complete: function(portResults) {
                             masterDataset = processCSVRows(portResults.data);
 
-                            // Procesar metas
                             Papa.parse(metasText, {
                                 header: true,
                                 skipEmptyLines: true,
@@ -762,14 +833,10 @@
                                     }
                                 }
                             });
-                        },
-                        error: function(err) {
-                            handleGitHubError(err.message || "Error al procesar el portafolio.");
                         }
                     });
                 })
                 .catch(err => {
-                    console.warn("Fallo de conexión a GitHub, cargando respaldo integrado.", err);
                     handleGitHubError(err.message || "Error de red");
                 });
         }
@@ -796,11 +863,8 @@
             reader.onload = function(e) {
                 const arrayBuffer = e.target.result;
                 let decodedText;
-                try {
-                    decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer);
-                } catch (err) {
-                    decodedText = new TextDecoder("windows-1252").decode(arrayBuffer);
-                }
+                try { decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
+                catch (err) { decodedText = new TextDecoder("windows-1252").decode(arrayBuffer); }
 
                 Papa.parse(decodedText, {
                     header: true,
@@ -808,18 +872,13 @@
                     complete: function(results) {
                         if (results.data && results.data.length > 0) {
                             localDataset = processCSVRows(results.data);
-                            
                             document.getElementById('portfolioSelector').value = 'cargada';
                             currentDataset = [...localDataset];
-                            
-                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas de tu archivo.`);
+                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas.`);
                             initializeDashboard();
                         } else {
-                            showConnectionStatus("error", "Error en archivo", "El archivo cargado no contiene un formato compatible.");
+                            showConnectionStatus("error", "Error en archivo", "Formato no compatible.");
                         }
-                    },
-                    error: function(err) {
-                        showConnectionStatus("error", "Error cargando archivo", err.message);
                     }
                 });
             };
@@ -827,38 +886,7 @@
         }
 
         // ==========================================
-        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
-        // ==========================================
-        function showConnectionStatus(status, title, message) {
-            const alert = document.getElementById("connectionAlert");
-            const icon = document.getElementById("alertIcon");
-            const aTitle = document.getElementById("alertTitle");
-            const aMessage = document.getElementById("alertMessage");
-
-            alert.className = "px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300 animate-fadeIn border ";
-
-            if (status === "loading") {
-                alert.classList.add("bg-cardBg", "border-palOrange/30", "text-slate-800");
-                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5 animate-spin";
-                icon.setAttribute("data-lucide", "refresh-cw");
-            } else if (status === "success") {
-                alert.classList.add("bg-cardBg", "border-palLime/50", "text-slate-800");
-                icon.className = "w-4 h-4 text-palForest shrink-0 mt-0.5";
-                icon.setAttribute("data-lucide", "check-circle");
-            } else if (status === "error") {
-                alert.classList.add("bg-cardBg", "border-palOrange/50", "text-slate-800");
-                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5";
-                icon.setAttribute("data-lucide", "alert-triangle");
-            }
-
-            aTitle.innerText = title;
-            aMessage.innerText = message;
-            alert.classList.remove("hidden");
-            lucide.createIcons();
-        }
-
-        // ==========================================
-        // SELECTOR DE PORTAFOLIOS
+        // SELECTOR DE PORTAFOLIOS Y FILTROS
         // ==========================================
         function handlePortfolioChange() {
             const selected = document.getElementById('portfolioSelector').value;
@@ -867,19 +895,16 @@
                 showConnectionStatus("success", "Mostrando Base Maestra (GitHub)", "La vista se ha sincronizado con el portafolio en la nube.");
             } else {
                 if (localDataset.length === 0) {
-                    showConnectionStatus("error", "Sin Base de Datos Cargada", "Por favor sube un archivo CSV/Excel para visualizar tu portafolio.");
+                    showConnectionStatus("error", "Sin Base de Datos Cargada", "Por favor sube un archivo CSV/Excel.");
                     currentDataset = [];
                 } else {
                     currentDataset = [...localDataset];
-                    showConnectionStatus("success", "Mostrando Base Cargada (Local)", `Visualizando tus datos cargados de manera local.`);
+                    showConnectionStatus("success", "Mostrando Base Cargada", `Visualizando datos locales.`);
                 }
             }
             initializeDashboard();
         }
 
-        // ==========================================
-        // FILTRADO DINÁMICO
-        // ==========================================
         let filteredDataset = [];
 
         function initializeFilters() {
@@ -931,7 +956,7 @@
         }
 
         // ==========================================
-        // CÁLCULO DE MÉTRICAS (KPIs) Y COMPARACIÓN CON METAS
+        // CÁLCULO DE KPI'S Y GRÁFICOS
         // ==========================================
         function updateKPIs() {
             const fAnio = document.getElementById("filterAnio").value;
@@ -940,7 +965,6 @@
             const sumEbitdaCapturado = filteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
             const sumHhtCapturado = filteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
             
-            // EBITDA potencial donde el estado de validación sea "Validado"
             const sumEbitdaValidado = filteredDataset.reduce((sum, item) => {
                 if (item.valEbitdaPotencial && item.valEbitdaPotencial.toLowerCase().trim() === "validado") {
                     return sum + item.ebitdaPotencial;
@@ -948,30 +972,19 @@
                 return sum;
             }, 0);
 
-            // Obtener metas para EBITDA capturado y HHT Capturada según filtros de año
             let targetEbitda = 0;
             let targetHht = 0;
 
             if (fAnio) {
-                // Filtro anual específico
-                const matchEbitda = globalMetas.find(m => 
-                    normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio)
-                );
-                const matchHht = globalMetas.find(m => 
-                    (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio)
-                );
+                const matchEbitda = globalMetas.find(m => normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio));
+                const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio));
                 targetEbitda = matchEbitda ? matchEbitda.meta : 0;
                 targetHht = matchHht ? matchHht.meta : 0;
             } else {
-                // Consolidar metas de todos los años representados en el dataset actual
                 const uniqueYears = [...new Set(filteredDataset.map(item => String(item.anio)))].filter(Boolean);
                 uniqueYears.forEach(yr => {
-                    const matchEbitda = globalMetas.find(m => 
-                        normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(yr)
-                    );
-                    const matchHht = globalMetas.find(m => 
-                        (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(yr)
-                    );
+                    const matchEbitda = globalMetas.find(m => normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(yr));
+                    const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(yr));
                     if (matchEbitda) targetEbitda += matchEbitda.meta;
                     if (matchHht) targetHht += matchHht.meta;
                 });
@@ -981,21 +994,17 @@
             const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
             const cerrados = totalProjects - abiertos;
 
-            // Renderizado de valores en KPI
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
             document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
-            // Comparativa EBITDA Capturado vs Meta
             const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaCapturado / targetEbitda) * 100) : 0;
             document.getElementById("kpiEbitdaCapturadoSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
             
-            // Porcentaje del EBITDA validado respecto al potencial total
             const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
             document.getElementById("kpiEbitdaPotencialSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
 
-            // Comparativa HHT Capturado Real vs Meta
             const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
             document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
 
@@ -1004,7 +1013,7 @@
         }
 
         // ==========================================
-        // RENDERIZADO DE TABLA DE DATOS
+        // RENDERIZADO DE TABLA DE INICIATIVAS
         // ==========================================
         function renderTable() {
             const tbody = document.getElementById("tableBody");
@@ -1021,14 +1030,14 @@
 
             filteredDataset.forEach(item => {
                 const tr = document.createElement("tr");
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
                 tr.onclick = () => openModal(item);
 
                 let riskBadge = "bg-slate-100 text-slate-600 border border-slate-200";
                 if (item.riesgo) {
                     const rNorm = item.riesgo.toLowerCase();
                     if (rNorm.includes("bajo")) riskBadge = "bg-emerald-50 text-palForest border border-palForest/20";
-                    else if (rNorm.includes("medio")) riskBadge = "bg-yellow-50 text-[#d97706] border border-palYellow/30"; // Texto adaptado para contraste y legibilidad
+                    else if (rNorm.includes("medio")) riskBadge = "bg-yellow-50 text-[#d97706] border border-palYellow/30";
                     else if (rNorm.includes("alto")) riskBadge = "bg-orange-50 text-palOrange border border-palOrange/20";
                 }
 
@@ -1037,7 +1046,6 @@
                     const eNorm = item.estado.toLowerCase();
                     if (eNorm.includes("abierto")) estadoBadge = "bg-lime-50 text-lime-800 border border-lime-200";
                     else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
-                    else estadoBadge = "bg-slate-100 text-slate-600 border border-slate-200";
                 }
 
                 tr.innerHTML = `
@@ -1064,12 +1072,12 @@
         }
 
         // ==========================================
-        // CREACIÓN Y ACTUALIZACIÓN DE GRÁFICOS
+        // CONFIGURACIÓN DE GRÁFICOS (CHART.JS)
         // ==========================================
         function initChartsContainer() {
-            Chart.defaults.color = '#475569'; // Gris oscuro para textos en modo claro
+            Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
-            Chart.defaults.borderColor = '#e2e8f0'; // Rejillas claras de fondo
+            Chart.defaults.borderColor = '#e2e8f0';
         }
 
         let chartEbitdaInstance = null;
@@ -1081,7 +1089,7 @@
             if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
 
-            // 1. Chart EBITDA Potencial vs Capturado por Unidad
+            // 1. EBITDA Potencial vs Capturado
             const ebitdaByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
@@ -1092,9 +1100,7 @@
                 ebitdaByGerencia[gerencia].capturado += item.ebitdaCapturado;
             });
 
-            const sortedGerencias = Object.keys(ebitdaByGerencia).sort((a, b) => {
-                return ebitdaByGerencia[b].potencial - ebitdaByGerencia[a].potencial;
-            });
+            const sortedGerencias = Object.keys(ebitdaByGerencia).sort((a, b) => ebitdaByGerencia[b].potencial - ebitdaByGerencia[a].potencial);
 
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
@@ -1105,7 +1111,7 @@
                         {
                             label: 'EBITDA Potencial',
                             data: sortedGerencias.map(g => ebitdaByGerencia[g].potencial),
-                            backgroundColor: 'rgba(149, 110, 178, 0.85)', // palPurple
+                            backgroundColor: 'rgba(149, 110, 178, 0.85)',
                             borderColor: '#956eb6',
                             borderWidth: 1,
                             borderRadius: 6
@@ -1113,7 +1119,7 @@
                         {
                             label: 'EBITDA Capturado',
                             data: sortedGerencias.map(g => ebitdaByGerencia[g].capturado),
-                            backgroundColor: 'rgba(15, 111, 70, 0.9)', // palForest
+                            backgroundColor: 'rgba(15, 111, 70, 0.9)',
                             borderColor: '#0f6f46',
                             borderWidth: 1,
                             borderRadius: 6
@@ -1123,9 +1129,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } }
-                    },
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
@@ -1136,16 +1140,14 @@
                 }
             });
 
-            // 2. Gráfico Proyectos por Unidad (Barras Horizontales con palLime)
+            // 2. Proyectos por Unidad
             const proyectosByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
                 proyectosByGerencia[gerencia] = (proyectosByGerencia[gerencia] || 0) + 1;
             });
 
-            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => {
-                return proyectosByGerencia[b] - proyectosByGerencia[a];
-            });
+            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b] - proyectosByGerencia[a]);
 
             const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
             chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
@@ -1155,33 +1157,25 @@
                     datasets: [{
                         label: 'Proyectos',
                         data: sortedProyectosGerencias.map(g => proyectosByGerencia[g]),
-                        backgroundColor: 'rgba(155, 202, 60, 0.85)', // palLime
+                        backgroundColor: 'rgba(155, 202, 60, 0.85)',
                         borderColor: '#9bca3c',
                         borderWidth: 1,
                         borderRadius: 4
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Barras horizontales
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: { color: 'rgba(107, 124, 133, 0.12)' },
-                            ticks: { precision: 0, font: { size: 9 } }
-                        },
-                        y: {
-                            grid: { display: false },
-                            ticks: { font: { size: 10 } }
-                        }
+                        x: { grid: { color: 'rgba(107, 124, 133, 0.12)' }, ticks: { precision: 0, font: { size: 9 } } },
+                        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     }
                 }
             });
 
-            // 3. Chart Tipo Innovación (Doughnut con palLime, palForest, palOrange, palPurple, palGray)
+            // 3. Tipo de Innovación
             const tiposCount = {};
             filteredDataset.forEach(i => {
                 const tipo = i.tipoInnovacion || "Sin tipo";
@@ -1222,20 +1216,13 @@
 
             // 4. Etapas del Funnel
             const funnelCount = {
-                "Archivados": 0,
-                "Problematización": 0,
-                "Alternativas de solución": 0,
-                "Diseño pilotaje": 0,
-                "Ejecución pilotaje": 0,
-                "Implementación": 0,
-                "Seguimiento": 0
+                "Archivados": 0, "Problematización": 0, "Alternativas de solución": 0,
+                "Diseño pilotaje": 0, "Ejecución pilotaje": 0, "Implementación": 0, "Seguimiento": 0
             };
 
             filteredDataset.forEach(i => {
                 const normalized = normalizeFunnelStage(i.funnel);
-                if (normalized && funnelCount[normalized] !== undefined) {
-                    funnelCount[normalized]++;
-                }
+                if (normalized && funnelCount[normalized] !== undefined) funnelCount[normalized]++;
             });
 
             const maxVal = Math.max(...Object.values(funnelCount));
@@ -1243,7 +1230,6 @@
             funnelContainer.innerHTML = "";
 
             let funnelHTML = `<div class="flex flex-col gap-3.5 w-full py-1">`;
-            
             FUNNEL_STAGES.forEach(stage => {
                 const countVal = funnelCount[stage] || 0;
                 const rawPercent = maxVal > 0 ? (countVal / maxVal) * 100 : 0;
@@ -1256,39 +1242,29 @@
                         </div>
                         <div class="w-[60%] flex justify-center items-center">
                             ${countVal > 0 ? `
-                                <div style="width: ${barWidth}%;" class="bg-[#956eb6] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md shadow-purple-900/10">
+                                <div style="width: ${barWidth}%;" class="bg-[#956eb6] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md">
                                     ${countVal}
                                 </div>
                             ` : `
-                                <div class="w-[12%] bg-slate-100 text-slate-400 text-[10px] py-1 rounded text-center border border-slate-200">
-                                    0
-                                </div>
+                                <div class="w-[12%] bg-slate-100 text-slate-400 text-[10px] py-1 rounded text-center border border-slate-200">0</div>
                             `}
                         </div>
                     </div>
                 `;
             });
-            
             funnelHTML += `</div>`;
             funnelContainer.innerHTML = funnelHTML;
 
-            // 5. Cálculo y Actualización de Velocímetro de Riesgo Promedio del Portafolio
+            // 5. Riesgo Promedio del Portafolio
             let totalRiskVal = 0;
             let countWithRisk = 0;
 
             filteredDataset.forEach(item => {
                 if (item.riesgo) {
                     const rNorm = item.riesgo.toLowerCase();
-                    if (rNorm.includes("bajo")) {
-                        totalRiskVal += 0.0;
-                        countWithRisk++;
-                    } else if (rNorm.includes("medio")) {
-                        totalRiskVal += 0.5;
-                        countWithRisk++;
-                    } else if (rNorm.includes("alto")) {
-                        totalRiskVal += 1.0;
-                        countWithRisk++;
-                    }
+                    if (rNorm.includes("bajo")) { totalRiskVal += 0.0; countWithRisk++; } 
+                    else if (rNorm.includes("medio")) { totalRiskVal += 0.5; countWithRisk++; } 
+                    else if (rNorm.includes("alto")) { totalRiskVal += 1.0; countWithRisk++; }
                 }
             });
 
@@ -1296,7 +1272,6 @@
             const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
             const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
 
-            // Actualiza la etiqueta textual del portafolio (N/A, BAJO, MEDIO, ALTO)
             if (portfolioRiskLabelEl) {
                 if (countWithRisk === 0) {
                     portfolioRiskLabelEl.innerText = "N/A";
@@ -1313,11 +1288,284 @@
                 }
             }
 
-            // Gira la aguja vectorialmente
             if (portfolioNeedleGroup) {
                 const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
+        }
+
+        // ==========================================
+        // PROCESADOR Y RENDERIZADOR DE CARTA GANTT DINÁMICA
+        // ==========================================
+        function loadProjectGantt(item) {
+            const loading = document.getElementById("ganttLoading");
+            const empty = document.getElementById("ganttEmpty");
+            const wrapper = document.getElementById("ganttChartWrapper");
+            const status = document.getElementById("ganttStatus");
+            const expectedFileSpan = document.getElementById("ganttExpectedFile");
+
+            const sanitizedId = item.id.replace(/[^a-zA-Z0-9_-]/g, "_");
+            const expectedFileName = `${sanitizedId}_hoja_ruta.csv`;
+            expectedFileSpan.innerText = expectedFileName;
+
+            loading.classList.remove("hidden");
+            empty.classList.add("hidden");
+            wrapper.classList.add("hidden");
+
+            status.className = "text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-slate-100 text-slate-500";
+            status.innerText = "Sincronizando...";
+
+            const ganttUrl = `https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/hojas-de-ruta/${expectedFileName}`;
+
+            fetch(ganttUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Archivo no cargado aún en GitHub.");
+                    return res.arrayBuffer();
+                })
+                .then(arrayBuffer => {
+                    let text;
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(arrayBuffer); }
+                    parseAndRenderGantt(text, item);
+                })
+                .catch(err => {
+                    console.warn(`Hoja de ruta real no encontrada (${expectedFileName}). No se cargará simulación.`);
+                    
+                    // Ocultar spinner de carga
+                    loading.classList.add("hidden");
+                    
+                    // Mostrar únicamente la advertencia de sincronización real pendiente
+                    empty.classList.remove("hidden");
+                    wrapper.classList.add("hidden");
+                    
+                    // Actualizar el estado visual del cronograma a pendiente
+                    status.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200";
+                    status.innerText = "Sincronización Pendiente";
+                });
+        }
+
+        // ==========================================
+        // DIBUJADO DE LA CARTA GANTT AGRUPADO
+        // ==========================================
+        function parseAndRenderGantt(csvText, item) {
+            const empty = document.getElementById("ganttEmpty");
+            const wrapper = document.getElementById("ganttChartWrapper");
+            const status = document.getElementById("ganttStatus");
+            const content = document.getElementById("ganttTimelineContent");
+
+            document.getElementById("ganttLoading").classList.add("hidden");
+
+            const parsed = Papa.parse(csvText, { skipEmptyLines: true });
+            const rows = parsed.data;
+
+            let headerIndex = -1;
+            for (let i = 0; i < rows.length; i++) {
+                const rowClean = rows[i].map(cell => normalizeKey(cleanEncoding(cell)));
+                if (rowClean.includes("fechadeinicio") || rowClean.includes("fechainicio") || rowClean.includes("inicio") || rowClean.includes("responsable")) {
+                    headerIndex = i;
+                    break;
+                }
+            }
+
+            if (headerIndex === -1) {
+                console.error("No se pudo detectar el encabezado de columnas en el archivo de ruta.");
+                empty.classList.remove("hidden");
+                return;
+            }
+
+            const headers = rows[headerIndex].map(cell => normalizeKey(cleanEncoding(cell)));
+            
+            const idxId = headers.findIndex(h => h === "id");
+            const idxActividad = headers.findIndex(h => h.includes("actividad"));
+            const idxTarea = headers.findIndex(h => h === "tarea");
+            const idxResponsable = headers.findIndex(h => h.includes("responsable") || h.includes("ejecutor"));
+            const idxInicio = headers.findIndex(h => h.includes("fechadeinicio") || h.includes("fechainicio") || h.includes("inicio"));
+            const idxTermino = headers.findIndex(h => h.includes("fechadetermino") || h.includes("fechatermino") || h.includes("termino"));
+            const idxEstado = headers.findIndex(h => h === "estado");
+
+            const objectivesMap = {};
+            let currentObjective = "Sin Objetivo Asignado";
+            const validTasksList = [];
+
+            for (let i = headerIndex + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length < 2) continue;
+
+                const rawId = idxId !== -1 ? cleanEncoding(row[idxId]) : "";
+                const rawActividad = idxActividad !== -1 ? cleanEncoding(row[idxActividad]) : "";
+                const rawTarea = idxTarea !== -1 ? cleanEncoding(row[idxTarea]) : "";
+                const rawResponsable = idxResponsable !== -1 ? cleanEncoding(row[idxResponsable]) : "";
+                const rawInicio = idxInicio !== -1 ? cleanEncoding(row[idxInicio]) : "";
+                const rawTermino = idxTermino !== -1 ? cleanEncoding(row[idxTermino]) : "";
+                const rawEstado = idxEstado !== -1 ? cleanEncoding(row[idxEstado]) : "";
+
+                const isHeaderRow = (rawInicio === "" || rawTermino === "");
+                const isObjName = rawActividad.toLowerCase().includes("objetivo") || rawTarea.toLowerCase().includes("objetivo");
+                const isDottedObjId = rawId !== "" && rawId.split('.').length === 2 && isHeaderRow;
+
+                if (isDottedObjId || isObjName) {
+                    currentObjective = rawActividad || rawTarea || rawId;
+                    if (!objectivesMap[currentObjective]) {
+                        objectivesMap[currentObjective] = [];
+                    }
+                    continue;
+                }
+
+                const startDate = parseDateDDMMYYYY(rawInicio);
+                const endDate = parseDateDDMMYYYY(rawTermino);
+
+                if (!startDate || !endDate) continue;
+
+                const taskName = rawTarea || rawActividad || `Actividad ${rawId}`;
+
+                const taskObj = {
+                    id: rawId,
+                    nombre: taskName,
+                    responsable: rawResponsable || "Sin asignar",
+                    inicio: startDate,
+                    termino: endDate,
+                    estado: rawEstado || "Planificado"
+                };
+
+                if (!objectivesMap[currentObjective]) {
+                    objectivesMap[currentObjective] = [];
+                }
+                objectivesMap[currentObjective].push(taskObj);
+                validTasksList.push(taskObj);
+            }
+
+            if (validTasksList.length === 0) {
+                empty.classList.remove("hidden");
+                return;
+            }
+
+            const minTime = Math.min(...validTasksList.map(t => t.inicio.getTime()));
+            const maxTime = Math.max(...validTasksList.map(t => t.termino.getTime()));
+            const totalDuration = maxTime - minTime;
+
+            if (totalDuration <= 0) {
+                empty.classList.remove("hidden");
+                return;
+            }
+
+            wrapper.classList.remove("hidden");
+            status.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
+            status.innerText = "Sincronizado GitHub";
+            empty.classList.add("hidden");
+
+            const monthsInProject = [];
+            let startCursor = new Date(minTime);
+            let endLimit = new Date(maxTime);
+            let cursor = new Date(startCursor.getFullYear(), startCursor.getMonth(), 1);
+            while (cursor <= endLimit) {
+                monthsInProject.push(new Date(cursor));
+                cursor.setMonth(cursor.getMonth() + 1);
+            }
+
+            let html = `
+                <div class="flex items-center border-b border-slate-200 pb-2 mb-2 font-bold text-slate-500 select-none">
+                    <div class="w-2/5 text-left text-[11px] font-extrabold uppercase tracking-wider">Actividad / Responsable</div>
+                    <div class="w-3/5 flex relative h-5">
+            `;
+
+            monthsInProject.forEach((mDate) => {
+                const mStart = new Date(mDate.getFullYear(), mDate.getMonth(), 1).getTime();
+                const mEnd = new Date(mDate.getFullYear(), mDate.getMonth() + 1, 0).getTime();
+                
+                const leftPct = Math.max(0, ((mStart - minTime) / totalDuration) * 100);
+                const rightBound = Math.min(100, ((mEnd - minTime) / totalDuration) * 100);
+                const widthPct = rightBound - leftPct;
+
+                const formatMonth = mDate.toLocaleDateString('es-CL', { month: 'short', year: '2-digit' });
+
+                html += `
+                    <div class="absolute text-[10px] border-l border-slate-200 pl-1.5 overflow-hidden whitespace-nowrap" style="left: ${leftPct}%; width: ${widthPct}%;">
+                        ${formatMonth.toUpperCase()}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+                <div class="space-y-4">
+            `;
+
+            Object.keys(objectivesMap).forEach(objTitle => {
+                const groupTasks = objectivesMap[objTitle];
+                if (groupTasks.length === 0) return;
+
+                html += `
+                    <div class="mt-4 animate-fadeIn">
+                        <div class="flex items-center bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700 font-extrabold text-[11px] uppercase tracking-wider gap-2 select-none">
+                            <i data-lucide="target" class="w-3.5 h-3.5 text-palPurple"></i>
+                            <span>${objTitle}</span>
+                        </div>
+                        <div class="space-y-2 mt-2 pl-1">
+                `;
+
+                groupTasks.forEach(t => {
+                    const taskStart = t.inicio.getTime();
+                    const taskEnd = t.termino.getTime();
+                    
+                    const leftPct = Math.max(0, ((taskStart - minTime) / totalDuration) * 100);
+                    const widthPct = Math.max(3, ((taskEnd - taskStart) / totalDuration) * 100);
+
+                    let barColor = "bg-slate-400";
+                    let textStatusColor = "text-slate-500";
+                    const estNorm = t.estado.toLowerCase();
+
+                    if (estNorm.includes("realizado") || estNorm.includes("terminado") || estNorm.includes("concluido")) {
+                        barColor = "bg-palForest";
+                        textStatusColor = "text-palForest";
+                    } else if (estNorm.includes("proceso") || estNorm.includes("marcha") || estNorm.includes("desarrollo")) {
+                        barColor = "bg-palYellow";
+                        textStatusColor = "text-amber-600";
+                    } else if (estNorm.includes("atrasado") || estNorm.includes("retraso") || estNorm.includes("alerta")) {
+                        barColor = "bg-palOrange";
+                        textStatusColor = "text-palOrange";
+                    } else if (estNorm.includes("plazo")) {
+                        barColor = "bg-palLime";
+                        textStatusColor = "text-[#0f6f46]";
+                    }
+
+                    const formattedDates = `${t.inicio.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })} al ${t.termino.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+
+                    html += `
+                        <div class="flex items-center hover:bg-slate-50 py-1.5 rounded-lg transition-colors group animate-fadeIn">
+                            <div class="w-2/5 pr-4 flex flex-col justify-center select-none">
+                                <div class="truncate text-[11px] font-bold text-slate-800" title="${t.nombre}">
+                                    ${t.id ? `<span class="font-mono text-slate-400 mr-1.5">${t.id}</span>` : ''}${t.nombre}
+                                </div>
+                                <div class="text-[9px] text-slate-400 truncate flex items-center gap-1.5 mt-0.5">
+                                    <span class="font-extrabold text-slate-600">${t.responsable}</span>
+                                    <span class="text-slate-200">|</span>
+                                    <span class="${textStatusColor} font-extrabold">${t.estado}</span>
+                                </div>
+                            </div>
+                            <div class="w-3/5 relative h-6 flex items-center">
+                                <div class="absolute inset-0 flex pointer-events-none opacity-40">
+                                    ${monthsInProject.map(() => `<div class="flex-1 border-l border-slate-200 border-dashed h-full"></div>`).join('')}
+                                </div>
+                                <div class="absolute h-4 rounded-full ${barColor} shadow-md group-hover:scale-[1.01] transition-all cursor-pointer flex items-center min-w-[12px]" 
+                                     style="left: ${leftPct}%; width: ${widthPct}%;"
+                                     title="${t.nombre} (${formattedDates}) - Responsable: ${t.responsable}">
+                                     <span class="w-1.5 h-1.5 bg-white/40 rounded-full ml-1.5"></span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            content.innerHTML = html;
+            lucide.createIcons();
         }
 
         // ==========================================
@@ -1345,11 +1593,13 @@
 
             const commContainer = document.getElementById("modalCommentContainer");
             const commText = document.getElementById("modalComment");
-            if (item.comentario && item.comentario.trim() !== "") {
-                commText.innerText = item.comentario;
-                commContainer.classList.remove("hidden");
-            } else {
-                commContainer.classList.add("hidden");
+            if (commText && commContainer) {
+                if (item.comentario && item.comentario.trim() !== "") {
+                    commText.innerText = item.comentario;
+                    commContainer.classList.remove("hidden");
+                } else {
+                    commContainer.classList.add("hidden");
+                }
             }
 
             const needleGroup = document.getElementById("needleGroup");
@@ -1377,9 +1627,19 @@
                 riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
             }
 
-            needleGroup.style.transform = `rotate(${rotation}deg)`;
+            if (needleGroup) {
+                needleGroup.style.transform = `rotate(${rotation}deg)`;
+            }
+            
+            // Disparar carga dinámica de la Carta Gantt para este proyecto
+            loadProjectGantt(item);
+
             document.getElementById("projectModal").classList.remove("hidden");
             lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById("projectModal").classList.add("hidden");
         }
 
         // ==========================================
@@ -1418,10 +1678,6 @@
                     kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
                 }
             ];
-        }
-
-        function closeModal() {
-            document.getElementById("projectModal").classList.add("hidden");
         }
 
         // ==========================================
@@ -1524,7 +1780,6 @@
             document.getElementById("filterTipo").value = "";
             document.getElementById("filterSponsor").value = "";
             document.getElementById("filterLider").value = "";
-            
             connectToGitHubCSV();
         }
 
