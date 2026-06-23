@@ -175,7 +175,7 @@
         </div>
 
         <!-- KPI METRICS GRID -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
             <!-- EBITDA Capturado (Verde Bosque) -->
             <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
@@ -206,6 +206,17 @@
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
                     <p class="text-[10px] text-palOrange font-semibold mt-0.5" id="kpiHhtSub">Meta: 0 (0%)</p>
+                </div>
+            </div>
+
+            <!-- HHT Potencial Anual (Amarillo Brillante) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
+                </div>
+                <div class="mt-2">
+                    <h3 class="text-xs font-bold text-slate-700">HHT Potencial Anual</h3>
+                    <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
                 </div>
             </div>
 
@@ -964,6 +975,7 @@
             const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
             const sumEbitdaCapturado = filteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
             const sumHhtCapturado = filteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
+            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (item.hht || 0), 0);
             
             const sumEbitdaValidado = filteredDataset.reduce((sum, item) => {
                 if (item.valEbitdaPotencial && item.valEbitdaPotencial.toLowerCase().trim() === "validado") {
@@ -997,6 +1009,7 @@
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
             document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
+            document.getElementById("kpiHhtPotencial").innerText = sumHhtPotencial.toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
             const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaCapturado / targetEbitda) * 100) : 0;
@@ -1007,6 +1020,9 @@
 
             const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
             document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
+
+            const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
+            document.getElementById("kpiHhtPotencialSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
 
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
             document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
@@ -1638,6 +1654,9 @@
             lucide.createIcons();
         }
 
+        // ==========================================
+        // PROCESADO DE VENTANA MODAL CERRAR
+        // ==========================================
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
