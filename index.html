@@ -428,30 +428,24 @@
                 </div>
             </div>
 
-            <!-- NUEVA SECCIÓN: MÉTRICAS DEL PROYECTO (KPI 1, KPI 2, KPI 3) -->
+            <!-- SECCIÓN: KPIs ORIGINALES DE LA BASE DE DATOS -->
             <div class="border-t border-slate-200 pt-5 space-y-3">
-                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Clave del Proyecto (KPIs)</h4>
+                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">KPIs Clave de la Iniciativa (Base de Datos)</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- KPI 1: EBITDA Capturado Real -->
+                    <!-- KPI 1 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">EBITDA Capturado Real (KPI 1)</span>
-                        <span id="modalKpiEbitdaCapturado" class="text-lg font-extrabold text-palForest mt-1">$0 CLP</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 1</span>
+                        <span id="modalKpi1" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
                     </div>
-                    <!-- KPI 2: EBITDA Potencial -->
+                    <!-- KPI 2 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">EBITDA Potencial (KPI 2)</span>
-                        <div class="flex flex-col mt-1">
-                            <span id="modalKpiEbitdaPotencial" class="text-lg font-extrabold text-palPurple">$0 CLP</span>
-                            <span id="modalKpiEbitdaPotencialVal" class="text-[9px] text-slate-400 font-semibold mt-0.5">Validación: N/A</span>
-                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 2</span>
+                        <span id="modalKpi2" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
                     </div>
-                    <!-- KPI 3: HHT Capturado Real -->
+                    <!-- KPI 3 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">HHT Capturado Real (KPI 3)</span>
-                        <div class="flex flex-col mt-1">
-                            <span id="modalKpiHht" class="text-lg font-extrabold text-palOrange">0 hrs</span>
-                            <span id="modalKpiHhtPotencial" class="text-[9px] text-slate-400 font-semibold mt-0.5">Potencial: 0 hrs</span>
-                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 3</span>
+                        <span id="modalKpi3" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
                     </div>
                 </div>
             </div>
@@ -610,7 +604,7 @@
                 } catch (e) {
                     const map = {
                         'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
-                        'Ã±': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
+                        'Ãñ': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
                         'Ã': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ãœ': 'Ü',
                         'â€“': '–', 'â€”': '—', 'Â°': '°', 'Â¿': '¿'
                     };
@@ -786,12 +780,17 @@
                 const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
                 const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
 
+                // Lectura literal y exacta de las columnas KPI 1, KPI 2, KPI 3
+                const kpi1 = cleanEncoding(findVal(["kpi1", "kpi_1", "kpi 1"]));
+                const kpi2 = cleanEncoding(findVal(["kpi2", "kpi_2", "kpi 2"]));
+                const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
+
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
-                    kr, respInnovacion
+                    kr, respInnovacion, kpi1, kpi2, kpi3
                 };
             }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
         }
@@ -1655,12 +1654,10 @@
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
-            // Sincronizar y rellenar las tarjetas de métricas del proyecto (KPI 1, KPI 2, KPI 3)
-            document.getElementById("modalKpiEbitdaCapturado").innerText = formatCurrency(item.ebitdaCapturado);
-            document.getElementById("modalKpiEbitdaPotencial").innerText = formatCurrency(item.ebitdaPotencial);
-            document.getElementById("modalKpiEbitdaPotencialVal").innerText = `Validación: ${item.valEbitdaPotencial || 'No informada'}`;
-            document.getElementById("modalKpiHht").innerText = `${(item.hhtCapturado || 0).toLocaleString("es-CL")} hrs`;
-            document.getElementById("modalKpiHhtPotencial").innerText = `Potencial: ${(item.hht || 0).toLocaleString("es-CL")} hrs`;
+            // Inyección directa de las columnas literales KPI 1, KPI 2 y KPI 3 de la base de datos
+            document.getElementById("modalKpi1").innerText = item.kpi1 && item.kpi1.trim() !== "" ? item.kpi1 : "N/R";
+            document.getElementById("modalKpi2").innerText = item.kpi2 && item.kpi2.trim() !== "" ? item.kpi2 : "N/R";
+            document.getElementById("modalKpi3").innerText = item.kpi3 && item.kpi3.trim() !== "" ? item.kpi3 : "N/R";
 
             let govText = item.tipoSolucion || "No especificado";
             if (item.requiereGobernanza) {
@@ -1723,7 +1720,7 @@
         }
 
         // ==========================================
-        // BASE DE DATOS DE RESPALDO (Resiliente)
+        // BASE DE DATOS DE RESPALDO (Resiliente con columnas KPI)
         // ==========================================
         function loadBackupDataset() {
             return [
@@ -1735,7 +1732,8 @@
                     inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 16500000, hht: 250, hhtCapturado: 190, estado: "Abierto", sponsor: "Director de Operaciones",
                     escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés"
+                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés",
+                    kpi1: "85% avance", kpi2: "$120M potencial", kpi3: "190 hrs registradas"
                 },
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
@@ -1745,7 +1743,8 @@
                     inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 99000000, hht: 300, hhtCapturado: 270, estado: "Cerrado", sponsor: "Director de Operaciones",
                     escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
-                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende"
+                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende",
+                    kpi1: "95% retorno", kpi2: "$135M real", kpi3: "270 hrs auditadas"
                 },
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
@@ -1755,7 +1754,8 @@
                     inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
                     ebitdaCapturado: 0, hht: 240, hhtCapturado: 0, estado: "Abierto", sponsor: "Gerente de Planta",
                     escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
+                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés",
+                    kpi1: "0 fallas críticas", kpi2: "$250M potencial", kpi3: "Fase de calibración"
                 }
             ];
         }
