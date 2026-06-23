@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos interactivos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plugin oficial de Chart.js para dibujar etiquetas directamente sobre gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- Lucide Icons para la iconografía -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- PapaParse para leer archivos de datos CSV -->
@@ -278,7 +280,7 @@
                 <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
                     <canvas id="chartTipoInno"></canvas>
                 </div>
-                <div class="flex justify-center gap-6 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
+                <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
             </div>
 
             <!-- ETAPA EN EL FUNNEL -->
@@ -316,8 +318,10 @@
                             <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                         </svg>
                     </div>
-                    <div class="text-center mt-3">
-                        <span id="portfolioRiskLabel" class="text-xs font-extrabold uppercase tracking-widest text-slate-500">N/A</span>
+                    <div class="text-center mt-3 flex flex-col items-center">
+                        <!-- Valor promedio numérico del riesgo (Etiqueta solicitada) -->
+                        <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
+                        <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
                     </div>
                 </div>
                 <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
@@ -428,9 +432,9 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN: KPIs ORIGINALES DE LA BASE DE DATOS -->
+            <!-- SECCIÓN DE KPIs INDIVIDUALES EN EL DESPLEGABLE (KPI 1, KPI 2, KPI 3 de la base) -->
             <div class="border-t border-slate-200 pt-5 space-y-3">
-                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">KPIs Clave de la Iniciativa (Base de Datos)</h4>
+                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Base del Registro</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- KPI 1 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
@@ -558,7 +562,7 @@
         ];
 
         // ==========================================
-        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
+        // ALERTA VISUAL DE CONEXIÓN Y ESTADO (CORREGIDO GLOBALMENTE)
         // ==========================================
         function showConnectionStatus(status, title, message) {
             const alert = document.getElementById("connectionAlert");
@@ -587,7 +591,9 @@
             aTitle.innerText = title;
             aMessage.innerText = message;
             alert.classList.remove("hidden");
-            lucide.createIcons();
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         // ==========================================
@@ -604,7 +610,7 @@
                 } catch (e) {
                     const map = {
                         'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
-                        'Ãñ': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
+                        'Ã±': 'ñ', 'Ã¼': 'ü', 'Ã‘': 'Ñ', 'Ã': 'Á', 'Ã‰': 'É',
                         'Ã': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ãœ': 'Ü',
                         'â€“': '–', 'â€”': '—', 'Â°': '°', 'Â¿': '¿'
                     };
@@ -644,19 +650,16 @@
             if (parts.length >= 3) {
                 let day, month, year;
                 if (parts[0].length === 4) {
-                    // Formato alternativo YYYY-MM-DD
                     year = parseInt(parts[0], 10);
                     month = parseInt(parts[1], 10) - 1;
                     day = parseInt(parts[2], 10);
                 } else {
-                    // Formato prioritario DD-MM-YYYY
                     day = parseInt(parts[0], 10);
-                    month = parseInt(parts[1], 10) - 1; // Base cero para Date
+                    month = parseInt(parts[1], 10) - 1;
                     year = parseInt(parts[2], 10);
                 }
                 
                 if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                    // Evitar desfase horario configurándolo a mediodía local
                     return new Date(year, month, day, 12, 0, 0);
                 }
             }
@@ -780,7 +783,7 @@
                 const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
                 const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
 
-                // Lectura literal y exacta de las columnas KPI 1, KPI 2, KPI 3
+                // Lectura literal de las columnas KPI 1, KPI 2, KPI 3
                 const kpi1 = cleanEncoding(findVal(["kpi1", "kpi_1", "kpi 1"]));
                 const kpi2 = cleanEncoding(findVal(["kpi2", "kpi_2", "kpi 2"]));
                 const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
@@ -1082,7 +1085,6 @@
             }
             emptyState.classList.add("hidden");
 
-            // Función auxiliar para ponderar y clasificar el nivel de riesgo en el ordenamiento: Alto (3) -> Medio (2) -> Bajo (1) -> N/A (0)
             const getRiskWeight = (risk) => {
                 if (!risk) return 0;
                 const r = risk.toLowerCase();
@@ -1092,7 +1094,6 @@
                 return 0;
             };
 
-            // Clonamos y ordenamos la lista por peso de riesgo descendente de forma que queden siempre primero los riesgos altos
             const sortedDataset = [...filteredDataset].sort((a, b) => {
                 return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
             });
@@ -1198,7 +1199,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
+                    plugins: { 
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                        datalabels: { display: false }
+                    },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
@@ -1236,7 +1240,10 @@
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: { display: false }
+                    },
                     scales: {
                         x: { grid: { color: 'rgba(107, 124, 133, 0.12)' }, ticks: { precision: 0, font: { size: 9 } } },
                         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
@@ -1246,14 +1253,17 @@
 
             // 3. Tipo de Innovación
             const tiposCount = {};
+            let totalTiposFiltered = 0;
             filteredDataset.forEach(i => {
                 const tipo = i.tipoInnovacion || "Sin tipo";
                 tiposCount[tipo] = (tiposCount[tipo] || 0) + 1;
+                totalTiposFiltered++;
             });
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
             chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: Object.keys(tiposCount),
                     datasets: [{
@@ -1265,7 +1275,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: {
+                                family: 'Plus Jakarta Sans, sans-serif',
+                                weight: '800',
+                                size: 11
+                            },
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.forEach(val => {
+                                    sum += val;
+                                });
+                                let pct = sum > 0 ? Math.round((value * 100) / sum) : 0;
+                                return pct > 0 ? `${pct}%` : '';
+                            },
+                            textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                            textShadowBlur: 4
+                        }
+                    },
                     cutout: '72%'
                 }
             });
@@ -1275,10 +1306,9 @@
             Object.keys(tiposCount).forEach((tipo, index) => {
                 const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'];
                 legendTipo.innerHTML += `
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
                         <span class="font-bold text-slate-700">${tipo}</span>
-                        <span class="text-slate-500">(${tiposCount[tipo]})</span>
                     </div>
                 `;
             });
@@ -1340,20 +1370,25 @@
             const avgRisk = countWithRisk > 0 ? (totalRiskVal / countWithRisk) : 0;
             const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
             const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
+            const portfolioRiskNumericEl = document.getElementById("portfolioRiskNumericValue");
+
+            if (portfolioRiskNumericEl) {
+                portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
+            }
 
             if (portfolioRiskLabelEl) {
                 if (countWithRisk === 0) {
                     portfolioRiskLabelEl.innerText = "N/A";
-                    portfolioRiskLabelEl.className = "text-xs font-bold uppercase tracking-widest text-slate-400";
+                    portfolioRiskLabelEl.className = "text-[10px] font-bold uppercase tracking-widest text-slate-400";
                 } else if (avgRisk < 0.33) {
                     portfolioRiskLabelEl.innerText = "BAJO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#0f6f46]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#0f6f46]";
                 } else if (avgRisk < 0.66) {
                     portfolioRiskLabelEl.innerText = "MEDIO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#d97706]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#d97706]";
                 } else {
                     portfolioRiskLabelEl.innerText = "ALTO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#f15a24]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#f15a24]";
                 }
             }
 
@@ -1399,15 +1434,9 @@
                 })
                 .catch(err => {
                     console.warn(`Hoja de ruta real no encontrada (${expectedFileName}). No se cargará simulación.`);
-                    
-                    // Ocultar spinner de carga
                     loading.classList.add("hidden");
-                    
-                    // Mostrar únicamente la advertencia de sincronización real pendiente
                     empty.classList.remove("hidden");
                     wrapper.classList.add("hidden");
-                    
-                    // Actualizar el estado visual del cronograma a pendiente
                     status.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200";
                     status.innerText = "Sincronización Pendiente";
                 });
@@ -1654,7 +1683,7 @@
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
-            // Inyección directa de las columnas literales KPI 1, KPI 2 y KPI 3 de la base de datos
+            // Inyección limpia de las columnas KPI 1, KPI 2, KPI 3
             document.getElementById("modalKpi1").innerText = item.kpi1 && item.kpi1.trim() !== "" ? item.kpi1 : "N/R";
             document.getElementById("modalKpi2").innerText = item.kpi2 && item.kpi2.trim() !== "" ? item.kpi2 : "N/R";
             document.getElementById("modalKpi3").innerText = item.kpi3 && item.kpi3.trim() !== "" ? item.kpi3 : "N/R";
@@ -1705,16 +1734,12 @@
                 needleGroup.style.transform = `rotate(${rotation}deg)`;
             }
             
-            // Disparar carga dinámica de la Carta Gantt para este proyecto
             loadProjectGantt(item);
 
             document.getElementById("projectModal").classList.remove("hidden");
             lucide.createIcons();
         }
 
-        // ==========================================
-        // PROCESADO DE VENTANA MODAL CERRAR
-        // ==========================================
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
