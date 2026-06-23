@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos interactivos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plugin oficial de Chart.js para dibujar etiquetas directamente sobre gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- Lucide Icons para la iconografía -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- PapaParse para leer archivos de datos CSV -->
@@ -126,7 +128,7 @@
             <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
                 
-                <div class="flex flex-wrap items-center gap-4 text-xs">
+                <div class="flex flex-wrap items-center gap-4 text-xs animate-fadeIn">
                     <!-- Año -->
                     <div class="flex items-center gap-2">
                         <span class="text-slate-500">Año:</span>
@@ -166,6 +168,14 @@
                             <option value="">Todos</option>
                         </select>
                     </div>
+
+                    <!-- Estado del proyecto -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500">Estado:</span>
+                        <select id="filterEstado" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -175,7 +185,7 @@
         </div>
 
         <!-- KPI METRICS GRID -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
             <!-- EBITDA Capturado (Verde Bosque) -->
             <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                 <div>
@@ -183,7 +193,7 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">EBITDA Capturado Real</h3>
-                    <p class="text-[10px] text-palForest font-semibold mt-0.5" id="kpiEbitdaCapturadoSub">Meta: $0 (0%)</p>
+                    <p class="text-[10px] text-palForest font-semibold mt-0.5" id="kpiEbitdaCapturadoSub">Validado: $0 (0%)</p>
                 </div>
             </div>
 
@@ -194,7 +204,7 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
-                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Validado: $0 (0%)</p>
+                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
                 </div>
             </div>
 
@@ -206,6 +216,17 @@
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
                     <p class="text-[10px] text-palOrange font-semibold mt-0.5" id="kpiHhtSub">Meta: 0 (0%)</p>
+                </div>
+            </div>
+
+            <!-- HHT Potencial Anual (Amarillo Brillante) -->
+            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div>
+                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
+                </div>
+                <div class="mt-2">
+                    <h3 class="text-xs font-bold text-slate-700">HHT Potencial Anual</h3>
+                    <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
                 </div>
             </div>
 
@@ -259,7 +280,7 @@
                 <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
                     <canvas id="chartTipoInno"></canvas>
                 </div>
-                <div class="flex justify-center gap-6 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
+                <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
             </div>
 
             <!-- ETAPA EN EL FUNNEL -->
@@ -297,8 +318,10 @@
                             <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                         </svg>
                     </div>
-                    <div class="text-center mt-3">
-                        <span id="portfolioRiskLabel" class="text-xs font-extrabold uppercase tracking-widest text-slate-500">N/A</span>
+                    <div class="text-center mt-3 flex flex-col items-center">
+                        <!-- Valor promedio numérico del riesgo (Etiqueta solicitada) -->
+                        <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
+                        <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
                     </div>
                 </div>
                 <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
@@ -322,8 +345,8 @@
         <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
             <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
-                    <p class="text-xs text-slate-500 mt-1">Haz clic sobre cualquier iniciativa para desplegar la ficha detallada.</p>
+                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas (Ordenadas por nivel de Riesgo)</h3>
+                    <p class="text-xs text-slate-500 mt-1">Las iniciativas se ordenan priorizando el riesgo Alto, luego el riesgo Medio, y finalmente el riesgo Bajo.</p>
                 </div>
                 <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
                     Mostrando 0 registros
@@ -406,6 +429,28 @@
                         </svg>
                     </div>
                     <span id="modalRiskLabel" class="text-xs font-extrabold uppercase tracking-widest mt-1">MEDIO</span>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE KPIs INDIVIDUALES EN EL DESPLEGABLE (KPI 1, KPI 2, KPI 3 de la base) -->
+            <div class="border-t border-slate-200 pt-5 space-y-3">
+                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Base del Registro</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- KPI 1 -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 1</span>
+                        <span id="modalKpi1" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                    </div>
+                    <!-- KPI 2 -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 2</span>
+                        <span id="modalKpi2" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                    </div>
+                    <!-- KPI 3 -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 3</span>
+                        <span id="modalKpi3" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                    </div>
                 </div>
             </div>
 
@@ -517,7 +562,7 @@
         ];
 
         // ==========================================
-        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
+        // ALERTA VISUAL DE CONEXIÓN Y ESTADO (CORREGIDO GLOBALMENTE)
         // ==========================================
         function showConnectionStatus(status, title, message) {
             const alert = document.getElementById("connectionAlert");
@@ -546,7 +591,9 @@
             aTitle.innerText = title;
             aMessage.innerText = message;
             alert.classList.remove("hidden");
-            lucide.createIcons();
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         // ==========================================
@@ -603,19 +650,16 @@
             if (parts.length >= 3) {
                 let day, month, year;
                 if (parts[0].length === 4) {
-                    // Formato alternativo YYYY-MM-DD
                     year = parseInt(parts[0], 10);
                     month = parseInt(parts[1], 10) - 1;
                     day = parseInt(parts[2], 10);
                 } else {
-                    // Formato prioritario DD-MM-YYYY
                     day = parseInt(parts[0], 10);
-                    month = parseInt(parts[1], 10) - 1; // Base cero para Date
+                    month = parseInt(parts[1], 10) - 1;
                     year = parseInt(parts[2], 10);
                 }
                 
                 if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                    // Evitar desfase horario configurándolo a mediodía local
                     return new Date(year, month, day, 12, 0, 0);
                 }
             }
@@ -739,12 +783,17 @@
                 const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
                 const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
 
+                // Lectura literal de las columnas KPI 1, KPI 2, KPI 3
+                const kpi1 = cleanEncoding(findVal(["kpi1", "kpi_1", "kpi 1"]));
+                const kpi2 = cleanEncoding(findVal(["kpi2", "kpi_2", "kpi 2"]));
+                const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
+
                 return {
                     id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
-                    kr, respInnovacion
+                    kr, respInnovacion, kpi1, kpi2, kpi3
                 };
             }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
         }
@@ -931,6 +980,7 @@
             populateSelect("filterTipo", "tipoInnovacion");
             populateSelect("filterSponsor", "sponsor");
             populateSelect("filterLider", "lider");
+            populateSelect("filterEstado", "estado");
         }
 
         function applyFilters() {
@@ -939,6 +989,7 @@
             const fTipo = document.getElementById("filterTipo").value;
             const fSponsor = document.getElementById("filterSponsor").value;
             const fLider = document.getElementById("filterLider").value;
+            const fEstado = document.getElementById("filterEstado").value;
 
             filteredDataset = currentDataset.filter(item => {
                 if (fAnio && item.anio !== fAnio) return false;
@@ -946,6 +997,7 @@
                 if (fTipo && item.tipoInnovacion !== fTipo) return false;
                 if (fSponsor && item.sponsor !== fSponsor) return false;
                 if (fLider && item.lider !== fLider) return false;
+                if (fEstado && item.estado !== fEstado) return false;
                 return true;
             });
 
@@ -964,6 +1016,7 @@
             const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
             const sumEbitdaCapturado = filteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
             const sumHhtCapturado = filteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
+            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (item.hht || 0), 0);
             
             const sumEbitdaValidado = filteredDataset.reduce((sum, item) => {
                 if (item.valEbitdaPotencial && item.valEbitdaPotencial.toLowerCase().trim() === "validado") {
@@ -997,16 +1050,20 @@
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
             document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
+            document.getElementById("kpiHhtPotencial").innerText = sumHhtPotencial.toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
-            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaCapturado / targetEbitda) * 100) : 0;
-            document.getElementById("kpiEbitdaCapturadoSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
+            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
+            document.getElementById("kpiEbitdaPotencialSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
             
             const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
-            document.getElementById("kpiEbitdaPotencialSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
+            document.getElementById("kpiEbitdaCapturadoSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
 
             const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
             document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
+
+            const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
+            document.getElementById("kpiHhtPotencialSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
 
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
             document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
@@ -1028,7 +1085,20 @@
             }
             emptyState.classList.add("hidden");
 
-            filteredDataset.forEach(item => {
+            const getRiskWeight = (risk) => {
+                if (!risk) return 0;
+                const r = risk.toLowerCase();
+                if (r.includes("alto")) return 3;
+                if (r.includes("medio")) return 2;
+                if (r.includes("bajo")) return 1;
+                return 0;
+            };
+
+            const sortedDataset = [...filteredDataset].sort((a, b) => {
+                return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
+            });
+
+            sortedDataset.forEach(item => {
                 const tr = document.createElement("tr");
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
                 tr.onclick = () => openModal(item);
@@ -1129,7 +1199,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
+                    plugins: { 
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                        datalabels: { display: false }
+                    },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
@@ -1167,7 +1240,10 @@
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: { display: false }
+                    },
                     scales: {
                         x: { grid: { color: 'rgba(107, 124, 133, 0.12)' }, ticks: { precision: 0, font: { size: 9 } } },
                         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
@@ -1177,14 +1253,17 @@
 
             // 3. Tipo de Innovación
             const tiposCount = {};
+            let totalTiposFiltered = 0;
             filteredDataset.forEach(i => {
                 const tipo = i.tipoInnovacion || "Sin tipo";
                 tiposCount[tipo] = (tiposCount[tipo] || 0) + 1;
+                totalTiposFiltered++;
             });
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
             chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: Object.keys(tiposCount),
                     datasets: [{
@@ -1196,7 +1275,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: {
+                                family: 'Plus Jakarta Sans, sans-serif',
+                                weight: '800',
+                                size: 11
+                            },
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.forEach(val => {
+                                    sum += val;
+                                });
+                                let pct = sum > 0 ? Math.round((value * 100) / sum) : 0;
+                                return pct > 0 ? `${pct}%` : '';
+                            },
+                            textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                            textShadowBlur: 4
+                        }
+                    },
                     cutout: '72%'
                 }
             });
@@ -1206,10 +1306,9 @@
             Object.keys(tiposCount).forEach((tipo, index) => {
                 const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'];
                 legendTipo.innerHTML += `
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
                         <span class="font-bold text-slate-700">${tipo}</span>
-                        <span class="text-slate-500">(${tiposCount[tipo]})</span>
                     </div>
                 `;
             });
@@ -1271,20 +1370,25 @@
             const avgRisk = countWithRisk > 0 ? (totalRiskVal / countWithRisk) : 0;
             const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
             const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
+            const portfolioRiskNumericEl = document.getElementById("portfolioRiskNumericValue");
+
+            if (portfolioRiskNumericEl) {
+                portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
+            }
 
             if (portfolioRiskLabelEl) {
                 if (countWithRisk === 0) {
                     portfolioRiskLabelEl.innerText = "N/A";
-                    portfolioRiskLabelEl.className = "text-xs font-bold uppercase tracking-widest text-slate-400";
+                    portfolioRiskLabelEl.className = "text-[10px] font-bold uppercase tracking-widest text-slate-400";
                 } else if (avgRisk < 0.33) {
                     portfolioRiskLabelEl.innerText = "BAJO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#0f6f46]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#0f6f46]";
                 } else if (avgRisk < 0.66) {
                     portfolioRiskLabelEl.innerText = "MEDIO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#d97706]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#d97706]";
                 } else {
                     portfolioRiskLabelEl.innerText = "ALTO";
-                    portfolioRiskLabelEl.className = "text-xs font-extrabold uppercase tracking-widest text-[#f15a24]";
+                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#f15a24]";
                 }
             }
 
@@ -1330,15 +1434,9 @@
                 })
                 .catch(err => {
                     console.warn(`Hoja de ruta real no encontrada (${expectedFileName}). No se cargará simulación.`);
-                    
-                    // Ocultar spinner de carga
                     loading.classList.add("hidden");
-                    
-                    // Mostrar únicamente la advertencia de sincronización real pendiente
                     empty.classList.remove("hidden");
                     wrapper.classList.add("hidden");
-                    
-                    // Actualizar el estado visual del cronograma a pendiente
                     status.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200";
                     status.innerText = "Sincronización Pendiente";
                 });
@@ -1585,6 +1683,11 @@
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
+            // Inyección limpia de las columnas KPI 1, KPI 2, KPI 3
+            document.getElementById("modalKpi1").innerText = item.kpi1 && item.kpi1.trim() !== "" ? item.kpi1 : "N/R";
+            document.getElementById("modalKpi2").innerText = item.kpi2 && item.kpi2.trim() !== "" ? item.kpi2 : "N/R";
+            document.getElementById("modalKpi3").innerText = item.kpi3 && item.kpi3.trim() !== "" ? item.kpi3 : "N/R";
+
             let govText = item.tipoSolucion || "No especificado";
             if (item.requiereGobernanza) {
                 govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
@@ -1631,7 +1734,6 @@
                 needleGroup.style.transform = `rotate(${rotation}deg)`;
             }
             
-            // Disparar carga dinámica de la Carta Gantt para este proyecto
             loadProjectGantt(item);
 
             document.getElementById("projectModal").classList.remove("hidden");
@@ -1643,7 +1745,7 @@
         }
 
         // ==========================================
-        // BASE DE DATOS DE RESPALDO (Resiliente)
+        // BASE DE DATOS DE RESPALDO (Resiliente con columnas KPI)
         // ==========================================
         function loadBackupDataset() {
             return [
@@ -1655,7 +1757,8 @@
                     inversion: 45000000, ebitdaPotencial: 120000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 16500000, hht: 250, hhtCapturado: 190, estado: "Abierto", sponsor: "Director de Operaciones",
                     escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés"
+                    kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés",
+                    kpi1: "85% avance", kpi2: "$120M potencial", kpi3: "190 hrs registradas"
                 },
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024",
@@ -1665,7 +1768,8 @@
                     inversion: 30000000, ebitdaPotencial: 135000000, valEbitdaPotencial: "Validado",
                     ebitdaCapturado: 99000000, hht: 300, hhtCapturado: 270, estado: "Cerrado", sponsor: "Director de Operaciones",
                     escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
-                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende"
+                    kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende",
+                    kpi1: "95% retorno", kpi2: "$135M real", kpi3: "270 hrs auditadas"
                 },
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025",
@@ -1675,7 +1779,8 @@
                     inversion: 80000000, ebitdaPotencial: 250000000, valEbitdaPotencial: "En Proceso",
                     ebitdaCapturado: 0, hht: 240, hhtCapturado: 0, estado: "Abierto", sponsor: "Gerente de Planta",
                     escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
-                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés"
+                    kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés",
+                    kpi1: "0 fallas críticas", kpi2: "$250M potencial", kpi3: "Fase de calibración"
                 }
             ];
         }
@@ -1780,6 +1885,7 @@
             document.getElementById("filterTipo").value = "";
             document.getElementById("filterSponsor").value = "";
             document.getElementById("filterLider").value = "";
+            document.getElementById("filterEstado").value = "";
             connectToGitHubCSV();
         }
 
