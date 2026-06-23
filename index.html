@@ -126,7 +126,7 @@
             <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
                 
-                <div class="flex flex-wrap items-center gap-4 text-xs">
+                <div class="flex flex-wrap items-center gap-4 text-xs animate-fadeIn">
                     <!-- Año -->
                     <div class="flex items-center gap-2">
                         <span class="text-slate-500">Año:</span>
@@ -166,6 +166,14 @@
                             <option value="">Todos</option>
                         </select>
                     </div>
+
+                    <!-- Estado del proyecto -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500">Estado:</span>
+                        <select id="filterEstado" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -183,7 +191,7 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">EBITDA Capturado Real</h3>
-                    <p class="text-[10px] text-palForest font-semibold mt-0.5" id="kpiEbitdaCapturadoSub">Meta: $0 (0%)</p>
+                    <p class="text-[10px] text-palForest font-semibold mt-0.5" id="kpiEbitdaCapturadoSub">Validado: $0 (0%)</p>
                 </div>
             </div>
 
@@ -194,7 +202,7 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
-                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Validado: $0 (0%)</p>
+                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
                 </div>
             </div>
 
@@ -333,8 +341,8 @@
         <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
             <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
-                    <p class="text-xs text-slate-500 mt-1">Haz clic sobre cualquier iniciativa para desplegar la ficha detallada.</p>
+                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas (Ordenadas por nivel de Riesgo)</h3>
+                    <p class="text-xs text-slate-500 mt-1">Las iniciativas se ordenan priorizando el riesgo Alto, luego el riesgo Medio, y finalmente el riesgo Bajo.</p>
                 </div>
                 <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
                     Mostrando 0 registros
@@ -417,6 +425,34 @@
                         </svg>
                     </div>
                     <span id="modalRiskLabel" class="text-xs font-extrabold uppercase tracking-widest mt-1">MEDIO</span>
+                </div>
+            </div>
+
+            <!-- NUEVA SECCIÓN: MÉTRICAS DEL PROYECTO (KPI 1, KPI 2, KPI 3) -->
+            <div class="border-t border-slate-200 pt-5 space-y-3">
+                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Clave del Proyecto (KPIs)</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- KPI 1: EBITDA Capturado Real -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">EBITDA Capturado Real (KPI 1)</span>
+                        <span id="modalKpiEbitdaCapturado" class="text-lg font-extrabold text-palForest mt-1">$0 CLP</span>
+                    </div>
+                    <!-- KPI 2: EBITDA Potencial -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">EBITDA Potencial (KPI 2)</span>
+                        <div class="flex flex-col mt-1">
+                            <span id="modalKpiEbitdaPotencial" class="text-lg font-extrabold text-palPurple">$0 CLP</span>
+                            <span id="modalKpiEbitdaPotencialVal" class="text-[9px] text-slate-400 font-semibold mt-0.5">Validación: N/A</span>
+                        </div>
+                    </div>
+                    <!-- KPI 3: HHT Capturado Real -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">HHT Capturado Real (KPI 3)</span>
+                        <div class="flex flex-col mt-1">
+                            <span id="modalKpiHht" class="text-lg font-extrabold text-palOrange">0 hrs</span>
+                            <span id="modalKpiHhtPotencial" class="text-[9px] text-slate-400 font-semibold mt-0.5">Potencial: 0 hrs</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -942,6 +978,7 @@
             populateSelect("filterTipo", "tipoInnovacion");
             populateSelect("filterSponsor", "sponsor");
             populateSelect("filterLider", "lider");
+            populateSelect("filterEstado", "estado");
         }
 
         function applyFilters() {
@@ -950,6 +987,7 @@
             const fTipo = document.getElementById("filterTipo").value;
             const fSponsor = document.getElementById("filterSponsor").value;
             const fLider = document.getElementById("filterLider").value;
+            const fEstado = document.getElementById("filterEstado").value;
 
             filteredDataset = currentDataset.filter(item => {
                 if (fAnio && item.anio !== fAnio) return false;
@@ -957,6 +995,7 @@
                 if (fTipo && item.tipoInnovacion !== fTipo) return false;
                 if (fSponsor && item.sponsor !== fSponsor) return false;
                 if (fLider && item.lider !== fLider) return false;
+                if (fEstado && item.estado !== fEstado) return false;
                 return true;
             });
 
@@ -1012,11 +1051,11 @@
             document.getElementById("kpiHhtPotencial").innerText = sumHhtPotencial.toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
-            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaCapturado / targetEbitda) * 100) : 0;
-            document.getElementById("kpiEbitdaCapturadoSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
+            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
+            document.getElementById("kpiEbitdaPotencialSub").innerText = `Meta: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
             
             const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
-            document.getElementById("kpiEbitdaPotencialSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
+            document.getElementById("kpiEbitdaCapturadoSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
 
             const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
             document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
@@ -1044,7 +1083,22 @@
             }
             emptyState.classList.add("hidden");
 
-            filteredDataset.forEach(item => {
+            // Función auxiliar para ponderar y clasificar el nivel de riesgo en el ordenamiento: Alto (3) -> Medio (2) -> Bajo (1) -> N/A (0)
+            const getRiskWeight = (risk) => {
+                if (!risk) return 0;
+                const r = risk.toLowerCase();
+                if (r.includes("alto")) return 3;
+                if (r.includes("medio")) return 2;
+                if (r.includes("bajo")) return 1;
+                return 0;
+            };
+
+            // Clonamos y ordenamos la lista por peso de riesgo descendente de forma que queden siempre primero los riesgos altos
+            const sortedDataset = [...filteredDataset].sort((a, b) => {
+                return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
+            });
+
+            sortedDataset.forEach(item => {
                 const tr = document.createElement("tr");
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
                 tr.onclick = () => openModal(item);
@@ -1601,6 +1655,13 @@
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
+            // Sincronizar y rellenar las tarjetas de métricas del proyecto (KPI 1, KPI 2, KPI 3)
+            document.getElementById("modalKpiEbitdaCapturado").innerText = formatCurrency(item.ebitdaCapturado);
+            document.getElementById("modalKpiEbitdaPotencial").innerText = formatCurrency(item.ebitdaPotencial);
+            document.getElementById("modalKpiEbitdaPotencialVal").innerText = `Validación: ${item.valEbitdaPotencial || 'No informada'}`;
+            document.getElementById("modalKpiHht").innerText = `${(item.hhtCapturado || 0).toLocaleString("es-CL")} hrs`;
+            document.getElementById("modalKpiHhtPotencial").innerText = `Potencial: ${(item.hht || 0).toLocaleString("es-CL")} hrs`;
+
             let govText = item.tipoSolucion || "No especificado";
             if (item.requiereGobernanza) {
                 govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
@@ -1799,6 +1860,7 @@
             document.getElementById("filterTipo").value = "";
             document.getElementById("filterSponsor").value = "";
             document.getElementById("filterLider").value = "";
+            document.getElementById("filterEstado").value = "";
             connectToGitHubCSV();
         }
 
