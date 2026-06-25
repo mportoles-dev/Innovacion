@@ -221,7 +221,6 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
-                    <p class="text-[10px] text-palOrange font-semibold mt-0.5" id="kpiHhtSub">Meta: 0 (0%)</p>
                 </div>
             </div>
 
@@ -257,8 +256,13 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- EBITDA POR UNIDAD -->
             <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
-                <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
+                    <!-- Botón Selector de Métrica (EBITDA / HHT) -->
+                    <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                        <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
+                        <button onclick="toggleMainChartMetric('hht')" id="btnMetricHht" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">HHT</button>
+                    </div>
                 </div>
                 <div class="flex-1 min-h-0 relative">
                     <canvas id="chartEbitdaProyecto"></canvas>
@@ -560,6 +564,7 @@
         let currentDataset = []; // Dataset activo en pantalla
         let globalMetas = [];    // Metas de EBITDA y HHT desde metas-innovacion.csv
         let charts = {};         // Instancias de Chart.js
+        let activeMainChartMetric = 'ebitda'; // Métrica activa del gráfico de barras ('ebitda' o 'hht')
 
         // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
@@ -1055,8 +1060,10 @@
 
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
-            document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
-            document.getElementById("kpiHhtPotencial").innerText = sumHhtPotencial.toLocaleString("es-CL");
+            
+            // Forzar redondeo estricto para eliminar decimales de HHT Capturado Real
+            document.getElementById("kpiHht").innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
+            document.getElementById("kpiHhtPotencial").innerText = Math.round(sumHhtPotencial).toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
             const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
@@ -1064,9 +1071,6 @@
             
             const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
             document.getElementById("kpiEbitdaCapturadoSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
-
-            const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
-            document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
 
             const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
             document.getElementById("kpiHhtPotencialSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
@@ -1148,6 +1152,29 @@
         }
 
         // ==========================================
+        // ALTERNANCIA DE MÉTRICA DEL GRÁFICO DE BARRAS
+        // ==========================================
+        function toggleMainChartMetric(metric) {
+            activeMainChartMetric = metric;
+            
+            const btnEbitda = document.getElementById("btnMetricEbitda");
+            const btnHht = document.getElementById("btnMetricHht");
+            const mainTitle = document.getElementById("mainChartTitle");
+
+            if (metric === 'ebitda') {
+                btnEbitda.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
+                btnHht.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
+                mainTitle.innerText = "EBITDA Potencial vs Capturado por Unidad / Gerencia";
+            } else {
+                btnEbitda.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
+                btnHht.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
+                mainTitle.innerText = "HHT Potencial vs Real por Unidad / Gerencia";
+            }
+
+            renderCharts();
+        }
+
+        // ==========================================
         // CONFIGURACIÓN DE GRÁFICOS (CHART.JS)
         // ==========================================
         function initChartsContainer() {
@@ -1165,18 +1192,48 @@
             if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
 
-            // 1. EBITDA Potencial vs Capturado
-            const ebitdaByGerencia = {};
+            // 1. EBITDA vs HHT por Gerencia (almacenando desgloses detallados por iniciativa)
+            const metricByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
-                if (!ebitdaByGerencia[gerencia]) {
-                    ebitdaByGerencia[gerencia] = { potencial: 0, capturado: 0 };
+                if (!metricByGerencia[gerencia]) {
+                    metricByGerencia[gerencia] = { 
+                        primary: 0, 
+                        secondary: 0,
+                        projects: []
+                    };
                 }
-                ebitdaByGerencia[gerencia].potencial += item.ebitdaPotencial;
-                ebitdaByGerencia[gerencia].capturado += item.ebitdaCapturado;
+                
+                let valPrimary = 0;
+                let valSecondary = 0;
+                
+                if (activeMainChartMetric === 'ebitda') {
+                    valPrimary = item.ebitdaPotencial || 0;
+                    valSecondary = item.ebitdaCapturado || 0;
+                } else {
+                    valPrimary = item.hht || 0;
+                    valSecondary = item.hhtCapturado || 0;
+                }
+
+                metricByGerencia[gerencia].primary += valPrimary;
+                metricByGerencia[gerencia].secondary += valSecondary;
+                
+                metricByGerencia[gerencia].projects.push({
+                    nombre: item.nombre || "Sin nombre",
+                    valPrimary: valPrimary,
+                    valSecondary: valSecondary
+                });
             });
 
-            const sortedGerencias = Object.keys(ebitdaByGerencia).sort((a, b) => ebitdaByGerencia[b].potencial - ebitdaByGerencia[a].potencial);
+            const sortedGerencias = Object.keys(metricByGerencia).sort((a, b) => metricByGerencia[b].primary - metricByGerencia[a].primary);
+
+            const labelPrimary = activeMainChartMetric === 'ebitda' ? 'EBITDA Potencial' : 'HHT Potencial Anual';
+            const labelSecondary = activeMainChartMetric === 'ebitda' ? 'EBITDA Capturado' : 'HHT Capturado Real';
+
+            const primaryColor = activeMainChartMetric === 'ebitda' ? 'rgba(149, 110, 178, 0.85)' : 'rgba(250, 204, 21, 0.85)'; // Púrpura vs Amarillo
+            const primaryBorderColor = activeMainChartMetric === 'ebitda' ? '#956eb6' : '#facc15';
+            const secondaryColor = activeMainChartMetric === 'ebitda' ? 'rgba(15, 111, 70, 0.9)' : 'rgba(241, 90, 36, 0.9)'; // Verde Bosque vs Naranja Coral
+            const secondaryBorderColor = activeMainChartMetric === 'ebitda' ? '#0f6f46' : '#f15a24';
 
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
@@ -1185,18 +1242,18 @@
                     labels: sortedGerencias,
                     datasets: [
                         {
-                            label: 'EBITDA Potencial',
-                            data: sortedGerencias.map(g => ebitdaByGerencia[g].potencial),
-                            backgroundColor: 'rgba(149, 110, 178, 0.85)',
-                            borderColor: '#956eb6',
+                            label: labelPrimary,
+                            data: sortedGerencias.map(g => metricByGerencia[g].primary),
+                            backgroundColor: primaryColor,
+                            borderColor: primaryBorderColor,
                             borderWidth: 1,
                             borderRadius: 6
                         },
                         {
-                            label: 'EBITDA Capturado',
-                            data: sortedGerencias.map(g => ebitdaByGerencia[g].capturado),
-                            backgroundColor: 'rgba(15, 111, 70, 0.9)',
-                            borderColor: '#0f6f46',
+                            label: labelSecondary,
+                            data: sortedGerencias.map(g => metricByGerencia[g].secondary),
+                            backgroundColor: secondaryColor,
+                            borderColor: secondaryBorderColor,
                             borderWidth: 1,
                             borderRadius: 6
                         }
@@ -1207,13 +1264,63 @@
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
-                        datalabels: { display: false }
+                        datalabels: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const gerencia = context.label;
+                                    const datasetIndex = context.datasetIndex; // 0: primary, 1: secondary
+                                    const isPrimary = (datasetIndex === 0);
+                                    const labelPrefix = context.dataset.label || '';
+                                    
+                                    const dataGroup = metricByGerencia[gerencia];
+                                    if (!dataGroup) return `${labelPrefix}: ${context.raw}`;
+
+                                    const totalValue = context.raw;
+                                    const totalFormatted = activeMainChartMetric === 'ebitda' 
+                                        ? formatCurrency(totalValue) 
+                                        : Math.round(totalValue).toLocaleString('es-CL') + ' HHT';
+
+                                    const lines = [`${labelPrefix} Total: ${totalFormatted}`, ''];
+                                    lines.push('Desglose por Iniciativa:');
+
+                                    // Filtrar y mapear proyectos activos
+                                    const projList = dataGroup.projects.map(p => ({
+                                        nombre: p.nombre,
+                                        value: isPrimary ? p.valPrimary : p.valSecondary
+                                    })).filter(p => p.value > 0);
+
+                                    if (projList.length === 0) {
+                                        lines.push('  • Ninguna activa');
+                                    } else {
+                                        // Ordenar de mayor a menor valor registrado
+                                        projList.sort((a, b) => b.value - a.value);
+                                        projList.forEach(p => {
+                                            const valFormatted = activeMainChartMetric === 'ebitda' 
+                                                ? formatCurrency(p.value) 
+                                                : Math.round(p.value).toLocaleString('es-CL') + ' HHT';
+                                            lines.push(`  • ${p.nombre}: ${valFormatted}`);
+                                        });
+                                    }
+                                    return lines;
+                                }
+                            }
+                        }
                     },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { 
                             grid: { color: 'rgba(107, 124, 133, 0.12)' },
-                            ticks: { font: { size: 9 }, callback: (v) => '$' + (v / 1e6) + 'M' }
+                            ticks: { 
+                                font: { size: 9 }, 
+                                callback: (v) => {
+                                    if (activeMainChartMetric === 'ebitda') {
+                                        return '$' + (v / 1e6) + 'M';
+                                    } else {
+                                        return Math.round(v).toLocaleString('es-CL');
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1528,7 +1635,7 @@
                     responsable: rawResponsable || "Sin asignar",
                     inicio: startDate,
                     termino: endDate,
-                    estado: rawEstado || "Planificado"
+                    text: rawEstado || "Planificado"
                 };
 
                 if (!objectivesMap[currentObjective]) {
