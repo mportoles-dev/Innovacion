@@ -221,7 +221,6 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
-                    <p class="text-[10px] text-palOrange font-semibold mt-0.5" id="kpiHhtSub">Meta: 0 (0%)</p>
                 </div>
             </div>
 
@@ -1055,8 +1054,10 @@
 
             document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
             document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
-            document.getElementById("kpiHht").innerText = sumHhtCapturado.toLocaleString("es-CL");
-            document.getElementById("kpiHhtPotencial").innerText = sumHhtPotencial.toLocaleString("es-CL");
+            
+            // Forzar redondeo estricto para eliminar decimales de HHT Capturado Real
+            document.getElementById("kpiHht").innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
+            document.getElementById("kpiHhtPotencial").innerText = Math.round(sumHhtPotencial).toLocaleString("es-CL");
             document.getElementById("kpiTotalProjects").innerText = totalProjects;
 
             const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
@@ -1064,9 +1065,6 @@
             
             const pctValidado = sumEbitdaPotencial > 0 ? Math.round((sumEbitdaValidado / sumEbitdaPotencial) * 100) : 0;
             document.getElementById("kpiEbitdaCapturadoSub").innerText = `Validado: ${formatCurrency(sumEbitdaValidado)} (${pctValidado}%)`;
-
-            const pctHhtMeta = targetHht > 0 ? Math.round((sumHhtCapturado / targetHht) * 100) : 0;
-            document.getElementById("kpiHhtSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtMeta}%)`;
 
             const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
             document.getElementById("kpiHhtPotencialSub").innerText = `Meta: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
