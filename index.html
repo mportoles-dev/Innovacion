@@ -1192,21 +1192,37 @@
             if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
 
-            // 1. EBITDA vs HHT por Gerencia
+            // 1. EBITDA vs HHT por Gerencia (almacenando desgloses detallados por iniciativa)
             const metricByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
                 if (!metricByGerencia[gerencia]) {
-                    metricByGerencia[gerencia] = { primary: 0, secondary: 0 };
+                    metricByGerencia[gerencia] = { 
+                        primary: 0, 
+                        secondary: 0,
+                        projects: []
+                    };
                 }
                 
+                let valPrimary = 0;
+                let valSecondary = 0;
+                
                 if (activeMainChartMetric === 'ebitda') {
-                    metricByGerencia[gerencia].primary += item.ebitdaPotencial;
-                    metricByGerencia[gerencia].secondary += item.ebitdaCapturado;
+                    valPrimary = item.ebitdaPotencial || 0;
+                    valSecondary = item.ebitdaCapturado || 0;
                 } else {
-                    metricByGerencia[gerencia].primary += (item.hht || 0);
-                    metricByGerencia[gerencia].secondary += (item.hhtCapturado || 0);
+                    valPrimary = item.hht || 0;
+                    valSecondary = item.hhtCapturado || 0;
                 }
+
+                metricByGerencia[gerencia].primary += valPrimary;
+                metricByGerencia[gerencia].secondary += valSecondary;
+                
+                metricByGerencia[gerencia].projects.push({
+                    nombre: item.nombre || "Sin nombre",
+                    valPrimary: valPrimary,
+                    valSecondary: valSecondary
+                });
             });
 
             const sortedGerencias = Object.keys(metricByGerencia).sort((a, b) => metricByGerencia[b].primary - metricByGerencia[a].primary);
@@ -1248,7 +1264,48 @@
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
-                        datalabels: { display: false }
+                        datalabels: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const gerencia = context.label;
+                                    const datasetIndex = context.datasetIndex; // 0: primary, 1: secondary
+                                    const isPrimary = (datasetIndex === 0);
+                                    const labelPrefix = context.dataset.label || '';
+                                    
+                                    const dataGroup = metricByGerencia[gerencia];
+                                    if (!dataGroup) return `${labelPrefix}: ${context.raw}`;
+
+                                    const totalValue = context.raw;
+                                    const totalFormatted = activeMainChartMetric === 'ebitda' 
+                                        ? formatCurrency(totalValue) 
+                                        : Math.round(totalValue).toLocaleString('es-CL') + ' HHT';
+
+                                    const lines = [`${labelPrefix} Total: ${totalFormatted}`, ''];
+                                    lines.push('Desglose por Iniciativa:');
+
+                                    // Filtrar y mapear proyectos activos
+                                    const projList = dataGroup.projects.map(p => ({
+                                        nombre: p.nombre,
+                                        value: isPrimary ? p.valPrimary : p.valSecondary
+                                    })).filter(p => p.value > 0);
+
+                                    if (projList.length === 0) {
+                                        lines.push('  • Ninguna activa');
+                                    } else {
+                                        // Ordenar de mayor a menor valor registrado
+                                        projList.sort((a, b) => b.value - a.value);
+                                        projList.forEach(p => {
+                                            const valFormatted = activeMainChartMetric === 'ebitda' 
+                                                ? formatCurrency(p.value) 
+                                                : Math.round(p.value).toLocaleString('es-CL') + ' HHT';
+                                            lines.push(`  • ${p.nombre}: ${valFormatted}`);
+                                        });
+                                    }
+                                    return lines;
+                                }
+                            }
+                        }
                     },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
@@ -1578,7 +1635,7 @@
                     responsable: rawResponsable || "Sin asignar",
                     inicio: startDate,
                     termino: endDate,
-                    estado: rawEstado || "Planificado"
+                    text: rawEstado || "Planificado"
                 };
 
                 if (!objectivesMap[currentObjective]) {
