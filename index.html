@@ -305,7 +305,7 @@
                 <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
                     <canvas id="chartTipoInno"></canvas>
                 </div>
-                <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2" id="legendTipoInno"></div>
+                <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2 max-h-[90px] overflow-y-auto custom-scrollbar" id="legendTipoInno"></div>
             </div>
 
             <!-- ETAPA EN EL FUNNEL -->
@@ -724,6 +724,69 @@
                       .replace(/[\u0300-\u036f]/g, "")
                       .replace(/[^a-z0-9]/g, "");
         };
+
+        // ==========================================
+        // ASOCIACIÓN DE COLORES ESPECÍFICOS POR UNIDAD
+        // ==========================================
+        function getUnitColors(unitName) {
+            const norm = normalizeKey(unitName);
+            
+            // Adm. y Finanzas: HEX #A369B1
+            if (norm.includes("finanz") || norm.includes("adm") || norm.includes("af")) {
+                return {
+                    potencial: '#A369B1',
+                    capturado: 'rgba(163, 105, 177, 0.55)',
+                    border: '#A369B1'
+                };
+            }
+            // CPP: HEX #006845
+            if (norm === "cpp") {
+                return {
+                    potencial: '#006845',
+                    capturado: 'rgba(0, 104, 69, 0.55)',
+                    border: '#006845'
+                };
+            }
+            // Corrupac: HEX #FE5000
+            if (norm.includes("corrupac")) {
+                return {
+                    potencial: '#FE5000',
+                    capturado: 'rgba(254, 80, 0, 0.55)',
+                    border: '#FE5000'
+                };
+            }
+            // Recupac: HEX #B1D600
+            if (norm.includes("recupac")) {
+                return {
+                    potencial: '#B1D600',
+                    capturado: 'rgba(177, 214, 0, 0.55)',
+                    border: '#B1D600'
+                };
+            }
+            
+            // Fallback para unidades de respaldo (Logística / Operaciones) o no catalogadas
+            if (norm.includes("logistica")) {
+                return {
+                    potencial: '#6b7c85', // Gris Pizarra elegante
+                    capturado: 'rgba(107, 124, 133, 0.55)',
+                    border: '#6b7c85'
+                };
+            }
+            if (norm.includes("operacion")) {
+                return {
+                    potencial: '#0f6f46', // Verde Bosque
+                    capturado: 'rgba(15, 111, 70, 0.55)',
+                    border: '#0f6f46'
+                };
+            }
+            
+            // Fallback absoluto por defecto
+            return {
+                potencial: '#475569', // Slate Slate-600
+                capturado: 'rgba(71, 85, 105, 0.55)',
+                border: '#475569'
+            };
+        }
 
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
@@ -1198,11 +1261,6 @@
             const labelPrimary = activeMainChartMetric === 'ebitda' ? 'EBITDA Potencial' : 'HHT Potencial Anual';
             const labelSecondary = activeMainChartMetric === 'ebitda' ? 'EBITDA Capturado' : 'HHT Capturado Real';
 
-            const primaryColor = activeMainChartMetric === 'ebitda' ? 'rgba(149, 110, 178, 0.85)' : 'rgba(250, 204, 21, 0.85)'; // Púrpura vs Amarillo
-            const primaryBorderColor = activeMainChartMetric === 'ebitda' ? '#956eb6' : '#facc15';
-            const secondaryColor = activeMainChartMetric === 'ebitda' ? 'rgba(15, 111, 70, 0.9)' : 'rgba(241, 90, 36, 0.9)'; // Verde Bosque vs Naranja Coral
-            const secondaryBorderColor = activeMainChartMetric === 'ebitda' ? '#0f6f46' : '#f15a24';
-
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
                 type: 'bar',
@@ -1212,16 +1270,16 @@
                         {
                             label: labelPrimary,
                             data: sortedGerencias.map(g => metricByGerencia[g].primary),
-                            backgroundColor: primaryColor,
-                            borderColor: primaryBorderColor,
+                            backgroundColor: sortedGerencias.map(g => getUnitColors(g).potencial),
+                            borderColor: sortedGerencias.map(g => getUnitColors(g).border),
                             borderWidth: 1,
                             borderRadius: 6
                         },
                         {
                             label: labelSecondary,
                             data: sortedGerencias.map(g => metricByGerencia[g].secondary),
-                            backgroundColor: secondaryColor,
-                            borderColor: secondaryBorderColor,
+                            backgroundColor: sortedGerencias.map(g => getUnitColors(g).capturado),
+                            borderColor: sortedGerencias.map(g => getUnitColors(g).border),
                             borderWidth: 1,
                             borderRadius: 6
                         }
@@ -1311,8 +1369,8 @@
                     datasets: [{
                         label: 'Proyectos',
                         data: sortedProyectosGerencias.map(g => proyectosByGerencia[g]),
-                        backgroundColor: 'rgba(155, 202, 60, 0.85)',
-                        borderColor: '#9bca3c',
+                        backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).potencial),
+                        borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
                         borderWidth: 1,
                         borderRadius: 4
                     }]
@@ -1332,7 +1390,7 @@
                 }
             });
 
-            // 3. Tipo / Vertical de Innovación
+            // 3. Tipo / Vertical de Innovación (Paleta exclusiva de azules profesionales)
             const chartDataCount = {};
             let totalItemsFiltered = 0;
             
@@ -1348,6 +1406,21 @@
                 totalItemsFiltered++;
             });
 
+            // Colores estrictamente dentro de la escala azulina / slate profesional 
+            // Esto asegura distancia cromática de los colores corporativos de Coipsa
+            const bluePalette = [
+                '#1e40af', // Azul Rey Oscuro
+                '#0284c7', // Azul Océano Medio
+                '#3b82f6', // Azul Eléctrico Claro
+                '#1e3a8a', // Azul Marino Profundo
+                '#0369a1', // Azul Marino Sólido
+                '#60a5fa', // Azul Aciano Brillante
+                '#475569', // Azul Pizarra Sutil
+                '#0099ff', // Azul Neón Vibrante
+                '#1d4ed8', // Azul Cobalto Fuerte
+                '#2563eb'  // Azul Real Estándar
+            ];
+
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
             chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
@@ -1356,7 +1429,7 @@
                     labels: Object.keys(chartDataCount),
                     datasets: [{
                         data: Object.values(chartDataCount),
-                        backgroundColor: ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85', '#3b82f6', '#eab308', '#ec4899', '#14b8a6', '#f97316'],
+                        backgroundColor: bluePalette,
                         borderWidth: 0
                     }]
                 },
@@ -1392,11 +1465,11 @@
             const legendTipo = document.getElementById("legendTipoInno");
             legendTipo.innerHTML = "";
             Object.keys(chartDataCount).forEach((category, index) => {
-                const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85', '#3b82f6', '#eab308', '#ec4899', '#14b8a6', '#f97316'];
+                const colorAssigned = bluePalette[index % bluePalette.length];
                 legendTipo.innerHTML += `
                     <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
-                        <span class="font-bold text-slate-700">${category}</span>
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${colorAssigned};"></span>
+                        <span class="font-bold text-slate-700 truncate">${category}</span>
                     </div>
                 `;
             });
@@ -2016,7 +2089,7 @@
 
                 const blobWriter = new zipLib.BlobWriter("application/zip");
                 const zipWriter = new zipLib.ZipWriter(blobWriter, {
-                    password: "coipsa_2026",
+                    password: "Coipsa.2026",
                     zipCrypto: true
                 });
 
