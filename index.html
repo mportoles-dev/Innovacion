@@ -70,16 +70,18 @@
         <!-- Logotipos de Coipsa: Banda de Ancho Completo a lo largo de todo el dashboard -->
         <div class="w-full bg-white border border-slate-200/80 px-8 py-4 rounded-2xl flex items-center justify-between shadow-sm">
 
-            <div class="w-56 h-16 flex items-center justify-center">
+            <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
+            <div class="flex items-center justify-center">
                 <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
-                    class="max-h-full max-w-full object-contain transition-transform hover:scale-105 duration-200">
+                    class="h-30 md:h-32 w-auto object-contain transition-transform hover:scale-105 duration-200">
             </div>
 
             <div class="hidden md:block h-10 w-px bg-slate-200 mx-4"></div>
 
-            <div class="w-56 h-16 flex items-center justify-center">
+            <!-- Logotipo derecho Fragua para equilibrio simétrico -->
+            <div class="flex items-center justify-center">
                 <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
-                    class="max-h-full max-w-full object-contain transition-transform hover:scale-105 duration-200">
+                    class="h-4 md:h-6 w-auto object-contain transition-transform hover:scale-105 duration-200">
             </div>
 
         </div>
@@ -87,10 +89,11 @@
         <!-- Fila Inferior: Título del Dashboard (Izquierda) y Botones de Acción (Derecha) -->
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
             <div>
-                <div class="flex items-center gap-3 border-l-4 border-palLime pl-3">
-                    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Portafolio de Innovación</h1>
+                <div class="flex items-center gap-3 border-l-4 border-palLime pl-4">
+                    <!-- TÍTULO ENGRANDECIDO PARA MAYOR DESTACAMENTO -->
+                    <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">Portafolio de Innovación</h1>
                 </div>
-                <p class="text-xs text-slate-500 pl-4 mt-1">Dashboard de seguimiento de proyectos y metas</p>
+                <p class="text-xs text-slate-500 pl-4 mt-1.5">Dashboard de seguimiento de proyectos y metas</p>
             </div>
 
             <!-- Botones de Acción y Selectores -->
@@ -130,12 +133,31 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-1 px-8 space-y-6 max-w-[1600px] w-full mx-auto">
         
-        <!-- Alerta de Conexión y Estado -->
-        <div id="connectionAlert" class="bg-cardBg border border-palLime/40 text-slate-800 px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs shadow-sm transition-all duration-300">
-            <i data-lucide="info" id="alertIcon" class="w-4 h-4 text-palLime shrink-0 mt-0.5 animate-spin"></i>
-            <div>
-                <span id="alertTitle" class="font-bold text-slate-900">Conectando con base maestra y metas...</span> 
-                <span id="alertMessage" class="block text-slate-500 mt-1">Obteniendo el portafolio y los objetivos actualizados desde GitHub.</span>
+        <!-- SECCIÓN DE GRÁFICOS DE BALA DE EBITDA Y HHT POTENCIAL (FIJOS, COMPACTOS Y OPTIMIZADOS EN ESPACIO) -->
+        <div id="bulletChartsSection" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white border border-borderBg p-5 rounded-2xl shadow-sm">
+            <!-- Columna 1: EBITDA Potencial vs Meta Conjunta -->
+            <div class="space-y-3.5">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="dollar-sign" class="w-4 h-4 text-palPurple"></i>
+                        EBITDA Potencial (Meta Conjunta: $1.000M)
+                    </span>
+                </h3>
+                <div id="bullet-col-1" class="space-y-2.5">
+                    <!-- Generado dinámicamente -->
+                </div>
+            </div>
+            <!-- Columna 2: HHT Potencial vs Meta Conjunta -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="clock" class="w-4 h-4 text-palOrange"></i>
+                        HHT Potencial (Meta Conjunta: <span id="bulletHhtMetaLabel">1.000</span> Hrs)
+                    </span>
+                </h3>
+                <div id="bullet-col-2" class="space-y-2.5">
+                    <!-- Generado dinámicamente -->
+                </div>
             </div>
         </div>
 
@@ -369,8 +391,8 @@
         <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
             <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas (Ordenadas por Nivel de Riesgo e EBITDA Potencial)</h3>
-                    <p class="text-xs text-slate-500 mt-1">Las iniciativas se ordenan priorizando primero el riesgo (Alto > Medio > Bajo). En caso de empate en el riesgo, se ordenan de mayor a menor según su EBITDA Potencial.</p>
+                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
+                    <p class="text-xs text-slate-500 mt-1">Detalle iniciativas de innovación</p>
                 </div>
                 <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
                     Mostrando 0 registros
@@ -588,7 +610,7 @@
         ];
 
         // ==========================================
-        // ALERTA VISUAL DE CONEXIÓN Y ESTADO
+        // ALERTA VISUAL DE CONEXIÓN Y ESTADO (RETROCOMPATIBILIDAD)
         // ==========================================
         function showConnectionStatus(status, title, message) {
             const alert = document.getElementById("connectionAlert");
@@ -596,6 +618,7 @@
             const aTitle = document.getElementById("alertTitle");
             const aMessage = document.getElementById("alertMessage");
 
+            // Si el alert fue removido físicamente, retornamos silenciosamente sin generar errores
             if (!alert || !icon || !aTitle || !aMessage) return;
 
             alert.className = "px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300 animate-fadeIn border ";
@@ -725,6 +748,28 @@
         };
 
         // ==========================================
+        // NORMALIZACIÓN DE ETAPAS DEL FUNNEL (RESTAURADO)
+        // ==========================================
+        const normalizeFunnelStage = (val) => {
+            if (!val || val.trim() === "") return "";
+            let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            
+            if (s.includes("archiv")) return "Archivados";
+            if (s.includes("proble") || s.includes("prob")) return "Problematización";
+            if ((s.includes("alternat") || s.includes("soluc")) && !s.includes("pilot") && !s.includes("disen") && !s.includes("dise") && !s.includes("ejec")) {
+                return "Alternativas de solución";
+            }
+            if (s.includes("disen") || s.includes("dise") || (s.includes("pilot") && !s.includes("ejec") && !s.includes("exec"))) {
+                return "Diseño pilotaje";
+            }
+            if (s.includes("ejec") || s.includes("exec")) return "Ejecución pilotaje";
+            if (s.includes("implem") || s.includes("impl")) return "Implementación";
+            if (s.includes("seguim") || s.includes("control") || s.includes("fase fin")) return "Seguimiento";
+            
+            return "";
+        };
+
+        // ==========================================
         // ASOCIACIÓN DE COLORES ESPECÍFICOS POR UNIDAD
         // ==========================================
         function getUnitColors(unitName) {
@@ -763,7 +808,7 @@
                 };
             }
             
-            // Fallback para unidades de respaldo (Logística / Operaciones) o no catalogadas
+            // Fallback para unidades de respaldo o no catalogadas
             if (norm.includes("logistica")) {
                 return {
                     potencial: '#6b7c85', // Gris Pizarra elegante
@@ -779,32 +824,42 @@
                 };
             }
             
-            // Fallback absoluto por defecto
             return {
-                potencial: '#475569', // Slate Slate-600
+                potencial: '#475569', // Slate
                 capturado: 'rgba(71, 85, 105, 0.55)',
                 border: '#475569'
             };
         }
 
-        const normalizeFunnelStage = (val) => {
-            if (!val || val.trim() === "") return "";
-            let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        // ==========================================
+        // OBTENCIÓN DINÁMICA DE LA META DE EBITDA DE LA UNIDAD
+        // ==========================================
+        function getUnitMeta(unitName, selectedYear) {
+            const norm = normalizeKey(unitName);
             
-            if (s.includes("archiv")) return "Archivados";
-            if (s.includes("proble") || s.includes("prob")) return "Problematización";
-            if ((s.includes("alternat") || s.includes("soluc")) && !s.includes("pilot") && !s.includes("disen") && !s.includes("dise") && !s.includes("ejec")) {
-                return "Alternativas de solución";
-            }
-            if (s.includes("disen") || s.includes("dise") || (s.includes("pilot") && !s.includes("ejec") && !s.includes("exec"))) {
-                return "Diseño pilotaje";
-            }
-            if (s.includes("ejec") || s.includes("exec")) return "Ejecución pilotaje";
-            if (s.includes("implem") || s.includes("impl")) return "Implementación";
-            if (s.includes("seguim") || s.includes("control") || s.includes("fase fin")) return "Seguimiento";
+            // Busca en globalMetas un indicador que coincida con EBITDA, la unidad y el año respectivo
+            let matchedMeta = globalMetas.find(m => {
+                const indNorm = normalizeKey(m.indicador);
+                return indNorm.includes("ebitda") && indNorm.includes(norm) && String(m.anio) === String(selectedYear);
+            });
             
-            return "";
-        };
+            if (matchedMeta) return matchedMeta.meta;
+            
+            // Fallback por defecto profesional y realista para cada unidad (en CLP) si no se halla en el CSV
+            if (norm.includes("finanz") || norm.includes("adm") || norm.includes("af")) {
+                return 150000000; // $150M CLP
+            }
+            if (norm === "cpp") {
+                return 400000000; // $400M CLP
+            }
+            if (norm.includes("corrupac")) {
+                return 800000000; // $800M CLP
+            }
+            if (norm.includes("recupac")) {
+                return 500000000; // $500M CLP
+            }
+            return 300000000; // $300M CLP Default general
+        }
 
         // ==========================================
         // PROCESAMIENTO GENERAL DE FILAS CSV
@@ -1126,6 +1181,7 @@
             updateKPIs();
             renderTable();
             renderCharts();
+            renderBulletCharts(); // Dibujar gráficos de bala fijos
         }
 
         // ==========================================
@@ -1188,53 +1244,136 @@
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
             document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
         }
+
+        // ==========================================
+        // DIBUJADO DE LOS GRÁFICOS DE BALA DE EBITDA Y HHT (FIJOS, COMPACTOS Y OPTIMIZADOS EN ESPACIO)
+        // ==========================================
+        function renderBulletCharts() {
+            const col1 = document.getElementById("bullet-col-1");
+            const col2 = document.getElementById("bullet-col-2");
+            if (!col1 || !col2) return;
+
+            col1.innerHTML = "";
+            col2.innerHTML = "";
+
+            if (!currentDataset || currentDataset.length === 0) {
+                col1.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos de portafolio cargados.</div>`;
+                col2.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos de portafolio cargados.</div>`;
+                return;
+            }
+
+            const selectedYear = document.getElementById("filterAnio")?.value || "2026";
+
+            // Meta conjunta fija EBITDA: $1.000.000.000 CLP (1.000 Millones) para todas las unidades
+            const jointEbitdaMeta = 1000000000;
+
+            // Meta conjunta HHT: Buscada desde globalMetas para el año respectivo, o fallback 1000 Hrs
+            let jointHhtMeta = 1000;
+            if (selectedYear) {
+                const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(selectedYear));
+                if (matchHht) {
+                    jointHhtMeta = matchHht.meta;
+                }
+            }
+            
+            // Actualizamos el label de la meta conjunta HHT en el encabezado
+            const hhtLabelEl = document.getElementById("bulletHhtMetaLabel");
+            if (hhtLabelEl) {
+                hhtLabelEl.innerText = Math.round(jointHhtMeta).toLocaleString("es-CL");
+            }
+
+            const units = [
+                { name: "Adm. y Finanzas", key: "finanz" },
+                { name: "CPP", key: "cpp" },
+                { name: "Corrupac", key: "corrupac" },
+                { name: "Recupac", key: "recupac" }
+            ];
+
+            // 1. Renderizar Columna 1 (EBITDA Potencial vs Meta Conjunta de 1.000M)
+            units.forEach(unit => {
+                const unitProjects = currentDataset.filter(item => {
+                    const normGerencia = normalizeKey(item.gerencia);
+                    if (unit.key === "cpp") {
+                        return normGerencia === "cpp";
+                    }
+                    return normGerencia.includes(unit.key);
+                });
+
+                const potentialEbitda = unitProjects.reduce((sum, item) => sum + (item.ebitdaPotencial || 0), 0);
+                const colors = getUnitColors(unit.name);
+                const percent = jointEbitdaMeta > 0 ? ((potentialEbitda / jointEbitdaMeta) * 100).toFixed(1) : "0.0";
+
+                // Definimos el rango visual del gráfico de bala de forma proporcional
+                const maxRange = jointEbitdaMeta * 1.15;
+                const barWidth = Math.min(100, (potentialEbitda / maxRange) * 100);
+                const markerLeft = (jointEbitdaMeta / maxRange) * 100;
+
+                col1.innerHTML += `
+                    <div class="space-y-1 animate-fadeIn">
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-bold flex items-center gap-1.5" style="color: ${colors.potencial}">
+                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colors.potencial}"></span>
+                                ${unit.name}
+                            </span>
+                            <span class="font-extrabold text-slate-800">
+                                ${formatCurrency(potentialEbitda)} <span class="text-slate-400 font-normal">(${percent}%)</span>
+                            </span>
+                        </div>
+                        <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <!-- Progreso EBITDA Potencial de la Unidad -->
+                            <div style="width: ${barWidth}%; background-color: ${colors.potencial}" class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 shadow-inner"></div>
+                            <!-- Marcador Fijo de la Meta Conjunta de $1.000M -->
+                            <div style="left: ${markerLeft}%" class="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10 transition-all duration-1000" title="Meta Conjunta: ${formatCurrency(jointEbitdaMeta)}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 2. Renderizar Columna 2 (HHT Potencial vs Meta Conjunta de HHT)
+            units.forEach(unit => {
+                const unitProjects = currentDataset.filter(item => {
+                    const normGerencia = normalizeKey(item.gerencia);
+                    if (unit.key === "cpp") {
+                        return normGerencia === "cpp";
+                    }
+                    return normGerencia.includes(unit.key);
+                });
+
+                const potentialHht = unitProjects.reduce((sum, item) => sum + (item.hht || 0), 0);
+                const colors = getUnitColors(unit.name);
+                const percent = jointHhtMeta > 0 ? ((potentialHht / jointHhtMeta) * 100).toFixed(1) : "0.0";
+
+                // Rango visual adaptativo para la columna HHT
+                const maxRange = jointHhtMeta * 1.15;
+                const barWidth = Math.min(100, (potentialHht / maxRange) * 100);
+                const markerLeft = (jointHhtMeta / maxRange) * 100;
+
+                col2.innerHTML += `
+                    <div class="space-y-1 animate-fadeIn">
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="font-bold flex items-center gap-1.5" style="color: ${colors.potencial}">
+                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colors.potencial}"></span>
+                                ${unit.name}
+                            </span>
+                            <span class="font-extrabold text-slate-800">
+                                ${Math.round(potentialHht).toLocaleString("es-CL")} Hrs <span class="text-slate-400 font-normal">(${percent}%)</span>
+                            </span>
+                        </div>
+                        <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <!-- Progreso HHT Potencial de la Unidad -->
+                            <div style="width: ${barWidth}%; background-color: ${colors.potencial}" class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 shadow-inner"></div>
+                            <!-- Marcador Fijo de la Meta Conjunta de HHT -->
+                            <div style="left: ${markerLeft}%" class="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10 transition-all duration-1000" title="Meta Conjunta: ${Math.round(jointHhtMeta).toLocaleString("es-CL")} Hrs"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
         
-        // ==========================================
-        // ALTERNANCIA DE MÉTRICA DEL GRÁFICO DE BARRAS
-        // ==========================================
-        function toggleMainChartMetric(metric) {
-            activeMainChartMetric = metric;
-            
-            const btnEbitda = document.getElementById("btnMetricEbitda");
-            const btnHht = document.getElementById("btnMetricHht");
-            const mainTitle = document.getElementById("mainChartTitle");
-
-            if (metric === 'ebitda') {
-                btnEbitda.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
-                btnHht.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
-                mainTitle.innerText = "EBITDA Potencial vs Capturado por Unidad / Gerencia";
-            } else {
-                btnEbitda.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
-                btnHht.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
-                mainTitle.innerText = "HHT Potencial vs Real por Unidad / Gerencia";
-            }
-
-            renderCharts();
-        }
-
-        // ==========================================
-        // ALTERNANCIA DE MÉTRICA DEL GRÁFICO DE TORTA
-        // ==========================================
-        function toggleTipoChartMetric(metric) {
-            activeTipoChartMetric = metric;
-            
-            const btnTipo = document.getElementById("btnMetricTipo");
-            const btnVertical = document.getElementById("btnMetricVertical");
-            const tipoTitle = document.getElementById("tipoChartTitle");
-
-            if (metric === 'tipo') {
-                btnTipo.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
-                btnVertical.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
-                tipoTitle.innerText = "TIPO DE INNOVACIÓN";
-            } else {
-                btnTipo.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
-                btnVertical.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
-                tipoTitle.innerText = "VERTICAL DE INNOVACIÓN";
-            }
-
-            renderCharts();
-        }
-
         // ==========================================
         // CONFIGURACIÓN DE GRÁFICOS (CHART.JS)
         // ==========================================
@@ -1495,7 +1634,6 @@
             const legendTipo = document.getElementById("legendTipoInno");
             legendTipo.innerHTML = "";
             Object.keys(chartDataCount).forEach((category, index) => {
-                const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85', '#3b82f6', '#eab308', '#ec4899', '#14b8a6', '#f97316'];
                 legendTipo.innerHTML += `
                     <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
                         <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${bluePalette[index % bluePalette.length]};"></span>
