@@ -370,8 +370,8 @@
         <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
             <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas (Ordenadas por nivel de Riesgo)</h3>
-                    <p class="text-xs text-slate-500 mt-1">Las iniciativas se ordenan priorizando el riesgo Alto, luego el riesgo Medio, y finalmente el riesgo Bajo.</p>
+                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas (Ordenadas por Nivel de Riesgo e EBITDA Potencial)</h3>
+                    <p class="text-xs text-slate-500 mt-1">Las iniciativas se ordenan priorizando primero el riesgo (Alto > Medio > Bajo). En caso de empate en el riesgo, se ordenan de mayor a menor según su EBITDA Potencial.</p>
                 </div>
                 <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
                     Mostrando 0 registros
@@ -1511,8 +1511,17 @@
                 return 0;
             };
 
+            // Ordenamiento por nivel de Riesgo (1ero) y por EBITDA Potencial descendente (2do)
             const sortedDataset = [...filteredDataset].sort((a, b) => {
-                return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
+                const weightA = getRiskWeight(a.riesgo);
+                const weightB = getRiskWeight(b.riesgo);
+                
+                if (weightB !== weightA) {
+                    return weightB - weightA;
+                }
+                
+                // Si el nivel de riesgo es igual, ordenar por EBITDA Potencial de forma descendente
+                return (b.ebitdaPotencial || 0) - (a.ebitdaPotencial || 0);
             });
 
             sortedDataset.forEach(item => {
@@ -2042,6 +2051,9 @@
             lucide.createIcons();
         }
 
+        // ==========================================
+        // RESETEAR FILTROS
+        // ==========================================
         function resetData() {
             document.getElementById("filterAnio").value = "";
             document.getElementById("filterGerencia").value = "";
