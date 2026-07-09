@@ -2308,6 +2308,21 @@
             initChartsContainer();
             connectToGitHubCSV();
         };
+
+        // Funciones auxiliares para interactividad de pestañas/métricas en las visualizaciones
+        function toggleMainChartMetric(metric) {
+            activeMainChartMetric = metric;
+            document.getElementById("btnMetricEbitda").className = metric === 'ebitda' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            document.getElementById("btnMetricHht").className = metric === 'hht' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            renderCharts();
+        }
+
+        function toggleTipoChartMetric(metric) {
+            activeTipoChartMetric = metric;
+            document.getElementById("btnMetricTipo").className = metric === 'tipo' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            document.getElementById("btnMetricVertical").className = metric === 'vertical' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            renderCharts();
+        }
     </script>
 </body>
 </html>
