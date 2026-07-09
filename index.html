@@ -294,8 +294,13 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- TIPO DE INNOVACIÓN -->
             <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                    <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                    <!-- Botón Selector de Métrica (Tipo / Vertical) -->
+                    <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                        <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
+                        <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
+                    </div>
                 </div>
                 <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
                     <canvas id="chartTipoInno"></canvas>
@@ -575,6 +580,7 @@
         let globalMetas = [];    // Metas de EBITDA y HHT desde metas-innovacion.csv
         let charts = {};         // Instancias de Chart.js
         let activeMainChartMetric = 'ebitda'; // Métrica activa del gráfico de barras ('ebitda' o 'hht')
+        let activeTipoChartMetric = 'tipo'; // Métrica activa del gráfico de torta ('tipo' o 'vertical')
 
         // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
@@ -778,7 +784,8 @@
                 const descripcion = cleanEncoding(findVal(["descripcion", "detalle"]));
                 const riesgo = cleanEncoding(findVal(["nivelderiesgo", "riesgo"]));
                 const gerencia = cleanEncoding(findVal(["unidad", "gerencia", "unidadgerencia"]));
-                const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "vertical", "tipoinnovacion"]));
+                const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "tipoinnovacion", "tipo"]));
+                const vertical = cleanEncoding(findVal(["vertical", "verticalinnovacion"]));
                 const lider = cleanEncoding(findVal(["liderfuncionalnombre", "lider", "responsable"]));
                 const correo = cleanEncoding(findVal(["liderfuncionalcorreo", "correo", "email"]));
                 
@@ -810,7 +817,7 @@
                 const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
 
                 return {
-                    id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion,
+                    id, nombre, anio, descripcion, riesgo, gerencia, tipoInnovacion, vertical,
                     lider, correo, funnel, inversion, ebitdaPotencial,
                     valEbitdaPotencial, ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
@@ -944,7 +951,7 @@
                             localDataset = processCSVRows(results.data);
                             document.getElementById('portfolioSelector').value = 'cargada';
                             currentDataset = [...localDataset];
-                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas.`);
+                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} initiatives.`);
                             initializeDashboard();
                         } else {
                             showConnectionStatus("error", "Error en archivo", "Formato no compatible.");
@@ -1088,79 +1095,7 @@
             document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
             document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
         }
-
-        // ==========================================
-        // RENDERIZADO DE TABLA DE INICIATIVAS
-        // ==========================================
-        function renderTable() {
-            const tbody = document.getElementById("tableBody");
-            const emptyState = document.getElementById("tableEmptyState");
-            tbody.innerHTML = "";
-
-            document.getElementById("tableRecordCount").innerText = `Mostrando ${filteredDataset.length} registros`;
-
-            if (filteredDataset.length === 0) {
-                emptyState.classList.remove("hidden");
-                return;
-            }
-            emptyState.classList.add("hidden");
-
-            const getRiskWeight = (risk) => {
-                if (!risk) return 0;
-                const r = risk.toLowerCase();
-                if (r.includes("alto")) return 3;
-                if (r.includes("medio")) return 2;
-                if (r.includes("bajo")) return 1;
-                return 0;
-            };
-
-            const sortedDataset = [...filteredDataset].sort((a, b) => {
-                return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
-            });
-
-            sortedDataset.forEach(item => {
-                const tr = document.createElement("tr");
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
-                tr.onclick = () => openModal(item);
-
-                let riskBadge = "bg-slate-100 text-slate-600 border border-slate-200";
-                if (item.riesgo) {
-                    const rNorm = item.riesgo.toLowerCase();
-                    if (rNorm.includes("bajo")) riskBadge = "bg-emerald-50 text-palForest border border-palForest/20";
-                    else if (rNorm.includes("medio")) riskBadge = "bg-yellow-50 text-[#d97706] border border-palYellow/30";
-                    else if (rNorm.includes("alto")) riskBadge = "bg-orange-50 text-palOrange border border-palOrange/20";
-                }
-
-                let estadoBadge = "bg-slate-100 text-slate-500 border border-slate-200";
-                if (item.estado) {
-                    const eNorm = item.estado.toLowerCase();
-                    if (eNorm.includes("abierto")) estadoBadge = "bg-lime-50 text-lime-800 border border-lime-200";
-                    else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
-                }
-
-                tr.innerHTML = `
-                    <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
-                    <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
-                    <td class="py-3 px-6">${item.lider || 'N/A'}</td>
-                    <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
-                            ${item.riesgo || 'N/A'}
-                        </span>
-                    </td>
-                    <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.inversion)}</td>
-                    <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
-                    <td class="py-3 px-6 text-right font-bold text-palForest">${formatCurrency(item.ebitdaCapturado)}</td>
-                    <td class="py-3 px-6 text-center">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
-                            ${item.estado || 'N/A'}
-                        </span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
+        
         // ==========================================
         // ALTERNANCIA DE MÉTRICA DEL GRÁFICO DE BARRAS
         // ==========================================
@@ -1179,6 +1114,29 @@
                 btnEbitda.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
                 btnHht.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
                 mainTitle.innerText = "HHT Potencial vs Real por Unidad / Gerencia";
+            }
+
+            renderCharts();
+        }
+
+        // ==========================================
+        // ALTERNANCIA DE MÉTRICA DEL GRÁFICO DE TORTA
+        // ==========================================
+        function toggleTipoChartMetric(metric) {
+            activeTipoChartMetric = metric;
+            
+            const btnTipo = document.getElementById("btnMetricTipo");
+            const btnVertical = document.getElementById("btnMetricVertical");
+            const tipoTitle = document.getElementById("tipoChartTitle");
+
+            if (metric === 'tipo') {
+                btnTipo.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
+                btnVertical.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
+                tipoTitle.innerText = "TIPO DE INNOVACIÓN";
+            } else {
+                btnTipo.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800";
+                btnVertical.className = "px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm";
+                tipoTitle.innerText = "VERTICAL DE INNOVACIÓN";
             }
 
             renderCharts();
@@ -1374,13 +1332,20 @@
                 }
             });
 
-            // 3. Tipo de Innovación
-            const tiposCount = {};
-            let totalTiposFiltered = 0;
+            // 3. Tipo / Vertical de Innovación
+            const chartDataCount = {};
+            let totalItemsFiltered = 0;
+            
             filteredDataset.forEach(i => {
-                const tipo = i.tipoInnovacion || "Sin tipo";
-                tiposCount[tipo] = (tiposCount[tipo] || 0) + 1;
-                totalTiposFiltered++;
+                let categoryKey = "Sin asignar";
+                if (activeTipoChartMetric === 'tipo') {
+                    categoryKey = i.tipoInnovacion || "Sin tipo";
+                } else {
+                    categoryKey = i.vertical || "Sin vertical";
+                }
+                
+                chartDataCount[categoryKey] = (chartDataCount[categoryKey] || 0) + 1;
+                totalItemsFiltered++;
             });
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
@@ -1388,10 +1353,10 @@
                 type: 'doughnut',
                 plugins: [ChartDataLabels],
                 data: {
-                    labels: Object.keys(tiposCount),
+                    labels: Object.keys(chartDataCount),
                     datasets: [{
-                        data: Object.values(tiposCount),
-                        backgroundColor: ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'],
+                        data: Object.values(chartDataCount),
+                        backgroundColor: ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85', '#3b82f6', '#eab308', '#ec4899', '#14b8a6', '#f97316'],
                         borderWidth: 0
                     }]
                 },
@@ -1426,12 +1391,12 @@
 
             const legendTipo = document.getElementById("legendTipoInno");
             legendTipo.innerHTML = "";
-            Object.keys(tiposCount).forEach((tipo, index) => {
-                const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85'];
+            Object.keys(chartDataCount).forEach((category, index) => {
+                const colors = ['#9bca3c', '#0f6f46', '#f15a24', '#956eb6', '#6b7c85', '#3b82f6', '#eab308', '#ec4899', '#14b8a6', '#f97316'];
                 legendTipo.innerHTML += `
                     <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[index % colors.length]};"></span>
-                        <span class="font-bold text-slate-700">${tipo}</span>
+                        <span class="font-bold text-slate-700">${category}</span>
                     </div>
                 `;
             });
@@ -1519,6 +1484,78 @@
                 const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
+        }
+
+        // ==========================================
+        // RENDERIZADO DE TABLA DE INICIATIVAS
+        // ==========================================
+        function renderTable() {
+            const tbody = document.getElementById("tableBody");
+            const emptyState = document.getElementById("tableEmptyState");
+            tbody.innerHTML = "";
+
+            document.getElementById("tableRecordCount").innerText = `Mostrando ${filteredDataset.length} registros`;
+
+            if (filteredDataset.length === 0) {
+                emptyState.classList.remove("hidden");
+                return;
+            }
+            emptyState.classList.add("hidden");
+
+            const getRiskWeight = (risk) => {
+                if (!risk) return 0;
+                const r = risk.toLowerCase();
+                if (r.includes("alto")) return 3;
+                if (r.includes("medio")) return 2;
+                if (r.includes("bajo")) return 1;
+                return 0;
+            };
+
+            const sortedDataset = [...filteredDataset].sort((a, b) => {
+                return getRiskWeight(b.riesgo) - getRiskWeight(a.riesgo);
+            });
+
+            sortedDataset.forEach(item => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
+                tr.onclick = () => openModal(item);
+
+                let riskBadge = "bg-slate-100 text-slate-600 border border-slate-200";
+                if (item.riesgo) {
+                    const rNorm = item.riesgo.toLowerCase();
+                    if (rNorm.includes("bajo")) riskBadge = "bg-emerald-50 text-palForest border border-palForest/20";
+                    else if (rNorm.includes("medio")) riskBadge = "bg-yellow-50 text-[#d97706] border border-palYellow/30";
+                    else if (rNorm.includes("alto")) riskBadge = "bg-orange-50 text-palOrange border border-palOrange/20";
+                }
+
+                let estadoBadge = "bg-slate-100 text-slate-500 border border-slate-200";
+                if (item.estado) {
+                    const eNorm = item.estado.toLowerCase();
+                    if (eNorm.includes("abierto")) estadoBadge = "bg-lime-50 text-lime-800 border border-lime-200";
+                    else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
+                }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
+                    <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
+                    <td class="py-3 px-6">${item.lider || 'N/A'}</td>
+                    <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
+                            ${item.riesgo || 'N/A'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.inversion)}</td>
+                    <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
+                    <td class="py-3 px-6 text-right font-bold text-palForest">${formatCurrency(item.ebitdaCapturado)}</td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
+                            ${item.estado || 'N/A'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         // ==========================================
