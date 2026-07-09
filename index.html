@@ -68,20 +68,20 @@
     <header class="px-8 pt-6 pb-4 max-w-[1600px] w-full mx-auto flex flex-col gap-6">
         
         <!-- Logotipos de Coipsa: Banda de Ancho Completo a lo largo de todo el dashboard -->
-        <div class="w-full bg-white border border-slate-200/80 px-8 py-4 rounded-2xl flex items-center justify-between shadow-sm">
+        <div class="w-full bg-white border border-slate-200/80 px-8 py-2 rounded-2xl flex items-center justify-between shadow-sm">
 
             <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
             <div class="flex items-center justify-center">
                 <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
-                    class="h-30 md:h-32 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                    class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200">
             </div>
 
-            <div class="hidden md:block h-10 w-px bg-slate-200 mx-4"></div>
+            <div class="hidden md:block h-6 w-px bg-slate-200 mx-4"></div>
 
             <!-- Logotipo derecho Fragua para equilibrio simétrico -->
             <div class="flex items-center justify-center">
                 <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
-                    class="h-4 md:h-6 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                    class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200">
             </div>
 
         </div>
@@ -775,8 +775,8 @@
         function getUnitColors(unitName) {
             const norm = normalizeKey(unitName);
             
-            // Adm. y Finanzas: HEX #A369B1
-            if (norm.includes("finanz") || norm.includes("adm") || norm.includes("af")) {
+            // Matriz: HEX #A369B1
+            if (norm.includes("matriz") || norm.includes("matr") || norm.includes("mtrz")) {
                 return {
                     potencial: '#A369B1',
                     capturado: 'rgba(163, 105, 177, 0.55)',
@@ -1283,7 +1283,7 @@
             }
 
             const units = [
-                { name: "Adm. y Finanzas", key: "finanz" },
+                { name: "Matriz", key: "matriz" },
                 { name: "CPP", key: "cpp" },
                 { name: "Corrupac", key: "corrupac" },
                 { name: "Recupac", key: "recupac" }
