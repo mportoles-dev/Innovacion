@@ -22,7 +22,7 @@
                     colors: {
                         mockupBg: '#f4f6f9',    // Fondo principal claro de alta gama
                         cardBg: '#ffffff',      // Fondo blanco para tarjetas y contenedores
-                        borderBg: '#e2e8f0',    // Bordes suaves y limnes
+                        borderBg: '#e2e8f0',    // Bordes suaves y limneos
                         palLime: '#9bca3c',     // Verde Limón brillante (Primera franja de la paleta)
                         palForest: '#0f6f46',   // Verde Bosque profundo (Segunda franja - Bajo)
                         palYellow: '#facc15',   // Amarillo brillante (Medio)
@@ -64,367 +64,401 @@
 </head>
 <body class="h-full text-slate-800 overflow-y-auto custom-scrollbar flex flex-col pb-12">
 
-    <!-- HEADER DEL PORTAFOLIO -->
-    <header class="px-8 pt-6 pb-4 max-w-[1600px] w-full mx-auto flex flex-col gap-6">
-        
-        <!-- Logotipos de Coipsa: Banda de Ancho Completo a lo largo de todo el dashboard -->
-        <div class="w-full bg-white border border-slate-200/80 px-8 py-2 rounded-2xl flex items-center justify-between shadow-sm">
-
-            <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
-            <div class="flex items-center justify-center">
-                <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
-                    class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200">
-            </div>
-
-            <div class="hidden md:block h-6 w-px bg-slate-200 mx-4"></div>
-
-            <!-- Logotipo derecho Fragua para equilibrio simétrico -->
-            <div class="flex items-center justify-center">
-                <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
-                    class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200">
-            </div>
-
-        </div>
-
-        <!-- Fila Inferior: Título del Dashboard (Izquierda) y Botones de Acción (Derecha) -->
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
-            <div>
-                <div class="flex items-center gap-3 border-l-4 border-palLime pl-4">
-                    <!-- TÍTULO ENGRANDECIDO PARA MAYOR DESTACAMENTO -->
-                    <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">Portafolio de Innovación</h1>
-                </div>
-                <p class="text-xs text-slate-500 pl-4 mt-1.5">Dashboard de seguimiento de proyectos y metas</p>
-            </div>
-
-            <!-- Botones de Acción y Selectores -->
-            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
-                <!-- Selector de Portafolio -->
-                <div class="relative">
-                    <select id="portfolioSelector" onchange="handlePortfolioChange()" class="appearance-none pl-4 pr-10 py-2 bg-cardBg border border-borderBg hover:border-palLime text-xs text-slate-700 rounded-xl cursor-pointer focus:outline-none transition-all shadow-sm">
-                        <option value="maestra">Portafolio Base Maestra (GitHub)</option>
-                        <option value="cargada">Portafolio Base Cargada (Local)</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
-                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    </div>
-                </div>
-
-                <!-- Botón Subir Excel -->
-                <label for="csvFileInput" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-palLime hover:bg-[#8bb535] text-slate-950 rounded-xl cursor-pointer transition-all text-xs font-bold shadow-md shadow-palLime/10" title="Subir Excel o CSV">
-                    <i data-lucide="upload-cloud" class="w-4 h-4 text-slate-950"></i>
-                    <span>Subir Excel/CSV</span>
-                </label>
-                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
-
-                <!-- Botón Descargar Excel ZIP Protegido -->
-                <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-50 text-slate-700 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-sm" title="Descargar ZIP protegido con clave">
-                    <i data-lucide="lock" class="w-4 h-4 text-palOrange animate-pulse"></i>
-                    <span>Descargar ZIP Protegido</span>
-                </button>
-
-                <!-- Botón de Recarga -->
-                <button onclick="resetData()" class="p-2 bg-cardBg hover:bg-slate-50 border border-borderBg text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm" title="Resetear / Conectar de nuevo">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="flex-1 px-8 space-y-6 max-w-[1600px] w-full mx-auto">
-        
-        <!-- SECCIÓN DE GRÁFICOS DE BALA DE EBITDA Y HHT POTENCIAL (FIJOS, COMPACTOS Y OPTIMIZADOS EN ESPACIO) -->
-        <div id="bulletChartsSection" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white border border-borderBg p-5 rounded-2xl shadow-sm">
-            <!-- Columna 1: EBITDA Potencial vs Meta Conjunta -->
-            <div class="space-y-3.5">
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                    <span class="flex items-center gap-1.5">
-                        <i data-lucide="dollar-sign" class="w-4 h-4 text-palPurple"></i>
-                        EBITDA Potencial (Meta Conjunta: $1.000M)
-                    </span>
-                </h3>
-                <div id="bullet-col-1" class="space-y-2.5">
-                    <!-- Generado dinámicamente -->
-                </div>
-            </div>
-            <!-- Columna 2: HHT Potencial vs Meta Conjunta -->
-            <div class="space-y-4">
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                    <span class="flex items-center gap-1.5">
-                        <i data-lucide="clock" class="w-4 h-4 text-palOrange"></i>
-                        HHT Potencial (Meta Conjunta: <span id="bulletHhtMetaLabel">1.000</span> Hrs)
-                    </span>
-                </h3>
-                <div id="bullet-col-2" class="space-y-2.5">
-                    <!-- Generado dinámicamente -->
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCIÓN DE FILTROS -->
-        <div class="bg-cardBg border border-borderBg p-4 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm">
-            <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
-                
-                <div class="flex flex-wrap items-center gap-4 text-xs animate-fadeIn">
-                    <!-- Año -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Año de Consulta (Implementación):</span>
-                        <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <!-- Los años se cargarán dinámicamente y la selección será única (sin la opción "Todos" ni el guion "-") -->
-                        </select>
-                    </div>
-
-                    <!-- Unidad / Gerencia -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Unidad:</span>
-                        <select id="filterGerencia" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-
-                    <!-- Tipo de Innovación -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Tipo de innovación:</span>
-                        <select id="filterTipo" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-
-                    <!-- Sponsor -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Sponsor:</span>
-                        <select id="filterSponsor" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-
-                    <!-- Líder del proyecto -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Líder:</span>
-                        <select id="filterLider" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-
-                    <!-- Estado del proyecto -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">Estado:</span>
-                        <select id="filterEstado" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-xs text-slate-500 shrink-0 font-medium">
-                <span id="projectCountLabel" class="text-slate-900 font-extrabold text-sm mr-1">0</span> proyectos filtrados
-            </div>
-        </div>
-
-        <!-- KPI METRICS GRID -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-            <!-- Total Proyectos (Verde Limón) -->
-            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
-                <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
-                </div>
-                <div class="flex justify-between items-end mt-2">
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-700">Total Proyectos</h3>
-                        <p class="text-[10px] text-slate-500 mt-0.5" id="kpiTotalProjectsSubLeft">Abiertos: 0</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-slate-500" id="kpiTotalProjectsSubRight">Otros / Cerrados: 0</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- EBITDA Potencial (Púrpura Amatista) -->
-            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
-                <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaPotencial">$0M</span>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
-                    <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
-                </div>
-            </div>
-
-            <!-- EBITDA Capturado (Verde Bosque) -->
-            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
-                <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-700">EBITDA Capturado Real</h3>
-                </div>
-            </div>
-
-            <!-- HHT Potencial Anual (Amarillo Brillante) -->
-            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
-                <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-700">HHT Potencial Anual</h3>
-                    <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
-                </div>
-            </div>
-
-            <!-- HHT Capturado Real (Naranja Coral) -->
-            <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
-                <div>
-                    <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- ROW 1 DE GRÁFICOS -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- EBITDA POR UNIDAD -->
-            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
-                    <!-- Botón Selector de Métrica (EBITDA / HHT) -->
-                    <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-                        <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
-                        <button onclick="toggleMainChartMetric('hht')" id="btnMetricHht" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">HHT</button>
-                    </div>
-                </div>
-                <div class="flex-1 min-h-0 relative">
-                    <canvas id="chartEbitdaProyecto"></canvas>
-                </div>
-            </div>
-
-            <!-- PROYECTOS POR UNIDAD / GERENCIA -->
-            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-sm justify-between">
-                <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Proyectos por Unidad / Gerencia</h3>
-                </div>
-                <div class="flex-1 relative min-h-0">
-                    <canvas id="chartProyectosUnidad"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ROW 2 DE GRÁFICOS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- TIPO DE INNOVACIÓN -->
-            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                    <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
-                    <!-- Botón Selector de Métrica (Tipo / Vertical) -->
-                    <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-                        <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
-                        <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
-                    </div>
-                </div>
-                <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
-                    <canvas id="chartTipoInno"></canvas>
-                </div>
-                <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2 max-h-[90px] overflow-y-auto custom-scrollbar" id="legendTipoInno"></div>
-            </div>
-
-            <!-- ETAPA EN EL FUNNEL -->
-            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm">
-                <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA EN EL FUNNEL</h3>
-                </div>
-                <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
-            </div>
-
-            <!-- RIESGO PROMEDIO DEL PORTAFOLIO -->
-            <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
-                </div>
-                <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
-                    <!-- SVG Velocímetro del Portafolio -->
-                    <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
-                        <svg class="w-48 h-24" viewBox="0 0 100 50">
-                            <!-- Arco base gris de fondo -->
-                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Bajo (Verde Bosque) -->
-                            <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
-                            <!-- Segmento Medio (Amarillo) -->
-                            <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
-                            <!-- Segmento Alto (Naranja Coral) -->
-                            <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
-                            
-                            <!-- Grupo de Aguja -->
-                            <g id="portfolioNeedleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
-                                <polygon points="49,50 51,50 50,14" fill="#1e293b" />
-                            </g>
-                            
-                            <!-- Eje Central -->
-                            <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <div class="text-center mt-3 flex flex-col items-center">
-                        <!-- Valor promedio numérico del riesgo -->
-                        <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
-                        <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
-                    </div>
-                </div>
-                <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #0f6f46;"></span>
-                        <span class="font-bold text-slate-700">Bajo</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #facc15;"></span>
-                        <span class="font-bold text-slate-700">Medio</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #f15a24;"></span>
-                        <span class="font-bold text-slate-700">Alto</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLA DE INICIATIVAS -->
-        <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
-            <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
-                    <p class="text-xs text-slate-500 mt-1">Detalle iniciativas de innovación</p>
-                </div>
-                <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
-                    Mostrando 0 registros
-                </span>
-            </div>
-
-            <!-- Responsive Table Container -->
-            <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[900px]">
-                    <thead>
-                        <tr class="border-b border-borderBg bg-[#f8fafc] text-xs font-bold uppercase tracking-wider text-slate-500">
-                            <th class="py-4 px-6">ID</th>
-                            <th class="py-4 px-6">Proyecto</th>
-                            <th class="py-4 px-6">Líder</th>
-                            <th class="py-4 px-6">Gerencia / Unidad</th>
-                            <th class="py-4 px-6 text-center">Riesgo</th>
-                            <th class="py-4 px-6 text-right">Inversión Ejec.</th>
-                            <th class="py-4 px-6 text-right">EBITDA Potencial</th>
-                            <th class="py-4 px-6 text-right">EBITDA Capturado</th>
-                            <th class="py-4 px-6 text-center">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="text-sm divide-y divide-slate-100 cursor-pointer"></tbody>
-                </table>
-            </div>
+    <!-- SECCIÓN 1: DESDE EL INICIO HASTA ANTES DE FILTROS -->
+    <section class="w-full bg-slate-50 border-b border-slate-200/60 pb-8">
+        <!-- HEADER DEL PORTAFOLIO -->
+        <header class="px-8 pt-6 pb-4 max-w-[1600px] w-full mx-auto flex flex-col gap-6">
             
-            <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
-                <i data-lucide="ban" class="w-10 h-10 text-slate-400"></i>
-                <p>No se encontraron proyectos con los filtros seleccionados.</p>
+            <!-- Logotipos de Coipsa: Banda de Ancho Completo a lo largo de todo el dashboard -->
+            <div class="w-full bg-white border border-slate-200/80 px-8 py-2 rounded-2xl flex items-center justify-between shadow-sm">
+
+                <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
+                <div class="flex items-center justify-center">
+                    <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
+                        class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                </div>
+
+                <div class="hidden md:block h-6 w-px bg-slate-200 mx-4"></div>
+
+                <!-- Logotipo derecho Fragua para equilibrio simétrico -->
+                <div class="flex items-center justify-center">
+                    <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
+                        class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                </div>
+
+            </div>
+
+            <!-- Fila Inferior: Título del Dashboard (Izquierda) y Botones de Acción (Derecha) -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
+                <div>
+                    <div class="flex items-center gap-3 border-l-4 border-palLime pl-4">
+                        <!-- TÍTULO ENGRANDECIDO PARA MAYOR DESTACAMENTO -->
+                        <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">Portafolio de Innovación</h1>
+                    </div>
+                    <p class="text-xs text-slate-500 pl-4 mt-1.5">Dashboard de seguimiento de proyectos y metas</p>
+                </div>
+
+                <!-- Botones de Acción y Selectores -->
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
+                    <!-- Selector de Portafolio -->
+                    <div class="relative">
+                        <select id="portfolioSelector" onchange="handlePortfolioChange()" class="appearance-none pl-4 pr-10 py-2 bg-cardBg border border-borderBg hover:border-palLime text-xs text-slate-700 rounded-xl cursor-pointer focus:outline-none transition-all shadow-sm">
+                            <option value="maestra">Portafolio Base Maestra (GitHub)</option>
+                            <option value="cargada">Portafolio Base Cargada (Local)</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+
+                    <!-- Botón Subir Excel -->
+                    <label for="csvFileInput" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-palLime hover:bg-[#8bb535] text-slate-950 rounded-xl cursor-pointer transition-all text-xs font-bold shadow-md shadow-palLime/10" title="Subir Excel o CSV">
+                        <i data-lucide="upload-cloud" class="w-4 h-4 text-slate-950"></i>
+                        <span>Subir Excel/CSV</span>
+                    </label>
+                    <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+
+                    <!-- Botón Descargar Excel ZIP Protegido -->
+                    <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-50 text-slate-700 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-sm" title="Descargar ZIP protegido con clave">
+                        <i data-lucide="lock" class="w-4 h-4 text-palOrange animate-pulse"></i>
+                        <span>Descargar ZIP Protegido</span>
+                    </button>
+
+                    <!-- Botón de Recarga -->
+                    <button onclick="resetData()" class="p-2 bg-cardBg hover:bg-slate-50 border border-borderBg text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm" title="Resetear / Conectar de nuevo">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Gráficos de Bala Simplificados y Apilados -->
+        <div class="px-8 max-w-[1600px] w-full mx-auto">
+            <div id="bulletChartsSection" class="bg-white border border-borderBg p-5 rounded-2xl shadow-sm space-y-4">
+
+                <!-- Encabezados -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- EBITDA -->
+                    <div>
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span>EBITDA Potencial</span>
+                            <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
+                                Total: $0
+                            </span>
+                        </h3>
+                    </div>
+
+                    <!-- HHT -->
+                    <div>
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span>HHT Potencial</span>
+                            <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
+                                Total: 0 Hrs
+                            </span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Leyenda compartida -->
+                <div id="bullet-shared-legend"
+                     class="flex flex-wrap justify-center items-center gap-6 py-2 text-[11px] text-slate-600 font-bold">
+                    <!-- Generado dinámicamente -->
+                </div>
+
+                <!-- Gráficos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="bullet-col-1" class="relative">
+                        <!-- Generado dinámicamente -->
+                    </div>
+
+                    <div id="bullet-col-2" class="relative">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
             </div>
         </div>
-    </main>
+    </section>
+
+    <!-- SECCIÓN 2: FILTROS -->
+    <section class="w-full bg-slate-100 border-b border-slate-200/60 py-6">
+        <div class="px-8 max-w-[1600px] w-full mx-auto">
+            <!-- SECCIÓN DE FILTROS -->
+            <div class="bg-cardBg border border-borderBg p-4 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm">
+                <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
+                    
+                    <div class="flex flex-wrap items-center gap-4 text-xs animate-fadeIn">
+                        <!-- Año -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Año de Consulta (Implementación):</span>
+                            <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <!-- Los años se cargarán dinámicamente y la selección será única (sin la opción "Todos" ni el guion "-") -->
+                            </select>
+                        </div>
+
+                        <!-- Unidad / Gerencia -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Unidad:</span>
+                            <select id="filterGerencia" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Innovación -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Tipo de innovación:</span>
+                            <select id="filterTipo" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+
+                        <!-- Sponsor -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Sponsor:</span>
+                            <select id="filterSponsor" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+
+                        <!-- Líder del proyecto -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Líder:</span>
+                            <select id="filterLider" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+
+                        <!-- Estado del proyecto -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">Estado:</span>
+                            <select id="filterEstado" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-500 shrink-0 font-medium">
+                    <span id="projectCountLabel" class="text-slate-900 font-extrabold text-sm mr-1">0</span> proyectos filtrados
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: KPI'S Y GRÁFICOS -->
+    <section class="w-full bg-slate-50 border-b border-slate-200/60 py-8">
+        <div class="px-8 max-w-[1600px] w-full mx-auto space-y-6">
+            <!-- KPI METRICS GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                <!-- Total Proyectos (Verde Limón) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
+                    </div>
+                    <div class="flex justify-between items-end mt-2">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-700">Total Proyectos</h3>
+                            <p class="text-[10px] text-slate-500 mt-0.5" id="kpiTotalProjectsSubLeft">Abiertos: 0</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-500" id="kpiTotalProjectsSubRight">Otros / Cerrados: 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EBITDA Potencial (Púrpura Amatista) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaPotencial">$0M</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
+                        <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
+                    </div>
+                </div>
+
+                <!-- EBITDA Capturado (Verde Bosque) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">EBITDA Capturado Real</h3>
+                    </div>
+                </div>
+
+                <!-- HHT Potencial Anual (Amarillo Brillante) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">HHT Potencial Anual</h3>
+                        <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
+                    </div>
+                </div>
+
+                <!-- HHT Capturado Real (Naranja Coral) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 1 DE GRÁFICOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- EBITDA/HHT POR UNIDAD -->
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
+                        <!-- Botón Selector de Métrica (EBITDA / HHT) -->
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                            <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
+                            <button onclick="toggleMainChartMetric('hht')" id="btnMetricHht" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">HHT</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-h-0 relative">
+                        <canvas id="chartEbitdaProyecto"></canvas>
+                    </div>
+                </div>
+
+                <!-- PROYECTOS POR UNIDAD / GERENCIA -->
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-sm justify-between">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Proyectos por Unidad / Gerencia</h3>
+                    </div>
+                    <div class="flex-1 relative min-h-0">
+                        <canvas id="chartProyectosUnidad"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 2 DE GRÁFICOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- TIPO DE INNOVACIÓN -->
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
+                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                        <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                        <!-- Botón Selector de Métrica (Tipo / Vertical) -->
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                            <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
+                            <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
+                        <canvas id="chartTipoInno"></canvas>
+                    </div>
+                    <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2 max-h-[90px] overflow-y-auto custom-scrollbar" id="legendTipoInno"></div>
+                </div>
+
+                <!-- ETAPA EN EL FUNNEL -->
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA EN EL FUNNEL</h3>
+                    </div>
+                    <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
+                </div>
+
+                <!-- RIESGO PROMEDIO DEL PORTAFOLIO -->
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
+                    </div>
+                    <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
+                        <!-- SVG Velocímetro del Portafolio -->
+                        <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
+                            <svg class="w-48 h-24" viewBox="0 0 100 50">
+                                <!-- Arco base gris de fondo -->
+                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
+                                <!-- Segmento Bajo (Verde Bosque) -->
+                                <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
+                                <!-- Segmento Medio (Amarillo) -->
+                                <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
+                                <!-- Segmento Alto (Naranja Coral) -->
+                                <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
+                                
+                                <!-- Grupo de Aguja -->
+                                <g id="portfolioNeedleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                                    <polygon points="49,50 51,50 50,14" fill="#1e293b" />
+                                </g>
+                                
+                                <!-- Eje Central -->
+                                <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
+                            </svg>
+                        </div>
+                        <div class="text-center mt-3 flex flex-col items-center">
+                            <!-- Valor promedio numérico del riesgo -->
+                            <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
+                            <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #0f6f46;"></span>
+                            <span class="font-bold text-slate-700">Bajo</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #facc15;"></span>
+                            <span class="font-bold text-slate-700">Medio</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #f15a24;"></span>
+                            <span class="font-bold text-slate-700">Alto</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: TABLA DE INICIATIVAS -->
+    <section class="w-full bg-slate-100 py-8">
+        <div class="px-8 max-w-[1600px] w-full mx-auto">
+            <!-- TABLA DE INICIATIVAS -->
+            <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
+                <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-800">Iniciativas Registradas</h3>
+                        <p class="text-xs text-slate-500 mt-1">Detalle iniciativas de innovación</p>
+                    </div>
+                    <span class="text-xs font-semibold bg-slate-100 text-slate-700 border border-borderBg px-3 py-1.5 rounded-full shadow-inner" id="tableRecordCount">
+                        Mostrando 0 registros
+                    </span>
+                </div>
+
+                <!-- Responsive Table Container -->
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse min-w-[900px]">
+                        <thead>
+                            <tr class="border-b border-borderBg bg-[#f8fafc] text-xs font-bold uppercase tracking-wider text-slate-500">
+                                <th class="py-4 px-6">ID</th>
+                                <th class="py-4 px-6">Proyecto</th>
+                                <th class="py-4 px-6">Líder</th>
+                                <th class="py-4 px-6">Gerencia / Unidad</th>
+                                <th class="py-4 px-6 text-center">Riesgo</th>
+                                <th class="py-4 px-6 text-right">Inversión Ejec.</th>
+                                <th class="py-4 px-6 text-right">EBITDA Potencial</th>
+                                <th class="py-4 px-6 text-right">EBITDA Piloto</th>
+                                <th class="py-4 px-6 text-right">EBITDA Capturado</th>
+                                <th class="py-4 px-6 text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-sm divide-y divide-slate-100 cursor-pointer"></tbody>
+                    </table>
+                </div>
+                
+                <div id="tableEmptyState" class="hidden py-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
+                    <i data-lucide="ban" class="w-10 h-10 text-slate-400"></i>
+                    <p>No se encontraron proyectos con los filtros seleccionados.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Modal Detalle Proyecto -->
     <div id="projectModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -589,65 +623,28 @@
         </div>
     </div>
 
+    <!-- JS SCRIPTS -->
     <script>
-        // URL Base de conexión directa
         const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/portafolio-innovacion-2026-06-01.csv";
         const METAS_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/metas-innovacion.csv";
 
-        // Almacenamiento global de bases de datos
-        let masterDataset = [];  // Base Maestra desde GitHub
-        let localDataset = [];   // Base de datos cargada localmente mediante "Subir Excel"
-        let currentDataset = []; // Dataset activo en pantalla
-        let globalMetas = [];    // Metas de EBITDA y HHT desde metas-innovacion.csv
-        let charts = {};         // Instancias de Chart.js
-        let activeMainChartMetric = 'ebitda'; // Métrica activa del gráfico de barras ('ebitda' o 'hht')
-        let activeTipoChartMetric = 'tipo'; // Métrica activa del gráfico de torta ('tipo' o 'vertical')
+        let masterDataset = [];  
+        let localDataset = [];   
+        let currentDataset = []; 
+        let globalMetas = [];    
+        let charts = {};         
+        let activeMainChartMetric = 'ebitda'; 
+        let activeTipoChartMetric = 'tipo'; 
 
-        // Estandarización fija para el Funnel de Innovación según la jerarquía del proceso
         const FUNNEL_STAGES = [
             "Archivados", "Problematización", "Alternativas de solución",
             "Diseño pilotaje", "Ejecución pilotaje", "Implementación", "Seguimiento"
         ];
 
-        // ==========================================
-        // ALERTA VISUAL DE CONEXIÓN Y ESTADO (RETROCOMPATIBILIDAD)
-        // ==========================================
         function showConnectionStatus(status, title, message) {
-            const alert = document.getElementById("connectionAlert");
-            const icon = document.getElementById("alertIcon");
-            const aTitle = document.getElementById("alertTitle");
-            const aMessage = document.getElementById("alertMessage");
-
-            // Si el alert fue removido físicamente, retornamos silenciosamente sin generar errores
-            if (!alert || !icon || !aTitle || !aMessage) return;
-
-            alert.className = "px-4 py-3.5 rounded-xl flex items-start gap-3 text-xs transition-all duration-300 animate-fadeIn border ";
-
-            if (status === "loading") {
-                alert.classList.add("bg-cardBg", "border-palOrange/30", "text-slate-800");
-                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5 animate-spin";
-                icon.setAttribute("data-lucide", "refresh-cw");
-            } else if (status === "success") {
-                alert.classList.add("bg-cardBg", "border-palLime/50", "text-slate-800");
-                icon.className = "w-4 h-4 text-palForest shrink-0 mt-0.5";
-                icon.setAttribute("data-lucide", "check-circle");
-            } else if (status === "error") {
-                alert.classList.add("bg-cardBg", "border-palOrange/50", "text-slate-800");
-                icon.className = "w-4 h-4 text-palOrange shrink-0 mt-0.5";
-                icon.setAttribute("data-lucide", "alert-triangle");
-            }
-
-            aTitle.innerText = title;
-            aMessage.innerText = message;
-            alert.classList.remove("hidden");
-            if (window.lucide) {
-                lucide.createIcons();
-            }
+            console.log(`[Status: ${status}] ${title} - ${message}`);
         }
 
-        // ==========================================
-        // SANITIZADOR Y DECODIFICADOR DE CARACTERES
-        // ==========================================
         const cleanEncoding = (str) => {
             if (str === undefined || str === null) return "";
             let s = String(str).trim();
@@ -687,9 +684,6 @@
             return s;
         };
 
-        // ==========================================
-        // PARSEO DE FECHAS EN FORMATO DD-MM-YYYY
-        // ==========================================
         function parseDateDDMMYYYY(str) {
             if (!str) return null;
             let s = String(str).trim();
@@ -724,6 +718,14 @@
             }).format(value || 0);
         };
 
+        const formatCompactCLP = (value) => {
+            if (value >= 1e6) {
+                const millions = Math.round(value / 1e6);
+                return '$' + millions.toLocaleString('es-CL') + 'M';
+            }
+            return formatCurrency(value);
+        };
+
         const parseNumeric = (val) => {
             if (val === undefined || val === null) return 0;
             if (typeof val === 'number') return val;
@@ -747,9 +749,6 @@
                       .replace(/[^a-z0-9]/g, "");
         };
 
-        // ==========================================
-        // NORMALIZACIÓN DE ETAPAS DEL FUNNEL (RESTAURADO)
-        // ==========================================
         const normalizeFunnelStage = (val) => {
             if (!val || val.trim() === "") return "";
             let s = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -769,517 +768,46 @@
             return "";
         };
 
-        // ==========================================
-        // ASOCIACIÓN DE COLORES ESPECÍFICOS POR UNIDAD
-        // ==========================================
         function getUnitColors(unitName) {
             const norm = normalizeKey(unitName);
-            
-            // Matriz: HEX #A369B1
             if (norm.includes("matriz") || norm.includes("matr") || norm.includes("mtrz")) {
-                return {
-                    potencial: '#A369B1',
-                    capturado: 'rgba(163, 105, 177, 0.55)',
-                    border: '#A369B1'
-                };
-            }
-            // CPP: HEX #006845
-            if (norm === "cpp") {
-                return {
-                    potencial: '#006845',
-                    capturado: 'rgba(0, 104, 69, 0.55)',
-                    border: '#006845'
-                };
-            }
-            // Corrupac: HEX #FE5000
-            if (norm.includes("corrupac")) {
-                return {
-                    potencial: '#FE5000',
-                    capturado: 'rgba(254, 80, 0, 0.55)',
-                    border: '#FE5000'
-                };
-            }
-            // Recupac: HEX #B1D600
-            if (norm.includes("recupac")) {
-                return {
-                    potencial: '#B1D600',
-                    capturado: 'rgba(177, 214, 0, 0.55)',
-                    border: '#B1D600'
-                };
-            }
-            
-            // Fallback para unidades de respaldo o no catalogadas
-            if (norm.includes("logistica")) {
-                return {
-                    potencial: '#6b7c85', // Gris Pizarra elegante
-                    capturado: 'rgba(107, 124, 133, 0.55)',
-                    border: '#6b7c85'
-                };
-            }
-            if (norm.includes("operacion")) {
-                return {
-                    potencial: '#0f6f46', // Verde Bosque
-                    capturado: 'rgba(15, 111, 70, 0.55)',
-                    border: '#0f6f46'
-                };
-            }
-            
-            return {
-                potencial: '#475569', // Slate
-                capturado: 'rgba(71, 85, 105, 0.55)',
-                border: '#475569'
-            };
-        }
-
-        // ==========================================
-        // OBTENCIÓN DINÁMICA DE LA META DE EBITDA DE LA UNIDAD
-        // ==========================================
-        function getUnitMeta(unitName, selectedYear) {
-            const norm = normalizeKey(unitName);
-            
-            // Busca en globalMetas un indicador que coincida con EBITDA, la unidad y el año respectivo
-            let matchedMeta = globalMetas.find(m => {
-                const indNorm = normalizeKey(m.indicador);
-                return indNorm.includes("ebitda") && indNorm.includes(norm) && String(m.anio) === String(selectedYear);
-            });
-            
-            if (matchedMeta) return matchedMeta.meta;
-            
-            // Fallback por defecto profesional y realista para cada unidad (en CLP) si no se halla en el CSV
-            if (norm.includes("finanz") || norm.includes("adm") || norm.includes("af")) {
-                return 150000000; // $150M CLP
+                return { potencial: '#A369B1', capturado: 'rgba(163, 105, 177, 0.55)', border: '#A369B1' };
             }
             if (norm === "cpp") {
-                return 400000000; // $400M CLP
+                return { potencial: '#006845', capturado: 'rgba(0, 104, 69, 0.55)', border: '#006845' };
             }
             if (norm.includes("corrupac")) {
-                return 800000000; // $800M CLP
+                return { potencial: '#FE5000', capturado: 'rgba(254, 80, 0, 0.55)', border: '#FE5000' };
             }
             if (norm.includes("recupac")) {
-                return 500000000; // $500M CLP
+                return { potencial: '#B1D600', capturado: 'rgba(177, 214, 0, 0.55)', border: '#B1D600' };
             }
-            return 300000000; // $300M CLP Default general
+            return { potencial: '#475569', capturado: 'rgba(71, 85, 105, 0.55)', border: '#475569' };
         }
 
-        // ==========================================
-        // PROCESAMIENTO GENERAL DE FILAS CSV
-        // ==========================================
-        function processCSVRows(rows) {
-            if (!rows || rows.length === 0) return [];
-            
-            return rows.map((row, index) => {
-                if (Object.keys(row).length < 3) return null;
-
-                const normRow = {};
-                Object.keys(row).forEach(k => {
-                    if (k !== undefined && k !== null) {
-                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
-                    }
-                });
-
-                const findVal = (keywords) => {
-                    for (const kw of keywords) {
-                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
-                            const raw = String(normRow[kw]).trim();
-                            return raw === "" ? "" : normRow[kw];
-                        }
-                    }
-                    for (const kw of keywords) {
-                        for (const actualKey of Object.keys(normRow)) {
-                            if (actualKey.includes(kw)) {
-                                const raw = String(normRow[actualKey]).trim();
-                                return raw === "" ? "" : normRow[actualKey];
-                            }
-                        }
-                    }
-                    return "";
-                };
-
-                const id = cleanEncoding(findVal(["id", "codigo", "key"])) || `PM-${String(index+1).padStart(3, '0')}`;
-                const nombre = cleanEncoding(findVal(["nombredelproyecto", "proyecto", "nombre"]));
-                const anio = cleanEncoding(findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]));
-                
-                // Extrae el "Año implementación" de la columna correspondiente. Fallback al año de creación si no existe.
-                let anioImplementacion = cleanEncoding(findVal(["anoimplementacion", "anioimplementacion", "implementacion", "añoimplementacion", "anodeimplementacion", "aniodeimplementacion"]));
-                if (!anioImplementacion) {
-                    anioImplementacion = anio;
-                }
-
-                const descripcion = cleanEncoding(findVal(["descripcion", "detalle"]));
-                const riesgo = cleanEncoding(findVal(["nivelderiesgo", "riesgo"]));
-                const gerencia = cleanEncoding(findVal(["unidad", "gerencia", "unidadgerencia"]));
-                const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "tipoinnovacion", "tipo"]));
-                const vertical = cleanEncoding(findVal(["vertical", "verticalinnovacion"]));
-                const lider = cleanEncoding(findVal(["liderfuncionalnombre", "lider", "responsable"]));
-                const correo = cleanEncoding(findVal(["liderfuncionalcorreo", "correo", "email"]));
-                
-                const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
-                const funnel = normalizeFunnelStage(cleanEncoding(rawFunnel));
-                
-                const inversion = parseNumeric(findVal(["inversionejecutada", "inversion", "presupuesto"]));
-                const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialanualclp", "ebitdapotencialclp", "ebitdapotencial"]));
-                
-                // Mapeo exacto de la columna "EBITDA real Capturado parcial (CLP)"
-                const ebitdaCapturado = parseNumeric(findVal(["ebitdarealcapturadoparcialclp", "ebitdarealcapturadoparcial", "ebitdacapturadorealparcial", "ebitdacapturadoclp", "ebitdacapturado"]));
-                
-                const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
-                const hhtCapturado = parseNumeric(findVal(["hhtcapturadorealafechahoras", "hhtcapturadorealafecha", "hhtcapturado", "hhtreal", "hhtcapturadas", "hht_capturado"]));
-                
-                const estado = cleanEncoding(findVal(["estadoproyecto", "estado", "status"]));
-                const sponsor = cleanEncoding(findVal(["sponsor"]));
-                const escalamiento = cleanEncoding(findVal(["potencialdeescalamiento", "escalamiento"]));
-                const tipoSolucion = cleanEncoding(findVal(["tipodesolucion", "solucion"]));
-                const origenSolucion = cleanEncoding(findVal(["origensolucion", "origen"]));
-                const comentario = cleanEncoding(findVal(["comentario", "comentarios", "observacion"]));
-                const requiereGobernanza = cleanEncoding(findVal(["requieregobernanzatd", "gobernanza"]));
-                
-                const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
-                const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
-
-                // Lectura de las columnas KPI 1, KPI 2, KPI 3
-                const kpi1 = cleanEncoding(findVal(["kpi1", "kpi_1", "kpi 1"]));
-                const kpi2 = cleanEncoding(findVal(["kpi2", "kpi_2", "kpi 2"]));
-                const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
-
-                return {
-                    id, nombre, anio, anioImplementacion, descripcion, riesgo, gerencia, tipoInnovacion, vertical,
-                    lider, correo, funnel, inversion, ebitdaPotencial,
-                    ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
-                    escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
-                    kr, respInnovacion, kpi1, kpi2, kpi3
-                };
-            }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
-        }
-
-        // ==========================================
-        // PROCESAMIENTO DE FILAS CSV (METAS)
-        // ==========================================
-        function processMetasRows(rows) {
-            if (!rows || rows.length === 0) return [];
-            return rows.map(row => {
-                const normRow = {};
-                Object.keys(row).forEach(k => {
-                    if (k !== undefined && k !== null) {
-                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
-                    }
-                });
-
-                const findVal = (keywords) => {
-                    for (const kw of keywords) {
-                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
-                            return row[Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw)];
-                        }
-                    }
-                    for (const kw of keywords) {
-                        for (const actualKey of Object.keys(normRow)) {
-                            if (actualKey.includes(kw)) {
-                                return row[Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === actualKey)];
-                            }
-                        }
-                    }
-                    return "";
-                };
-
-                const indicador = cleanEncoding(findVal(["indicador", "ind", "name"]));
-                const anio = cleanEncoding(findVal(["ano", "anio", "year"]));
-                const meta = parseNumeric(findVal(["meta", "valor", "goal"]));
-
-                return { indicador, anio, meta };
-            }).filter(item => item.indicador !== "");
-        }
-
-        // ==========================================
-        // CARGA ASÍNCRONA DESDE GITHUB
-        // ==========================================
-        function connectToGitHubCSV() {
-            showConnectionStatus("loading", "Sincronizando...", "Obteniendo datos del portafolio y metas desde GitHub.");
-            
-            const fetchPortafolio = fetch(GITHUB_CSV_URL).then(res => {
-                if (!res.ok) throw new Error("No se pudo obtener el portafolio.");
-                return res.arrayBuffer();
-            });
-
-            const fetchMetas = fetch(METAS_CSV_URL).then(res => {
-                if (!res.ok) throw new Error("No se pudieron obtener las metas.");
-                return res.arrayBuffer();
-            });
-
-            Promise.all([fetchPortafolio, fetchMetas])
-                .then(([portafolioBuffer, metasBuffer]) => {
-                    let portafolioText;
-                    try { portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer); } 
-                    catch (e) { portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer); }
-
-                    let metasText;
-                    try { metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer); } 
-                    catch (e) { metasText = new TextDecoder("windows-1252").decode(metasBuffer); }
-
-                    Papa.parse(portafolioText, {
-                        header: true,
-                        skipEmptyLines: true,
-                        complete: function(portResults) {
-                            masterDataset = processCSVRows(portResults.data);
-
-                            Papa.parse(metasText, {
-                                header: true,
-                                skipEmptyLines: true,
-                                complete: function(metaResults) {
-                                    globalMetas = processMetasRows(metaResults.data);
-                                    console.log("Metas unificadas cargadas:", globalMetas);
-
-                                    showConnectionStatus("success", "Datos Sincronizados", `Se cargaron ${masterDataset.length} proyectos y metas desde GitHub.`);
-                                    
-                                    if (document.getElementById('portfolioSelector').value === 'maestra') {
-                                        currentDataset = [...masterDataset];
-                                        initializeDashboard();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                })
-                .catch(err => {
-                    handleGitHubError(err.message || "Error de red");
-                });
-        }
-
-        function handleGitHubError(errorDetail) {
-            showConnectionStatus("error", "Error de conexión con GitHub", `No se pudo conectar al Raw. Usando Base Maestra de Respaldo Integrada.`);
-            masterDataset = loadBackupDataset(); 
-            if (document.getElementById('portfolioSelector').value === 'maestra') {
-                currentDataset = [...masterDataset];
-                initializeDashboard();
-            }
-        }
-
-        // ==========================================
-        // SUBIDA DE ARCHIVOS LOCALES (Excel/CSV)
-        // ==========================================
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            showConnectionStatus("loading", "Cargando archivo local...", "Procesando el archivo CSV cargado.");
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const arrayBuffer = e.target.result;
-                let decodedText;
-                try { decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
-                catch (err) { decodedText = new TextDecoder("windows-1252").decode(arrayBuffer); }
-
-                Papa.parse(decodedText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        if (results.data && results.data.length > 0) {
-                            localDataset = processCSVRows(results.data);
-                            document.getElementById('portfolioSelector').value = 'cargada';
-                            currentDataset = [...localDataset];
-                            showConnectionStatus("success", "Portafolio Local Cargado", `Se han cargado con éxito ${localDataset.length} iniciativas.`);
-                            initializeDashboard();
-                        } else {
-                            showConnectionStatus("error", "Error en archivo", "Formato no compatible.");
-                        }
-                    }
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // ==========================================
-        // SELECTOR DE PORTAFOLIOS Y FILTROS
-        // ==========================================
-        function handlePortfolioChange() {
-            const selected = document.getElementById('portfolioSelector').value;
-            if (selected === 'maestra') {
-                currentDataset = [...masterDataset];
-                showConnectionStatus("success", "Mostrando Base Maestra (GitHub)", "La vista se ha sincronizado con el portafolio en la nube.");
-            } else {
-                if (localDataset.length === 0) {
-                    showConnectionStatus("error", "Sin Base de Datos Cargada", "Por favor sube un archivo CSV/Excel.");
-                    currentDataset = [];
-                } else {
-                    currentDataset = [...localDataset];
-                    showConnectionStatus("success", "Mostrando Base Cargada", `Visualizando datos locales.`);
-                }
-            }
-            initializeDashboard();
-        }
-
-        let filteredDataset = [];
-
-        function initializeFilters() {
-            const populateSelect = (elementId, property) => {
-                const select = document.getElementById(elementId);
-                const currentValue = select.value;
-                
-                // Si es el filtro de año, NO agregamos opción "Todos" para forzar selección única.
-                if (elementId === "filterAnio") {
-                    select.innerHTML = '';
-                } else {
-                    select.innerHTML = '<option value="">Todos</option>';
-                }
-                
-                let uniqueValues = [...new Set(currentDataset.map(item => item[property]))]
-                                        .filter(Boolean);
-
-                // Excluir explícitamente el guion "-" en el filtro del Año de Consulta (Implementación)
-                if (elementId === "filterAnio") {
-                    uniqueValues = uniqueValues.filter(val => val.trim() !== "-");
-                }
-
-                uniqueValues.sort();
-
-                uniqueValues.forEach(val => {
-                    const option = document.createElement("option");
-                    option.value = val;
-                    option.innerText = val;
-                    select.appendChild(option);
-                });
-
-                if (elementId === "filterAnio") {
-                    // Si existe un valor previo válido, conservarlo; de lo contrario, por defecto seleccionar el año máximo
-                    if (currentValue && uniqueValues.includes(currentValue)) {
-                        select.value = currentValue;
-                    } else if (uniqueValues.length > 0) {
-                        // Ordenar numéricamente descendente para obtener el año de implementación más reciente
-                        const sortedYears = [...uniqueValues].sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
-                        select.value = sortedYears[0];
-                    }
-                } else {
-                    select.value = currentValue;
-                }
-            };
-
-            populateSelect("filterAnio", "anioImplementacion"); // Selección basada en el Año de Implementación (columna "Año implementación")
-            populateSelect("filterGerencia", "gerencia");
-            populateSelect("filterTipo", "tipoInnovacion");
-            populateSelect("filterSponsor", "sponsor");
-            populateSelect("filterLider", "lider");
-            populateSelect("filterEstado", "estado");
-        }
-
-        function applyFilters() {
-            // NOTA: Ignoramos filterAnio al filtrar el dataset principal, ya que "Todo lo demás debe mostrarse siempre".
-            const fGerencia = document.getElementById("filterGerencia").value;
-            const fTipo = document.getElementById("filterTipo").value;
-            const fSponsor = document.getElementById("filterSponsor").value;
-            const fLider = document.getElementById("filterLider").value;
-            const fEstado = document.getElementById("filterEstado").value;
-
-            filteredDataset = currentDataset.filter(item => {
-                if (fGerencia && item.gerencia !== fGerencia) return false;
-                if (fTipo && item.tipoInnovacion !== fTipo) return false;
-                if (fSponsor && item.sponsor !== fSponsor) return false;
-                if (fLider && item.lider !== fLider) return false;
-                if (fEstado && item.estado !== fEstado) return false;
-                return true;
-            });
-
-            document.getElementById("projectCountLabel").innerText = filteredDataset.length;
-            updateKPIs();
-            renderTable();
-            renderCharts();
-            renderBulletCharts(); // Dibujar gráficos de bala fijos
-        }
-
-        // ==========================================
-        // CÁLCULO DE KPI'S Y GRÁFICOS
-        // ==========================================
-        function updateKPIs() {
-            const fAnio = document.getElementById("filterAnio").value;
-            const numericYear = parseInt(fAnio, 10);
-
-            // KPIs Potenciales / Generales: Consideran la totalidad del portafolio filtrado (independientes del año)
-            const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
-            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (item.hht || 0), 0);
-
-            // EBITDA y HHT Capturado Real: Consideran el año de implementación de consulta ("Año implementación") y los dos anteriores (T-2 a T)
-            let capturedYearFilteredDataset = [];
-            if (!isNaN(numericYear)) {
-                capturedYearFilteredDataset = filteredDataset.filter(item => {
-                    // Excluir explícitamente si el Año de Implementación es un guion "-" (no implementado)
-                    if (item.anioImplementacion === "-") return false;
-                    const itemImplYear = parseInt(item.anioImplementacion, 10);
-                    return !isNaN(itemImplYear) && itemImplYear >= (numericYear - 2) && itemImplYear <= numericYear;
-                });
-            } else {
-                capturedYearFilteredDataset = filteredDataset.filter(item => item.anioImplementacion !== "-");
-            }
-
-            const sumEbitdaCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
-            const sumHhtCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
-
-            // Metas de EBITDA y HHT oficiales asignadas al año piloto específico seleccionado fAnio
-            let targetEbitda = 0;
-            let targetHht = 0;
-
-            if (fAnio && fAnio !== "-") {
-                const matchEbitda = globalMetas.find(m => normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio));
-                const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio));
-                targetEbitda = matchEbitda ? matchEbitda.meta : 0;
-                targetHht = matchHht ? matchHht.meta : 0;
-            }
-
-            const totalProjects = filteredDataset.length;
-            const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
-            const cerrados = totalProjects - abiertos;
-
-            // Inyección de valores en la UI
-            document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
-            document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
-            
-            // Forzar redondeo estricto para eliminar decimales de HHT Capturado Real
-            document.getElementById("kpiHht").innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
-            document.getElementById("kpiHhtPotencial").innerText = Math.round(sumHhtPotencial).toLocaleString("es-CL");
-            document.getElementById("kpiTotalProjects").innerText = totalProjects;
-
-            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
-            document.getElementById("kpiEbitdaPotencialSub").innerText = `Meta ${fAnio}: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
-
-            const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
-            document.getElementById("kpiHhtPotencialSub").innerText = `Meta ${fAnio}: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
-
-            document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
-            document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
-        }
-
-        // ==========================================
-        // DIBUJADO DE LOS GRÁFICOS DE BALA DE EBITDA Y HHT (FIJOS, COMPACTOS Y OPTIMIZADOS EN ESPACIO)
-        // ==========================================
         function renderBulletCharts() {
             const col1 = document.getElementById("bullet-col-1");
             const col2 = document.getElementById("bullet-col-2");
-            if (!col1 || !col2) return;
+            const legendContainer = document.getElementById("bullet-shared-legend");
+            if (!col1 || !col2 || !legendContainer) return;
 
             col1.innerHTML = "";
             col2.innerHTML = "";
+            legendContainer.innerHTML = "";
 
             if (!currentDataset || currentDataset.length === 0) {
-                col1.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos de portafolio cargados.</div>`;
-                col2.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos de portafolio cargados.</div>`;
+                col1.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos</div>`;
+                col2.innerHTML = `<div class="text-xs text-slate-400 py-2">Sin datos</div>`;
                 return;
             }
 
             const selectedYear = document.getElementById("filterAnio")?.value || "2026";
-
-            // Meta conjunta fija EBITDA: $1.000.000.000 CLP (1.000 Millones) para todas las unidades
             const jointEbitdaMeta = 1000000000;
 
-            // Meta conjunta HHT: Buscada desde globalMetas para el año respectivo, o fallback 1000 Hrs
             let jointHhtMeta = 1000;
             if (selectedYear) {
                 const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(selectedYear));
-                if (matchHht) {
-                    jointHhtMeta = matchHht.meta;
-                }
-            }
-            
-            // Actualizamos el label de la meta conjunta HHT en el encabezado
-            const hhtLabelEl = document.getElementById("bulletHhtMetaLabel");
-            if (hhtLabelEl) {
-                hhtLabelEl.innerText = Math.round(jointHhtMeta).toLocaleString("es-CL");
+                if (matchHht) jointHhtMeta = matchHht.meta;
             }
 
             const units = [
@@ -1289,94 +817,143 @@
                 { name: "Recupac", key: "recupac" }
             ];
 
-            // 1. Renderizar Columna 1 (EBITDA Potencial vs Meta Conjunta de 1.000M)
+            const ebitdaData = [];
+            const hhtData = [];
+
             units.forEach(unit => {
                 const unitProjects = currentDataset.filter(item => {
                     const normGerencia = normalizeKey(item.gerencia);
-                    if (unit.key === "cpp") {
-                        return normGerencia === "cpp";
-                    }
+                    if (unit.key === "cpp") return normGerencia === "cpp";
                     return normGerencia.includes(unit.key);
                 });
 
                 const potentialEbitda = unitProjects.reduce((sum, item) => sum + (item.ebitdaPotencial || 0), 0);
-                const colors = getUnitColors(unit.name);
-                const percent = jointEbitdaMeta > 0 ? ((potentialEbitda / jointEbitdaMeta) * 100).toFixed(1) : "0.0";
-
-                // Definimos el rango visual del gráfico de bala de forma proporcional
-                const maxRange = jointEbitdaMeta * 1.15;
-                const barWidth = Math.min(100, (potentialEbitda / maxRange) * 100);
-                const markerLeft = (jointEbitdaMeta / maxRange) * 100;
-
-                col1.innerHTML += `
-                    <div class="space-y-1 animate-fadeIn">
-                        <div class="flex justify-between items-center text-[11px]">
-                            <span class="font-bold flex items-center gap-1.5" style="color: ${colors.potencial}">
-                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colors.potencial}"></span>
-                                ${unit.name}
-                            </span>
-                            <span class="font-extrabold text-slate-800">
-                                ${formatCurrency(potentialEbitda)} <span class="text-slate-400 font-normal">(${percent}%)</span>
-                            </span>
-                        </div>
-                        <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                            <!-- Progreso EBITDA Potencial de la Unidad -->
-                            <div style="width: ${barWidth}%; background-color: ${colors.potencial}" class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 shadow-inner"></div>
-                            <!-- Marcador Fijo de la Meta Conjunta de $1.000M -->
-                            <div style="left: ${markerLeft}%" class="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10 transition-all duration-1000" title="Meta Conjunta: ${formatCurrency(jointEbitdaMeta)}"></div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // 2. Renderizar Columna 2 (HHT Potencial vs Meta Conjunta de HHT)
-            units.forEach(unit => {
-                const unitProjects = currentDataset.filter(item => {
-                    const normGerencia = normalizeKey(item.gerencia);
-                    if (unit.key === "cpp") {
-                        return normGerencia === "cpp";
-                    }
-                    return normGerencia.includes(unit.key);
-                });
-
                 const potentialHht = unitProjects.reduce((sum, item) => sum + (item.hht || 0), 0);
                 const colors = getUnitColors(unit.name);
-                const percent = jointHhtMeta > 0 ? ((potentialHht / jointHhtMeta) * 100).toFixed(1) : "0.0";
 
-                // Rango visual adaptativo para la columna HHT
-                const maxRange = jointHhtMeta * 1.15;
-                const barWidth = Math.min(100, (potentialHht / maxRange) * 100);
-                const markerLeft = (jointHhtMeta / maxRange) * 100;
+                ebitdaData.push({ name: unit.name, value: potentialEbitda, color: colors.potencial });
+                hhtData.push({ name: unit.name, value: potentialHht, color: colors.potencial });
+            });
 
-                col2.innerHTML += `
-                    <div class="space-y-1 animate-fadeIn">
-                        <div class="flex justify-between items-center text-[11px]">
-                            <span class="font-bold flex items-center gap-1.5" style="color: ${colors.potencial}">
-                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colors.potencial}"></span>
-                                ${unit.name}
-                            </span>
-                            <span class="font-extrabold text-slate-800">
-                                ${Math.round(potentialHht).toLocaleString("es-CL")} Hrs <span class="text-slate-400 font-normal">(${percent}%)</span>
-                            </span>
-                        </div>
-                        <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                            <!-- Progreso HHT Potencial de la Unidad -->
-                            <div style="width: ${barWidth}%; background-color: ${colors.potencial}" class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 shadow-inner"></div>
-                            <!-- Marcador Fijo de la Meta Conjunta de HHT -->
-                            <div style="left: ${markerLeft}%" class="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10 transition-all duration-1000" title="Meta Conjunta: ${Math.round(jointHhtMeta).toLocaleString("es-CL")} Hrs"></div>
-                        </div>
+            ebitdaData.sort((a, b) => b.value - a.value);
+            hhtData.sort((a, b) => b.value - a.value);
+
+            const totalEbitda = ebitdaData.reduce((sum, d) => sum + d.value, 0);
+            const totalHht = hhtData.reduce((sum, d) => sum + d.value, 0);
+
+            document.getElementById("bulletEbitdaTotalLabel").innerText = `Total: ${formatCurrency(totalEbitda)}`;
+            document.getElementById("bulletHhtTotalLabel").innerText = `Total: ${Math.round(totalHht).toLocaleString("es-CL")} Hrs`;
+
+            // Renderizar EBITDA
+            const maxRangeEbitda = Math.max(totalEbitda, jointEbitdaMeta) * 1.15;
+            const ebitdaMetaMarkerLeft = (jointEbitdaMeta / maxRangeEbitda) * 100;
+
+            let ebitdaSegmentsHtml = "";
+            ebitdaData.forEach(d => {
+                if (d.value <= 0) return;
+                const widthPct = (d.value / maxRangeEbitda) * 100;
+                const textToShow = widthPct >= 6 ? formatCompactCLP(d.value) : "";
+                ebitdaSegmentsHtml += `
+                    <div style="width: ${widthPct}%; background-color: ${d.color};" 
+                         class="h-full flex items-center justify-center text-[10px] font-black text-white px-1 truncate transition-all duration-1000 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
+                         title="${d.name}: ${formatCurrency(d.value)}">
+                        ${textToShow}
                     </div>
                 `;
             });
 
-            if (window.lucide) {
-                lucide.createIcons();
-            }
+            col1.innerHTML = `
+                <div class="relative w-full h-8 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex">
+                    ${ebitdaSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
+                    <div style="left: ${ebitdaMetaMarkerLeft}%" 
+                         class="absolute top-0 bottom-0 w-1 bg-slate-950 z-10 transition-all duration-1000 shadow-[0_0_3px_rgba(0,0,0,0.4)]" 
+                         title="Meta Conjunta: ${formatCurrency(jointEbitdaMeta)}">
+                         <div class="absolute -top-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                         <div class="absolute -bottom-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[9px] text-slate-400 mt-1 px-1 font-semibold select-none">
+                    <span>$0</span>
+                    <span class="text-slate-900 font-extrabold" style="margin-left: calc(${ebitdaMetaMarkerLeft}% - 30px)">Meta: $1.000M</span>
+                    <span>${formatCompactCLP(maxRangeEbitda)}</span>
+                </div>
+            `;
+
+            // Renderizar HHT
+            const maxRangeHht = Math.max(totalHht, jointHhtMeta) * 1.15;
+            const hhtMetaMarkerLeft = (jointHhtMeta / maxRangeHht) * 100;
+
+            let hhtSegmentsHtml = "";
+            hhtData.forEach(d => {
+                if (d.value <= 0) return;
+                const widthPct = (d.value / maxRangeHht) * 100;
+                const textToShow = widthPct >= 6 ? Math.round(d.value).toLocaleString('es-CL') : "";
+                hhtSegmentsHtml += `
+                    <div style="width: ${widthPct}%; background-color: ${d.color};" 
+                         class="h-full flex items-center justify-center text-[10px] font-black text-white px-1 truncate transition-all duration-1000 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
+                         title="${d.name}: ${Math.round(d.value).toLocaleString('es-CL')} Hrs">
+                        ${textToShow}
+                    </div>
+                `;
+            });
+
+            col2.innerHTML = `
+                <div class="relative w-full h-8 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex">
+                    ${hhtSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
+                    <div style="left: ${hhtMetaMarkerLeft}%" 
+                         class="absolute top-0 bottom-0 w-1 bg-slate-950 z-10 transition-all duration-1000 shadow-[0_0_3px_rgba(0,0,0,0.4)]" 
+                         title="Meta Conjunta: ${Math.round(jointHhtMeta).toLocaleString('es-CL')} Hrs">
+                         <div class="absolute -top-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                         <div class="absolute -bottom-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[9px] text-slate-400 mt-1 px-1 font-semibold select-none">
+                    <span>0 Hrs</span>
+                    <span class="text-slate-900 font-extrabold" style="margin-left: calc(${hhtMetaMarkerLeft}% - 30px)">Meta: ${Math.round(jointHhtMeta).toLocaleString('es-CL')} Hrs</span>
+                    <span>${Math.round(maxRangeHht).toLocaleString('es-CL')} Hrs</span>
+                </div>
+            `;
+
+            // Construir leyenda compartida
+            units.forEach(unit => {
+                const colors = getUnitColors(unit.name);
+                legendContainer.innerHTML += `
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full shrink-0 shadow-sm border border-black/10" style="background-color: ${colors.potencial};"></span>
+                        <span class="text-slate-700 font-bold">${unit.name}</span>
+                    </div>
+                `;
+            });
+
+            if (window.lucide) lucide.createIcons();
         }
-        
-        // ==========================================
-        // CONFIGURACIÓN DE GRÁFICOS (CHART.JS)
-        // ==========================================
+
+        const customXAxisLabelsPlugin = {
+            id: 'customXAxisLabelsPlugin',
+            afterDraw: (chart) => {
+                const { ctx, scales: { x } } = chart;
+                ctx.save();
+                ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#64748b'; // color slate-500
+                ctx.textAlign = 'center';
+
+                chart.data.labels.forEach((label, index) => {
+                    const meta0 = chart.getDatasetMeta(0);
+                    const meta1 = chart.getDatasetMeta(1);
+                    
+                    if (meta0 && meta0.data[index] && meta1 && meta1.data[index]) {
+                        const bar0X = meta0.data[index].x;
+                        const bar1X = meta1.data[index].x;
+                        const yPos = x.bottom + 10; // Dibujado justo encima de la etiqueta principal centrada
+
+                        ctx.fillText('Potencial', bar0X, yPos);
+                        ctx.fillText('Capturado', bar1X, yPos);
+                    }
+                });
+                ctx.restore();
+            }
+        };
+
         function initChartsContainer() {
             Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
@@ -1392,16 +969,12 @@
             if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
 
-            // 1. EBITDA vs HHT por Gerencia (almacenando desgloses detallados por iniciativa)
+            // 1. EBITDA vs HHT por Gerencia
             const metricByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
                 if (!metricByGerencia[gerencia]) {
-                    metricByGerencia[gerencia] = { 
-                        primary: 0, 
-                        secondary: 0,
-                        projects: []
-                    };
+                    metricByGerencia[gerencia] = { primary: 0, secondary: 0, projects: [] };
                 }
                 
                 let valPrimary = 0;
@@ -1417,7 +990,6 @@
 
                 metricByGerencia[gerencia].primary += valPrimary;
                 metricByGerencia[gerencia].secondary += valSecondary;
-                
                 metricByGerencia[gerencia].projects.push({
                     nombre: item.nombre || "Sin nombre",
                     valPrimary: valPrimary,
@@ -1433,6 +1005,7 @@
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
                 type: 'bar',
+                plugins: [customXAxisLabelsPlugin],
                 data: {
                     labels: sortedGerencias,
                     datasets: [
@@ -1458,15 +1031,15 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
-                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                        legend: { display: false }, // Deshabilitado para evitar conflictos cromáticos
                         datalabels: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     const gerencia = context.label;
-                                    const datasetIndex = context.datasetIndex; // 0: primary, 1: secondary
+                                    const datasetIndex = context.datasetIndex; 
                                     const isPrimary = (datasetIndex === 0);
-                                    const labelPrefix = context.dataset.label || '';
+                                    const labelPrefix = isPrimary ? labelPrimary : labelSecondary;
                                     
                                     const dataGroup = metricByGerencia[gerencia];
                                     if (!dataGroup) return `${labelPrefix}: ${context.raw}`;
@@ -1479,7 +1052,6 @@
                                     const lines = [`${labelPrefix} Total: ${totalFormatted}`, ''];
                                     lines.push('Desglose por Iniciativa:');
 
-                                    // Filtrar y mapear proyectos activos
                                     const projList = dataGroup.projects.map(p => ({
                                         nombre: p.nombre,
                                         value: isPrimary ? p.valPrimary : p.valSecondary
@@ -1488,7 +1060,6 @@
                                     if (projList.length === 0) {
                                         lines.push('  • Ninguna activa');
                                     } else {
-                                        // Ordenar de mayor a menor valor registrado
                                         projList.sort((a, b) => b.value - a.value);
                                         projList.forEach(p => {
                                             const valFormatted = activeMainChartMetric === 'ebitda' 
@@ -1503,7 +1074,13 @@
                         }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { 
+                                padding: 22, // Empujar etiqueta nativa de Unidad hacia abajo para dejar espacio
+                                font: { size: 10, weight: 'bold' }
+                            } 
+                        },
                         y: { 
                             grid: { color: 'rgba(107, 124, 133, 0.12)' },
                             ticks: { 
@@ -1559,7 +1136,7 @@
                 }
             });
 
-            // 3. Tipo / Vertical de Innovación (Paleta exclusiva de azules profesionales)
+            // 3. Tipo / Vertical de Innovación
             const chartDataCount = {};
             let totalItemsFiltered = 0;
             
@@ -1570,24 +1147,12 @@
                 } else {
                     categoryKey = i.vertical || "Sin vertical";
                 }
-                
                 chartDataCount[categoryKey] = (chartDataCount[categoryKey] || 0) + 1;
                 totalItemsFiltered++;
             });
 
-            // Colores estrictamente dentro de la escala azulina / slate profesional 
-            // Esto asegura distancia cromática de los colores corporativos de Coipsa
             const bluePalette = [
-                '#1e40af', // Azul Rey Oscuro
-                '#0284c7', // Azul Océano Medio
-                '#3b82f6', // Azul Eléctrico Claro
-                '#1e3a8a', // Azul Marino Profundo
-                '#0369a1', // Azul Marino Sólido
-                '#60a5fa', // Azul Aciano Brillante
-                '#475569', // Azul Pizarra Sutil
-                '#0099ff', // Azul Neón Vibrante
-                '#1d4ed8', // Azul Cobalto Fuerte
-                '#2563eb'  // Azul Real Estándar
+                '#1e40af', '#0284c7', '#3b82f6', '#1e3a8a', '#0369a1', '#60a5fa', '#475569', '#0099ff', '#1d4ed8', '#2563eb'
             ];
 
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
@@ -1609,17 +1174,11 @@
                         legend: { display: false },
                         datalabels: {
                             color: '#ffffff',
-                            font: {
-                                family: 'Plus Jakarta Sans, sans-serif',
-                                weight: '800',
-                                size: 11
-                            },
+                            font: { family: 'Plus Jakarta Sans, sans-serif', weight: '800', size: 11 },
                             formatter: (value, ctx) => {
                                 let sum = 0;
                                 let dataArr = ctx.chart.data.datasets[0].data;
-                                dataArr.forEach(val => {
-                                    sum += val;
-                                });
+                                dataArr.forEach(val => sum += val);
                                 let pct = sum > 0 ? Math.round((value * 100) / sum) : 0;
                                 return pct > 0 ? `${pct}%` : '';
                             },
@@ -1701,9 +1260,7 @@
             const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
             const portfolioRiskNumericEl = document.getElementById("portfolioRiskNumericValue");
 
-            if (portfolioRiskNumericEl) {
-                portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
-            }
+            if (portfolioRiskNumericEl) portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
 
             if (portfolioRiskLabelEl) {
                 if (countWithRisk === 0) {
@@ -1727,9 +1284,320 @@
             }
         }
 
-        // ==========================================
-        // RENDERIZADO DE TABLA DE INICIATIVAS
-        // ==========================================
+        function processCSVRows(rows) {
+            if (!rows || rows.length === 0) return [];
+            
+            return rows.map((row, index) => {
+                if (Object.keys(row).length < 3) return null;
+
+                const normRow = {};
+                Object.keys(row).forEach(k => {
+                    if (k !== undefined && k !== null) {
+                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
+                    }
+                });
+
+                const findVal = (keywords) => {
+                    for (const kw of keywords) {
+                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                            const raw = String(normRow[kw]).trim();
+                            return raw === "" ? "" : normRow[kw];
+                        }
+                    }
+                    for (const kw of keywords) {
+                        for (const actualKey of Object.keys(normRow)) {
+                            if (actualKey.includes(kw)) {
+                                const raw = String(normRow[actualKey]).trim();
+                                return raw === "" ? "" : normRow[actualKey];
+                            }
+                        }
+                    }
+                    return "";
+                };
+
+                const id = cleanEncoding(findVal(["id", "codigo", "key"])) || `PM-${String(index+1).padStart(3, '0')}`;
+                const nombre = cleanEncoding(findVal(["nombredelproyecto", "proyecto", "nombre"]));
+                const anio = cleanEncoding(findVal(["anodecreacion", "anio", "ano", "aniodecreacion"]));
+                
+                let anioImplementacion = cleanEncoding(findVal(["anoimplementacion", "anioimplementacion", "implementacion", "añoimplementacion", "anodeimplementacion", "aniodeimplementacion"]));
+                if (!anioImplementacion) anioImplementacion = anio;
+
+                const descripcion = cleanEncoding(findVal(["descripcion", "detalle"]));
+                const riesgo = cleanEncoding(findVal(["nivelderiesgo", "riesgo"]));
+                const gerencia = cleanEncoding(findVal(["unidad", "gerencia", "unidadgerencia"]));
+                const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "tipoinnovacion", "tipo"]));
+                const vertical = cleanEncoding(findVal(["vertical", "verticalinnovacion"]));
+                const lider = cleanEncoding(findVal(["liderfuncionalnombre", "lider", "responsable"]));
+                const correo = cleanEncoding(findVal(["liderfuncionalcorreo", "correo", "email"]));
+                
+                const rawFunnel = findVal(["embudo", "funnel", "fase", "etapa"]);
+                const funnel = normalizeFunnelStage(cleanEncoding(rawFunnel));
+                
+                const inversion = parseNumeric(findVal(["inversionejecutada", "inversion", "presupuesto"]));
+                const ebitdaPotencial = parseNumeric(findVal(["ebitdapotencialanualclp", "ebitdapotencialclp", "ebitdapotencial"]));
+                const ebitdaPiloto = parseNumeric(findVal(["ebitdapilotoanualh3clp", "ebitdapilotoanualh3", "ebitdapiloto", "piloto"]));
+                const ebitdaCapturado = parseNumeric(findVal(["ebitdarealcapturadoparcialclp", "ebitdarealcapturadoparcial", "ebitdacapturadorealparcial", "ebitdacapturadoclp", "ebitdacapturado"]));
+                
+                const hht = parseNumeric(findVal(["hhtpotencialanualhoras", "hhtpotencial", "hht", "horas"]));
+                const hhtCapturado = parseNumeric(findVal(["hhtcapturadorealafechahoras", "hhtcapturadorealafecha", "hhtcapturado", "hhtreal", "hhtcapturadas", "hht_capturado"]));
+                
+                const estado = cleanEncoding(findVal(["estadoproyecto", "estado", "status"]));
+                const sponsor = cleanEncoding(findVal(["sponsor"]));
+                const escalamiento = cleanEncoding(findVal(["potencialdeescalamiento", "escalamiento"]));
+                const tipoSolucion = cleanEncoding(findVal(["tipodesolucion", "solucion"]));
+                const origenSolucion = cleanEncoding(findVal(["origensolucion", "origen"]));
+                const comentario = cleanEncoding(findVal(["comentario", "comentarios", "observacion"]));
+                const requiereGobernanza = cleanEncoding(findVal(["requieregobernanzatd", "gobernanza"]));
+                
+                const kr = cleanEncoding(findVal(["kr", "keyresult", "resultadoclave", "krs"]));
+                const respInnovacion = cleanEncoding(findVal(["responsabledeinnovacion", "responsableinnovacion", "responsable_innovacion", "liderinnovacion"]));
+
+                const kpi1 = cleanEncoding(findVal(["kpi1", "kpi_1", "kpi 1"]));
+                const kpi2 = cleanEncoding(findVal(["kpi2", "kpi_2", "kpi 2"]));
+                const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
+
+                return {
+                    id, nombre, anio, anioImplementacion, descripcion, riesgo, gerencia, tipoInnovacion, vertical,
+                    lider, correo, funnel, inversion, ebitdaPotencial, ebitdaPiloto,
+                    ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
+                    escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
+                    kr, respInnovacion, kpi1, kpi2, kpi3
+                };
+            }).filter(item => item !== null && item.nombre !== "" && item.id !== "-");
+        }
+
+        function processMetasRows(rows) {
+            if (!rows || rows.length === 0) return [];
+            return rows.map(row => {
+                const normRow = {};
+                Object.keys(row).forEach(k => {
+                    if (k !== undefined && k !== null) {
+                        normRow[normalizeKey(cleanEncoding(k))] = row[k];
+                    }
+                });
+
+                const findVal = (keywords) => {
+                    for (const kw of keywords) {
+                        if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                            return row[Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw)];
+                        }
+                    }
+                    return "";
+                };
+
+                const indicador = cleanEncoding(findVal(["indicador", "ind", "name"]));
+                const anio = cleanEncoding(findVal(["ano", "anio", "year"]));
+                const meta = parseNumeric(findVal(["meta", "valor", "goal"]));
+
+                return { indicador, anio, meta };
+            }).filter(item => item.indicador !== "");
+        }
+
+        function connectToGitHubCSV() {
+            showConnectionStatus("loading", "Sincronizando...", "Obteniendo datos del portafolio y metas desde GitHub.");
+            
+            const fetchPortafolio = fetch(GITHUB_CSV_URL).then(res => {
+                if (!res.ok) throw new Error("No se pudo obtener el portafolio.");
+                return res.arrayBuffer();
+            });
+
+            const fetchMetas = fetch(METAS_CSV_URL).then(res => {
+                if (!res.ok) throw new Error("No se pudieron obtener las metas.");
+                return res.arrayBuffer();
+            });
+
+            Promise.all([fetchPortafolio, fetchMetas])
+                .then(([portafolioBuffer, metasBuffer]) => {
+                    let portafolioText;
+                    try { portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer); } 
+                    catch (e) { portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer); }
+
+                    let metasText;
+                    try { metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer); } 
+                    catch (e) { metasText = new TextDecoder("windows-1252").decode(metasBuffer); }
+
+                    Papa.parse(portafolioText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(portResults) {
+                            masterDataset = processCSVRows(portResults.data);
+
+                            Papa.parse(metasText, {
+                                header: true,
+                                skipEmptyLines: true,
+                                complete: function(metaResults) {
+                                    globalMetas = processMetasRows(metaResults.data);
+                                    showConnectionStatus("success", "Datos Sincronizados", `Se cargaron ${masterDataset.length} proyectos.`);
+                                    
+                                    if (document.getElementById('portfolioSelector').value === 'maestra') {
+                                        currentDataset = [...masterDataset];
+                                        initializeDashboard();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                })
+                .catch(err => {
+                    masterDataset = loadBackupDataset(); 
+                    currentDataset = [...masterDataset];
+                    initializeDashboard();
+                });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                let decodedText;
+                try { decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
+                catch (err) { decodedText = new TextDecoder("windows-1252").decode(arrayBuffer); }
+
+                Papa.parse(decodedText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.data && results.data.length > 0) {
+                            localDataset = processCSVRows(results.data);
+                            document.getElementById('portfolioSelector').value = 'cargada';
+                            currentDataset = [...localDataset];
+                            initializeDashboard();
+                        }
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handlePortfolioChange() {
+            const selected = document.getElementById('portfolioSelector').value;
+            if (selected === 'maestra') {
+                currentDataset = [...masterDataset];
+            } else {
+                currentDataset = localDataset.length > 0 ? [...localDataset] : [];
+            }
+            initializeDashboard();
+        }
+
+        let filteredDataset = [];
+
+        function initializeFilters() {
+            const populateSelect = (elementId, property) => {
+                const select = document.getElementById(elementId);
+                const currentValue = select.value;
+                
+                if (elementId === "filterAnio") select.innerHTML = '';
+                else select.innerHTML = '<option value="">Todos</option>';
+                
+                let uniqueValues = [...new Set(currentDataset.map(item => item[property]))].filter(Boolean);
+                if (elementId === "filterAnio") uniqueValues = uniqueValues.filter(val => val.trim() !== "-");
+
+                uniqueValues.sort();
+
+                uniqueValues.forEach(val => {
+                    const option = document.createElement("option");
+                    option.value = val;
+                    option.innerText = val;
+                    select.appendChild(option);
+                });
+
+                if (elementId === "filterAnio") {
+                    if (currentValue && uniqueValues.includes(currentValue)) select.value = currentValue;
+                    else if (uniqueValues.length > 0) {
+                        const sortedYears = [...uniqueValues].sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
+                        select.value = sortedYears[0];
+                    }
+                } else {
+                    select.value = currentValue;
+                }
+            };
+
+            populateSelect("filterAnio", "anioImplementacion");
+            populateSelect("filterGerencia", "gerencia");
+            populateSelect("filterTipo", "tipoInnovacion");
+            populateSelect("filterSponsor", "sponsor");
+            populateSelect("filterLider", "lider");
+            populateSelect("filterEstado", "estado");
+        }
+
+        function applyFilters() {
+            const fGerencia = document.getElementById("filterGerencia").value;
+            const fTipo = document.getElementById("filterTipo").value;
+            const fSponsor = document.getElementById("filterSponsor").value;
+            const fLider = document.getElementById("filterLider").value;
+            const fEstado = document.getElementById("filterEstado").value;
+
+            filteredDataset = currentDataset.filter(item => {
+                if (fGerencia && item.gerencia !== fGerencia) return false;
+                if (fTipo && item.tipoInnovacion !== fTipo) return false;
+                if (fSponsor && item.sponsor !== fSponsor) return false;
+                if (fLider && item.lider !== fLider) return false;
+                if (fEstado && item.estado !== fEstado) return false;
+                return true;
+            });
+
+            document.getElementById("projectCountLabel").innerText = filteredDataset.length;
+            updateKPIs();
+            renderTable();
+            renderCharts();
+            renderBulletCharts();
+        }
+
+        function updateKPIs() {
+            const fAnio = document.getElementById("filterAnio").value;
+            const numericYear = parseInt(fAnio, 10);
+
+            const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
+            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (item.hht || 0), 0);
+
+            let capturedYearFilteredDataset = [];
+            if (!isNaN(numericYear)) {
+                capturedYearFilteredDataset = filteredDataset.filter(item => {
+                    if (item.anioImplementacion === "-") return false;
+                    const itemImplYear = parseInt(item.anioImplementacion, 10);
+                    return !isNaN(itemImplYear) && itemImplYear >= (numericYear - 2) && itemImplYear <= numericYear;
+                });
+            } else {
+                capturedYearFilteredDataset = filteredDataset.filter(item => item.anioImplementacion !== "-");
+            }
+
+            const sumEbitdaCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
+            const sumHhtCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
+
+            let targetEbitda = 0;
+            let targetHht = 0;
+
+            if (fAnio && fAnio !== "-") {
+                const matchEbitda = globalMetas.find(m => normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio));
+                const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio));
+                targetEbitda = matchEbitda ? matchEbitda.meta : 0;
+                targetHht = matchHht ? matchHht.meta : 0;
+            }
+
+            const totalProjects = filteredDataset.length;
+            const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
+            const cerrados = totalProjects - abiertos;
+
+            document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
+            document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
+            
+            document.getElementById("kpiHht").innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
+            document.getElementById("kpiHhtPotencial").innerText = Math.round(sumHhtPotencial).toLocaleString("es-CL");
+            document.getElementById("kpiTotalProjects").innerText = totalProjects;
+
+            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
+            document.getElementById("kpiEbitdaPotencialSub").innerText = `Meta ${fAnio}: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
+
+            const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
+            document.getElementById("kpiHhtPotencialSub").innerText = `Meta ${fAnio}: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
+
+            document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
+            document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
+        }
+
         function renderTable() {
             const tbody = document.getElementById("tableBody");
             const emptyState = document.getElementById("tableEmptyState");
@@ -1752,16 +1620,10 @@
                 return 0;
             };
 
-            // Ordenamiento por nivel de Riesgo (1ero) y por EBITDA Potencial descendente (2do)
             const sortedDataset = [...filteredDataset].sort((a, b) => {
                 const weightA = getRiskWeight(a.riesgo);
                 const weightB = getRiskWeight(b.riesgo);
-                
-                if (weightB !== weightA) {
-                    return weightB - weightA;
-                }
-                
-                // Si el nivel de riesgo es igual, ordenar por EBITDA Potencial de forma descendente
+                if (weightB !== weightA) return weightB - weightA;
                 return (b.ebitdaPotencial || 0) - (a.ebitdaPotencial || 0);
             });
 
@@ -1797,6 +1659,7 @@
                     </td>
                     <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.inversion)}</td>
                     <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
+                    <td class="py-3 px-6 text-right font-medium text-slate-600 bg-slate-150/40">${formatCurrency(item.ebitdaPiloto)}</td>
                     <td class="py-3 px-6 text-right font-bold text-palForest">${formatCurrency(item.ebitdaCapturado)}</td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
@@ -1808,9 +1671,6 @@
             });
         }
 
-        // ==========================================
-        // PROCESADOR Y RENDERIZADOR DE CARTA GANTT DINÁMICA
-        // ==========================================
         function loadProjectGantt(item) {
             const loading = document.getElementById("ganttLoading");
             const empty = document.getElementById("ganttEmpty");
@@ -1833,7 +1693,7 @@
 
             fetch(ganttUrl)
                 .then(res => {
-                    if (!res.ok) throw new Error("Archivo no cargado aún en GitHub.");
+                    if (!res.ok) throw new Error("Archivo no disponible.");
                     return res.arrayBuffer();
                 })
                 .then(arrayBuffer => {
@@ -1843,7 +1703,6 @@
                     parseAndRenderGantt(text, item);
                 })
                 .catch(err => {
-                    console.warn(`Hoja de ruta real no encontrada (${expectedFileName}). No se cargará simulación.`);
                     loading.className = "hidden";
                     empty.className = "bg-[#f8fafc] border border-dashed border-slate-200 rounded-2xl p-4 text-center space-y-2";
                     wrapper.className = "hidden";
@@ -1852,9 +1711,6 @@
                 });
         }
 
-        // ==========================================
-        // DIBUJADO DE LA CARTA GANTT AGRUPADO
-        // ==========================================
         function parseAndRenderGantt(csvText, item) {
             const empty = document.getElementById("ganttEmpty");
             const wrapper = document.getElementById("ganttChartWrapper");
@@ -1876,7 +1732,6 @@
             }
 
             if (headerIndex === -1) {
-                console.error("No se pudo detectar el encabezado de columnas en el archivo de ruta.");
                 empty.className = "bg-[#f8fafc] border border-dashed border-slate-200 rounded-2xl p-4 text-center space-y-2";
                 return;
             }
@@ -1913,9 +1768,7 @@
 
                 if (isDottedObjId || isObjName) {
                     currentObjective = rawActividad || rawTarea || rawId;
-                    if (!objectivesMap[currentObjective]) {
-                        objectivesMap[currentObjective] = [];
-                    }
+                    if (!objectivesMap[currentObjective]) objectivesMap[currentObjective] = [];
                     continue;
                 }
 
@@ -1935,9 +1788,7 @@
                     estado: rawEstado || "Planificado"
                 };
 
-                if (!objectivesMap[currentObjective]) {
-                    objectivesMap[currentObjective] = [];
-                }
+                if (!objectivesMap[currentObjective]) objectivesMap[currentObjective] = [];
                 objectivesMap[currentObjective].push(taskObj);
                 validTasksList.push(taskObj);
             }
@@ -1979,11 +1830,9 @@
             monthsInProject.forEach((mDate) => {
                 const mStart = new Date(mDate.getFullYear(), mDate.getMonth(), 1).getTime();
                 const mEnd = new Date(mDate.getFullYear(), mDate.getMonth() + 1, 0).getTime();
-                
                 const leftPct = Math.max(0, ((mStart - minTime) / totalDuration) * 100);
                 const rightBound = Math.min(100, ((mEnd - minTime) / totalDuration) * 100);
                 const widthPct = rightBound - leftPct;
-
                 const formatMonth = mDate.toLocaleDateString('es-CL', { month: 'short', year: '2-digit' });
 
                 html += `
@@ -2015,7 +1864,6 @@
                 groupTasks.forEach(t => {
                     const taskStart = t.inicio.getTime();
                     const taskEnd = t.termino.getTime();
-                    
                     const leftPct = Math.max(0, ((taskStart - minTime) / totalDuration) * 100);
                     const widthPct = Math.max(3, ((taskEnd - taskStart) / totalDuration) * 100);
 
@@ -2076,9 +1924,6 @@
             lucide.createIcons();
         }
 
-        // ==========================================
-        // VENTANA MODAL DETALLE DE INICIATIVA
-        // ==========================================
         function openModal(item) {
             document.getElementById("modalTitle").innerText = item.nombre || "Sin nombre";
             document.getElementById("modalGerencia").innerText = item.gerencia || "Sin asignar";
@@ -2093,15 +1938,12 @@
             document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
             document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
 
-            // Inyección de KPI 1, 2, 3
             document.getElementById("modalKpi1").innerText = item.kpi1 && item.kpi1.trim() !== "" ? item.kpi1 : "N/R";
             document.getElementById("modalKpi2").innerText = item.kpi2 && item.kpi2.trim() !== "" ? item.kpi2 : "N/R";
             document.getElementById("modalKpi3").innerText = item.kpi3 && item.kpi3.trim() !== "" ? item.kpi3 : "N/R";
 
             let govText = item.tipoSolucion || "No especificado";
-            if (item.requiereGobernanza) {
-                govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
-            }
+            if (item.requiereGobernanza) govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
             document.querySelector("#modalGovernance span").innerText = govText;
 
             const commContainer = document.getElementById("modalCommentContainer");
@@ -2140,26 +1982,17 @@
                 riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
             }
 
-            if (needleGroup) {
-                needleGroup.style.transform = `rotate(${rotation}deg)`;
-            }
+            if (needleGroup) needleGroup.style.transform = `rotate(${rotation}deg)`;
             
             loadProjectGantt(item);
-
             document.getElementById("projectModal").classList.remove("hidden");
             lucide.createIcons();
         }
 
-        // ==========================================
-        // VENTANA MODAL CIERRE
-        // ==========================================
         function closeModal() {
             document.getElementById("projectModal").classList.add("hidden");
         }
 
-        // ==========================================
-        // BASE DE DATOS DE RESPALDO
-        // ==========================================
         function loadBackupDataset() {
             return [
                 {
@@ -2167,7 +2000,7 @@
                     descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
                     riesgo: "Bajo", gerencia: "Logística", tipoInnovacion: "Incremental",
                     lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
-                    inversion: 45000000, ebitdaPotencial: 120000000,
+                    inversion: 45000000, ebitdaPotencial: 120000000, ebitdaPiloto: 90000000,
                     ebitdaCapturado: 16500000, hht: 250, hhtCapturado: 190, estado: "Abierto", sponsor: "Director de Operaciones",
                     escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
                     kr: "Reducir un 15% los residuos textiles en centros de distribución", respInnovacion: "María José Valdés",
@@ -2178,7 +2011,7 @@
                     descripcion: "Reestructuración del flujo logístico para devoluciones y empaques circulares reduciendo tiempos.",
                     riesgo: "Medio", gerencia: "Logística", tipoInnovacion: "Adyacente",
                     lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
-                    inversion: 30000000, ebitdaPotencial: 135000000,
+                    inversion: 30000000, ebitdaPotencial: 135000000, ebitdaPiloto: 110000000,
                     ebitdaCapturado: 99000000, hht: 300, hhtCapturado: 270, estado: "Cerrado", sponsor: "Director de Operaciones",
                     escalamiento: "no", tipoSolucion: "Plataforma Web Móvil", origenSolucion: "Iniciativa Líder", comentario: "",
                     kr: "Disminuir costos de retornos de empaques en un 20%", respInnovacion: "Sebastián Allende",
@@ -2189,7 +2022,7 @@
                     descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
                     riesgo: "Alto", gerencia: "Operaciones", tipoInnovacion: "Adyacente",
                     lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Diseño pilotaje",
-                    inversion: 80000000, ebitdaPotencial: 250000000,
+                    inversion: 80000000, ebitdaPotencial: 250000000, ebitdaPiloto: 180000000,
                     ebitdaCapturado: 0, hht: 240, hhtCapturado: 0, estado: "Abierto", sponsor: "Gerente de Planta",
                     escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
                     kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés",
@@ -2198,61 +2031,41 @@
             ];
         }
 
-        // ==========================================
-        // CARGADOR ASÍNCRONO RESILIENTE PARA ZIP.JS
-        // ==========================================
         async function loadZipLibrary() {
             if (window.zip) return window.zip;
-
             const urls = [
                 "https://cdnjs.cloudflare.com/ajax/libs/zip.js/2.7.34/zip-no-worker.min.js",
-                "https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.34/dist/zip-no-worker.min.js",
-                "https://unpkg.com/@zip.js/zip.js@2.7.34/dist/zip-no-worker.min.js"
+                "https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.34/dist/zip-no-worker.min.js"
             ];
-
             for (const url of urls) {
                 try {
                     await new Promise((resolve, reject) => {
                         const tempDefine = window.define;
                         window.define = undefined;
-
                         const script = document.createElement("script");
                         script.src = url;
                         script.onload = () => {
                             window.define = tempDefine;
                             if (window.zip) resolve();
-                            else reject(new Error("Cargado pero indefinido"));
+                            else reject();
                         };
                         script.onerror = () => {
                             window.define = tempDefine;
-                            reject(new Error("Fallo de red"));
+                            reject();
                         };
                         document.head.appendChild(script);
                     });
-                    console.log("Biblioteca zip.js cargada con éxito desde: " + url);
                     return window.zip;
-                } catch (e) {
-                    console.warn("No se pudo cargar zip.js desde " + url + ", reintentando...", e);
-                }
+                } catch (e) {}
             }
-            throw new Error("No se pudo cargar la biblioteca zip.js.");
+            throw new Error("No se pudo cargar zip.js.");
         }
 
-        // ==========================================
-        // DESCARGA EN ZIP PROTEGIDO CON CONTRASEÑA
-        // ==========================================
         async function downloadSecureZip() {
-            if (filteredDataset.length === 0) {
-                showConnectionStatus("error", "Error de exportación", "No hay datos filtrados para descargar.");
-                return;
-            }
-
+            if (filteredDataset.length === 0) return;
             try {
-                showConnectionStatus("loading", "Cifrando datos...", "Generando contenedor seguro con contraseña...");
-
                 const csvData = "\ufeff" + Papa.unparse(filteredDataset);
                 const zipLib = await loadZipLibrary();
-
                 zipLib.configure({ useWebWorkers: false });
 
                 const blobWriter = new zipLib.BlobWriter("application/zip");
@@ -2263,7 +2076,6 @@
 
                 const fileName = `portafolio-innovacion-${new Date().toISOString().split('T')[0]}.csv`;
                 await zipWriter.add(fileName, new zipLib.TextReader(csvData));
-                
                 await zipWriter.close();
                 const zipBlob = await blobWriter.getData();
 
@@ -2275,26 +2087,17 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-
-                showConnectionStatus("success", "Descarga Completada", "El archivo ZIP protegido ha sido descargado con éxito.");
             } catch (error) {
                 console.error("Error al cifrar el ZIP:", error);
-                showConnectionStatus("error", "Error al encriptar", `Error: ${error.message || "No se pudo generar el ZIP."}`);
             }
         }
 
-        // ==========================================
-        // INICIALIZACIONES Y CONTROL DE CARGA
-        // ==========================================
         function initializeDashboard() {
             initializeFilters();
             applyFilters();
             lucide.createIcons();
         }
 
-        // ==========================================
-        // RESETEAR FILTROS
-        // ==========================================
         function resetData() {
             document.getElementById("filterGerencia").value = "";
             document.getElementById("filterTipo").value = "";
@@ -2309,7 +2112,6 @@
             connectToGitHubCSV();
         };
 
-        // Funciones auxiliares para interactividad de pestañas/métricas en las visualizaciones
         function toggleMainChartMetric(metric) {
             activeMainChartMetric = metric;
             document.getElementById("btnMetricEbitda").className = metric === 'ebitda' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
