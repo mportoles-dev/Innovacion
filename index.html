@@ -413,6 +413,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ROW 3 DE GRÁFICOS (Evolutivo anual de proyectos CREADOS por unidad/gerencia) -->
+            <div class="grid grid-cols-1 gap-6">
+                <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] shadow-sm">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su Año de Creación</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-h-0 relative">
+                        <canvas id="chartProyectosCreados"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -785,6 +800,15 @@
             return { potencial: '#475569', capturado: 'rgba(71, 85, 105, 0.55)', border: '#475569' };
         }
 
+        const getStandardUnitName = (gerencia) => {
+            const norm = normalizeKey(gerencia);
+            if (norm.includes("matriz") || norm.includes("matr") || norm.includes("mtrz")) return "Matriz";
+            if (norm === "cpp") return "CPP";
+            if (norm.includes("corrupac")) return "Corrupac";
+            if (norm.includes("recupac")) return "Recupac";
+            return "Otros";
+        };
+
         function renderBulletCharts() {
             const col1 = document.getElementById("bullet-col-1");
             const col2 = document.getElementById("bullet-col-2");
@@ -954,6 +978,55 @@
             }
         };
 
+        // Custom plugin to draw grand totals for created projects above annual cluster groups
+        const chartCreatedProjectsTotalsPlugin = {
+            id: 'chartCreatedProjectsTotals',
+            afterDraw(chart) {
+                const { ctx, scales: { x, y } } = chart;
+                ctx.save();
+                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#1e293b'; // slate-800
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+
+                chart.data.labels.forEach((label, index) => {
+                    let minY = y.bottom;
+                    let firstX = null;
+                    let lastX = null;
+
+                    // Locate the highest bar and calculate the bounds of the cluster group
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (meta && meta.data[index] && !meta.hidden) {
+                            const model = meta.data[index];
+                            if (model.y < minY) {
+                                minY = model.y;
+                            }
+                            if (firstX === null) firstX = model.x;
+                            lastX = model.x;
+                        }
+                    });
+
+                    // Fallback to axis coordinate if no visible bars exist
+                    const groupCenterX = (firstX !== null && lastX !== null) ? (firstX + lastX) / 2 : x.getPixelForValue(label);
+
+                    // Calculate the year's total (only count active/visible datasets)
+                    let total = 0;
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (meta && !meta.hidden) {
+                            total += (dataset.data[index] || 0);
+                        }
+                    });
+
+                    if (total > 0) {
+                        ctx.fillText(`Total: ${total}`, groupCenterX, minY - 6);
+                    }
+                });
+                ctx.restore();
+            }
+        };
+
         function initChartsContainer() {
             Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
@@ -963,11 +1036,13 @@
         let chartEbitdaInstance = null;
         let chartProyectosUnidadInstance = null;
         let chartTipoInstance = null;
+        let chartProyectosCreadosInstance = null;
 
         function renderCharts() {
             if (chartEbitdaInstance) chartEbitdaInstance.destroy();
             if (chartProyectosUnidadInstance) chartProyectosUnidadInstance.destroy();
             if (chartTipoInstance) chartTipoInstance.destroy();
+            if (chartProyectosCreadosInstance) chartProyectosCreadosInstance.destroy();
 
             // 1. EBITDA vs HHT por Gerencia
             const metricByGerencia = {};
@@ -1031,7 +1106,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
-                        legend: { display: false }, // Deshabilitado para evitar conflictos cromáticos
+                        legend: { display: false }, 
                         datalabels: { display: false },
                         tooltip: {
                             callbacks: {
@@ -1077,7 +1152,7 @@
                         x: { 
                             grid: { display: false }, 
                             ticks: { 
-                                padding: 22, // Empujar etiqueta nativa de Unidad hacia abajo para dejar espacio
+                                padding: 22, 
                                 font: { size: 10, weight: 'bold' }
                             } 
                         },
@@ -1282,6 +1357,96 @@
                 const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
+
+            // 6. Evolutivo Anual de Proyectos Creados por Unidad (No interactúa con filtro de año de consulta)
+            const creationYearsSet = new Set();
+            filteredDataset.forEach(item => {
+                if (item.anio && item.anio !== "-" && item.anio.trim() !== "") {
+                    creationYearsSet.add(item.anio.trim());
+                }
+            });
+            const sortedCreationYears = Array.from(creationYearsSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+            // Default fallback years if dataset happens to be empty
+            if (sortedCreationYears.length === 0) {
+                sortedCreationYears.push("2024", "2025", "2026");
+            }
+
+            const standardUnits = ["Matriz", "CPP", "Corrupac", "Recupac", "Otros"];
+            const countsByYearAndUnit = {};
+            sortedCreationYears.forEach(y => {
+                countsByYearAndUnit[y] = { "Matriz": 0, "CPP": 0, "Corrupac": 0, "Recupac": 0, "Otros": 0 };
+            });
+
+            filteredDataset.forEach(item => {
+                const y = (item.anio || "").trim();
+                if (countsByYearAndUnit[y]) {
+                    const stdUnit = getStandardUnitName(item.gerencia);
+                    countsByYearAndUnit[y][stdUnit]++;
+                }
+            });
+
+            const datasetsCreated = standardUnits.map(unitName => {
+                const colors = getUnitColors(unitName);
+                return {
+                    label: unitName,
+                    data: sortedCreationYears.map(y => countsByYearAndUnit[y][unitName] || 0),
+                    backgroundColor: colors.potencial,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                    borderRadius: 4
+                };
+            });
+
+            const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
+            chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
+                type: 'bar',
+                plugins: [chartCreatedProjectsTotalsPlugin],
+                data: {
+                    labels: sortedCreationYears,
+                    datasets: datasetsCreated
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 10, weight: 'bold' }
+                            }
+                        },
+                        datalabels: { display: false } // Custom draw is used instead via plugin
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10, weight: 'bold' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(107, 124, 133, 0.12)' },
+                            ticks: {
+                                precision: 0,
+                                font: { size: 10 }
+                            },
+                            suggestedMax: (() => {
+                                let maxYearTotal = 0;
+                                sortedCreationYears.forEach(y => {
+                                    let yearSum = 0;
+                                    standardUnits.forEach(u => {
+                                        yearSum += countsByYearAndUnit[y][u] || 0;
+                                    });
+                                    if (yearSum > maxYearTotal) maxYearTotal = yearSum;
+                                });
+                                // Add buffer margin above to fit totals label clearly
+                                return maxYearTotal > 0 ? maxYearTotal * 1.3 : 5;
+                            })()
+                        }
+                    }
+                }
+            });
         }
 
         function processCSVRows(rows) {
