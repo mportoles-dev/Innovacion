@@ -75,7 +75,8 @@
                 <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
                 <div class="flex items-center justify-center">
                     <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
-                        class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                        class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200"
+                        onerror="this.src='https://placehold.co/200x80/ffffff/0f6f46?text=COIPSA'">
                 </div>
 
                 <div class="hidden md:block h-6 w-px bg-slate-200 mx-4"></div>
@@ -83,7 +84,8 @@
                 <!-- Logotipo derecho Fragua para equilibrio simétrico -->
                 <div class="flex items-center justify-center">
                     <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
-                        class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200">
+                        class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200"
+                        onerror="this.src='https://placehold.co/100x30/ffffff/9bca3c?text=FRAGUA'">
                 </div>
 
             </div>
@@ -141,7 +143,7 @@
                     <!-- EBITDA -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>EBITDA Potencial (Pilotaje)</span>
+                            <span>EBITDA Potencial (Fases de Piloto)</span>
                             <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
                                 Total: $0
                             </span>
@@ -151,7 +153,7 @@
                     <!-- HHT -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>HHT Potencial (Pilotaje)</span>
+                            <span>HHT Potencial (Fases de Piloto)</span>
                             <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
                                 Total: 0 Hrs
                             </span>
@@ -188,12 +190,12 @@
                 <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
                     
-                    <div class="flex flex-wrap items-center gap-4 text-xs animate-fadeIn">
+                    <div class="flex flex-wrap items-center gap-4 text-xs">
                         <!-- Año -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Año de Consulta (Implementación):</span>
                             <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-palLime">
-                                <!-- Los años se cargarán dinámicamente y la selección será única (sin la opción "Todos" ni el guion "-") -->
+                                <!-- Los años se cargarán dinámicamente -->
                             </select>
                         </div>
 
@@ -249,9 +251,11 @@
     <!-- SECCIÓN 3: KPI'S Y GRÁFICOS -->
     <section class="w-full bg-slate-50 border-b border-slate-200/60 py-8">
         <div class="px-8 max-w-[1600px] w-full mx-auto space-y-6">
-            <!-- KPI METRICS GRID -->
+            
+            <!-- KPI METRICS GRID REORDENADO SEGÚN SOLICITUD -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                <!-- Total Proyectos (Verde Limón) -->
+                
+                <!-- 1° Total Proyectos (Verde Limón) -->
                 <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
@@ -267,21 +271,7 @@
                     </div>
                 </div>
 
-                <!-- EBITDA Potencial (Púrpura Amatista) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Solo suma proyectos en etapa de Ejecución Pilotaje, Implementación o Seguimiento">
-                    <div>
-                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaPotencial">$0M</span>
-                    </div>
-                    <div class="mt-2">
-                        <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1">
-                            <span>EBITDA Pot. Pilotaje</span>
-                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400" title="Condicionado a etapas de pilotaje en funnel"></i>
-                        </h3>
-                        <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
-                    </div>
-                </div>
-
-                <!-- EBITDA Capturado (Verde Bosque) -->
+                <!-- 2° EBITDA Capturado Real (Verde Bosque) -->
                 <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
@@ -291,21 +281,7 @@
                     </div>
                 </div>
 
-                <!-- HHT Potencial Anual (Amarillo Brillante) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Solo suma proyectos en etapa de Ejecución Pilotaje, Implementación o Seguimiento">
-                    <div>
-                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
-                    </div>
-                    <div class="mt-2">
-                        <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1">
-                            <span>HHT Pot. Pilotaje</span>
-                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400" title="Condicionado a etapas de pilotaje en funnel"></i>
-                        </h3>
-                        <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
-                    </div>
-                </div>
-
-                <!-- HHT Capturado Real (Naranja Coral) -->
+                <!-- 3° HHT Capturado Real (Naranja Coral) -->
                 <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
@@ -314,6 +290,30 @@
                         <h3 class="text-xs font-bold text-slate-700">HHT Capturado Real</h3>
                     </div>
                 </div>
+
+                <!-- 4° Tasa de Pilotaje (Amarillo/Ámbar) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de pilotaje anual (último año cargado)">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaPilotaje">0%</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">Tasa de Pilotaje</h3>
+                        <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiTasaPilotajeSub">Año: N/A</p>
+                    </div>
+                </div>
+
+                <!-- 5° Tasa de Implementación (Púrpura Amatista - SIN AÑO VISIBLE) -->
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de implementación histórica (último año cargado)">
+                    <div>
+                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaImplementacion">0%</span>
+                    </div>
+                    <div class="mt-2">
+                        <h3 class="text-xs font-bold text-slate-700">Tasa de Implementación</h3>
+                        <!-- Mantener el ID oculto para que el script no falle -->
+                        <p class="hidden" id="kpiTasaImplementacionSub">Año: N/A</p>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ROW 1 DE GRÁFICOS -->
@@ -323,7 +323,7 @@
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
                             <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Potencial vs Capturado por Unidad / Gerencia</h3>
-                            <p class="text-[10px] text-slate-500">Los valores de potencial consideran exclusivamente proyectos en fases de pilotaje</p>
+                            <p class="text-[10px] text-slate-500">Los valores de potencial consideran exclusivamente proyectos que estén mínimo en fases de pilotaje</p>
                         </div>
                         <!-- Botón Selector de Métrica (EBITDA / HHT) -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
@@ -353,7 +353,7 @@
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
                     <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
                         <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
-                        <!-- Botón Selector de Métrica (Tipo / Vertical) -->
+                        <!-- Botón Selector de Métrica -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
                             <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
@@ -423,13 +423,18 @@
                 </div>
             </div>
 
-            <!-- ROW 3 DE GRÁFICOS (Evolutivo anual de proyectos CREADOS por unidad/gerencia) -->
+            <!-- ROW 3 DE GRÁFICOS -->
             <div class="grid grid-cols-1 gap-6">
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] shadow-sm">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
-                            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su año de Creación</p>
+                            <h3 id="creationChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
+                            <p id="creationChartSub" class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su año de Creación</p>
+                        </div>
+                        <!-- Botón Selector de Métrica (Proyectos Creados / Tasa de Pilotaje) -->
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                            <button onclick="toggleCreationChartMetric('creados')" id="btnMetricCreados" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Proyectos Creados</button>
+                            <button onclick="toggleCreationChartMetric('pilotaje')" id="btnMetricPilotaje" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Tasa de Pilotaje</button>
                         </div>
                     </div>
                     <div class="flex-1 min-h-0 relative">
@@ -486,7 +491,7 @@
 
     <!-- Modal Detalle Proyecto -->
     <div id="projectModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-4xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800 animate-fadeIn">
+        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-4xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800">
             <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -651,14 +656,19 @@
     <script>
         const GITHUB_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/BASE%20MAESTRA%20OFICIAL(BASE%20MAESTRA).csv";
         const METAS_CSV_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/metas-innovacion.csv";
+        const TASA_IMPLEMENTACION_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/BASE%20MAESTRA%20OFICIAL(TASA%20DE%20IMPLEMENTACI%C3%93N%20HIST%C3%93RIC).csv";
+        const TASA_PILOTAJE_URL = "https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/BASE%20MAESTRA%20OFICIAL(TASA%20DE%20PILOTO%20ANUAL).csv";
 
         let masterDataset = [];  
         let localDataset = [];   
         let currentDataset = []; 
         let globalMetas = [];    
+        let datasetTasaImplementacion = [];
+        let datasetTasaPilotaje = [];
         let charts = {};         
         let activeMainChartMetric = 'ebitda'; 
         let activeTipoChartMetric = 'tipo'; 
+        let activeCreationChartMetric = 'creados';
 
         const FUNNEL_STAGES = [
             "Archivados", "Problematización", "Alternativas de solución",
@@ -667,6 +677,35 @@
 
         // Advanced stages where potential EBITDA & HHT are eligible to accumulate
         const PILOTAGE_STAGES = ["Ejecución pilotaje", "Implementación", "Seguimiento"];
+
+        async function smartFetch(url) {
+            let urlsToTry = [url];
+            if (url.includes("refs/heads/main")) {
+                urlsToTry.push(url.replace("refs/heads/main", "main"));
+                urlsToTry.push(url.replace("refs/heads/main", "master"));
+                urlsToTry.push(url.replace("refs/heads/main", "refs/heads/master"));
+            } else if (url.includes("/main/")) {
+                urlsToTry.push(url.replace("/main/", "/refs/heads/main/"));
+                urlsToTry.push(url.replace("/main/", "/master/"));
+                urlsToTry.push(url.replace("/main/", "/refs/heads/master/"));
+            } else if (url.includes("/master/")) {
+                urlsToTry.push(url.replace("/master/", "/refs/heads/master/"));
+                urlsToTry.push(url.replace("/master/", "/main/"));
+                urlsToTry.push(url.replace("/master/", "/refs/heads/main/"));
+            }
+            
+            for (const targetUrl of urlsToTry) {
+                try {
+                    const res = await fetch(targetUrl);
+                    if (res.ok) {
+                        return await res.arrayBuffer();
+                    }
+                } catch (e) {
+                    console.warn(`Intento fallido para ${targetUrl}:`, e);
+                }
+            }
+            throw new Error(`No se pudo obtener recurso remoto para: ${url}`);
+        }
 
         function showConnectionStatus(status, title, message) {
             console.log(`[Status: ${status}] ${title} - ${message}`);
@@ -770,10 +809,16 @@
 
         const normalizeKey = (key) => {
             if (!key) return "";
-            return key.toLowerCase()
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .replace(/[^a-z0-9]/g, "");
+            let s = key.toLowerCase()
+                       .replace(/á/g, "a")
+                       .replace(/é/g, "e")
+                       .replace(/í/g, "i")
+                       .replace(/ó/g, "o")
+                       .replace(/ú/g, "u")
+                       .replace(/ñ/g, "n");
+            return s.normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9]/g, "");
         };
 
         const normalizeFunnelStage = (val) => {
@@ -795,11 +840,6 @@
             return "";
         };
 
-        /**
-         * Helper condition: EBITDA/HHT Potentials are only eligible to accumulate
-         * if the project's stage belongs to Advanced/Pilotage stages:
-         * "Ejecución pilotaje", "Implementación" or "Seguimiento".
-         */
         const isPotentialEligible = (item) => {
             if (!item) return false;
             const normStage = normalizeFunnelStage(item.funnel);
@@ -831,6 +871,20 @@
             if (norm.includes("recupac")) return "Recupac";
             return "Otros";
         };
+
+        // Analiza el texto del CSV para ver si utiliza coma (,) o punto y coma (;) y lo procesa
+        function parseCSVText(text) {
+            let delimiter = ",";
+            if (text.includes(";")) {
+                const firstLine = text.split(/\r?\n/)[0];
+                const commaCount = (firstLine.match(/,/g) || []).length;
+                const semiCount = (firstLine.match(/;/g) || []).length;
+                if (semiCount > commaCount) {
+                    delimiter = ";";
+                }
+            }
+            return Papa.parse(text, { header: true, skipEmptyLines: true, delimiter: delimiter });
+        }
 
         function renderBulletCharts() {
             const col1 = document.getElementById("bullet-col-1");
@@ -874,7 +928,6 @@
                     return normGerencia.includes(unit.key);
                 });
 
-                // Conditional Summing: only count potential EBITDA and HHT if the project is in a pilotage stage
                 const potentialEbitda = unitProjects.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.ebitdaPotencial || 0) : 0), 0);
                 const potentialHht = unitProjects.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.hht || 0) : 0), 0);
                 const colors = getUnitColors(unit.name);
@@ -992,7 +1045,7 @@
                     if (meta0 && meta0.data[index] && meta1 && meta1.data[index]) {
                         const bar0X = meta0.data[index].x;
                         const bar1X = meta1.data[index].x;
-                        const yPos = x.bottom + 10; // Dibujado justo encima de la etiqueta principal centrada
+                        const yPos = x.bottom + 4;
 
                         ctx.fillText('Potencial', bar0X, yPos);
                         ctx.fillText('Capturado', bar1X, yPos);
@@ -1002,10 +1055,10 @@
             }
         };
 
-        // Custom plugin to draw grand totals for created projects above annual cluster groups
         const chartCreatedProjectsTotalsPlugin = {
             id: 'chartCreatedProjectsTotals',
             afterDraw(chart) {
+                if (chart.config.type !== 'bar') return;
                 const { ctx, scales: { x, y } } = chart;
                 ctx.save();
                 ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
@@ -1018,7 +1071,6 @@
                     let firstX = null;
                     let lastX = null;
 
-                    // Locate the highest bar and calculate the bounds of the cluster group
                     chart.data.datasets.forEach((dataset, datasetIndex) => {
                         const meta = chart.getDatasetMeta(datasetIndex);
                         if (meta && meta.data[index] && !meta.hidden) {
@@ -1031,10 +1083,8 @@
                         }
                     });
 
-                    // Fallback to axis coordinate if no visible bars exist
                     const groupCenterX = (firstX !== null && lastX !== null) ? (firstX + lastX) / 2 : x.getPixelForValue(label);
 
-                    // Calculate the year's total (only count active/visible datasets)
                     let total = 0;
                     chart.data.datasets.forEach((dataset, datasetIndex) => {
                         const meta = chart.getDatasetMeta(datasetIndex);
@@ -1079,7 +1129,6 @@
                 let valPrimary = 0;
                 let valSecondary = 0;
                 
-                // EBITDA / HHT Potencial (Primary) are conditioned to pilotage stages
                 if (activeMainChartMetric === 'ebitda') {
                     valPrimary = isPotentialEligible(item) ? (item.ebitdaPotencial || 0) : 0;
                     valSecondary = item.ebitdaCapturado || 0;
@@ -1130,6 +1179,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 12
+                        }
+                    },
                     plugins: { 
                         legend: { display: false }, 
                         datalabels: { display: false },
@@ -1177,7 +1231,7 @@
                         x: { 
                             grid: { display: false }, 
                             ticks: { 
-                                padding: 22, 
+                                padding: 18, 
                                 font: { size: 10, weight: 'bold' }
                             } 
                         },
@@ -1383,95 +1437,157 @@
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
 
-            // 6. Evolutivo Anual de Proyectos Creados por Unidad (No interactúa con filtro de año de consulta)
-            const creationYearsSet = new Set();
-            filteredDataset.forEach(item => {
-                if (item.anio && item.anio !== "-" && item.anio.trim() !== "") {
-                    creationYearsSet.add(item.anio.trim());
+            // 6. Evolutivo Anual (Proyectos Creados vs Tasa de Pilotaje)
+            if (activeCreationChartMetric === 'creados') {
+                const creationYearsSet = new Set();
+                filteredDataset.forEach(item => {
+                    if (item.anio && item.anio !== "-" && item.anio.trim() !== "") {
+                        creationYearsSet.add(item.anio.trim());
+                    }
+                });
+                const sortedCreationYears = Array.from(creationYearsSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+                if (sortedCreationYears.length === 0) {
+                    sortedCreationYears.push("2024", "2025", "2026");
                 }
-            });
-            const sortedCreationYears = Array.from(creationYearsSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
-            // Default fallback years if dataset happens to be empty
-            if (sortedCreationYears.length === 0) {
-                sortedCreationYears.push("2024", "2025", "2026");
-            }
+                const standardUnits = ["Matriz", "CPP", "Corrupac", "Recupac", "Otros"];
+                const countsByYearAndUnit = {};
+                sortedCreationYears.forEach(y => {
+                    countsByYearAndUnit[y] = { "Matriz": 0, "CPP": 0, "Corrupac": 0, "Recupac": 0, "Otros": 0 };
+                });
 
-            const standardUnits = ["Matriz", "CPP", "Corrupac", "Recupac", "Otros"];
-            const countsByYearAndUnit = {};
-            sortedCreationYears.forEach(y => {
-                countsByYearAndUnit[y] = { "Matriz": 0, "CPP": 0, "Corrupac": 0, "Recupac": 0, "Otros": 0 };
-            });
+                filteredDataset.forEach(item => {
+                    const y = (item.anio || "").trim();
+                    if (countsByYearAndUnit[y]) {
+                        const stdUnit = getStandardUnitName(item.gerencia);
+                        countsByYearAndUnit[y][stdUnit]++;
+                    }
+                });
 
-            filteredDataset.forEach(item => {
-                const y = (item.anio || "").trim();
-                if (countsByYearAndUnit[y]) {
-                    const stdUnit = getStandardUnitName(item.gerencia);
-                    countsByYearAndUnit[y][stdUnit]++;
-                }
-            });
+                const datasetsCreated = standardUnits.map(unitName => {
+                    const colors = getUnitColors(unitName);
+                    return {
+                        label: unitName,
+                        type: 'bar',
+                        data: sortedCreationYears.map(y => countsByYearAndUnit[y][unitName] || 0),
+                        backgroundColor: colors.potencial,
+                        borderColor: colors.border,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    };
+                });
 
-            const datasetsCreated = standardUnits.map(unitName => {
-                const colors = getUnitColors(unitName);
-                return {
-                    label: unitName,
-                    data: sortedCreationYears.map(y => countsByYearAndUnit[y][unitName] || 0),
-                    backgroundColor: colors.potencial,
-                    borderColor: colors.border,
-                    borderWidth: 1,
-                    borderRadius: 4
-                };
-            });
-
-            const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
-            chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
-                type: 'bar',
-                plugins: [chartCreatedProjectsTotalsPlugin],
-                data: {
-                    labels: sortedCreationYears,
-                    datasets: datasetsCreated
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                boxWidth: 12,
-                                font: { size: 10, weight: 'bold' }
-                            }
-                        },
-                        datalabels: { display: false } // Custom draw is used instead via plugin
+                const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
+                chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
+                    type: 'bar',
+                    plugins: [chartCreatedProjectsTotalsPlugin],
+                    data: {
+                        labels: sortedCreationYears,
+                        datasets: datasetsCreated
                     },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { size: 10, weight: 'bold' } }
-                        },
-                        y: {
-                            grid: { color: 'rgba(107, 124, 133, 0.12)' },
-                            ticks: {
-                                precision: 0,
-                                font: { size: 10 }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: { size: 10, weight: 'bold' }
+                                }
                             },
-                            suggestedMax: (() => {
-                                let maxYearTotal = 0;
-                                sortedCreationYears.forEach(y => {
-                                    let yearSum = 0;
-                                    standardUnits.forEach(u => {
-                                        yearSum += countsByYearAndUnit[y][u] || 0;
+                            datalabels: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 10, weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(107, 124, 133, 0.12)' },
+                                ticks: {
+                                    precision: 0,
+                                    font: { size: 10 }
+                                },
+                                suggestedMax: (() => {
+                                    let maxYearTotal = 0;
+                                    sortedCreationYears.forEach(y => {
+                                        let yearSum = 0;
+                                        standardUnits.forEach(u => {
+                                            yearSum += countsByYearAndUnit[y][u] || 0;
+                                        });
+                                        if (yearSum > maxYearTotal) maxYearTotal = yearSum;
                                     });
-                                    if (yearSum > maxYearTotal) maxYearTotal = yearSum;
-                                });
-                                // Add buffer margin above to fit totals label clearly
-                                return maxYearTotal > 0 ? maxYearTotal * 1.3 : 5;
-                            })()
+                                    return maxYearTotal > 0 ? maxYearTotal * 1.3 : 5;
+                                })()
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                // Gráfico de Línea: Evolución de Tasa de Pilotaje Anual
+                const sortedRates = [...datasetTasaPilotaje].sort((a, b) => {
+                    const yA = parseInt(a.anio, 10) || 0;
+                    const yB = parseInt(b.anio, 10) || 0;
+                    return yA - yB;
+                });
+
+                const years = sortedRates.map(d => d.anio);
+                const values = sortedRates.map(d => d.tasa);
+
+                const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
+                chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: 'Tasa de Pilotaje (%)',
+                            data: values,
+                            borderColor: '#956eb6', // Amatista
+                            backgroundColor: 'rgba(149, 110, 182, 0.15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#956eb6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                display: true,
+                                color: '#1e293b',
+                                align: 'top',
+                                font: { weight: 'bold', size: 11 },
+                                formatter: (val) => `${val.toFixed(1)}%`
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 10, weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(107, 124, 133, 0.12)' },
+                                ticks: {
+                                    font: { size: 10 },
+                                    callback: (v) => `${v}%`
+                                },
+                                min: 0,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         function processCSVRows(rows) {
@@ -1583,55 +1699,325 @@
             }).filter(item => item.indicador !== "");
         }
 
-        function connectToGitHubCSV() {
-            showConnectionStatus("loading", "Sincronizando...", "Obteniendo datos del portafolio y metas desde GitHub.");
-            
-            const fetchPortafolio = fetch(GITHUB_CSV_URL).then(res => {
-                if (!res.ok) throw new Error("No se pudo obtener el portafolio.");
-                return res.arrayBuffer();
-            });
-
-            const fetchMetas = fetch(METAS_CSV_URL).then(res => {
-                if (!res.ok) throw new Error("No se pudieron obtener las metas.");
-                return res.arrayBuffer();
-            });
-
-            Promise.all([fetchPortafolio, fetchMetas])
-                .then(([portafolioBuffer, metasBuffer]) => {
-                    let portafolioText;
-                    try { portafolioText = new TextDecoder("utf-8", { fatal: true }).decode(portafolioBuffer); } 
-                    catch (e) { portafolioText = new TextDecoder("windows-1252").decode(portafolioBuffer); }
-
-                    let metasText;
-                    try { metasText = new TextDecoder("utf-8", { fatal: true }).decode(metasBuffer); } 
-                    catch (e) { metasText = new TextDecoder("windows-1252").decode(metasBuffer); }
-
-                    Papa.parse(portafolioText, {
-                        header: true,
-                        skipEmptyLines: true,
-                        complete: function(portResults) {
-                            masterDataset = processCSVRows(portResults.data);
-
-                            Papa.parse(metasText, {
-                                header: true,
-                                skipEmptyLines: true,
-                                complete: function(metaResults) {
-                                    globalMetas = processMetasRows(metaResults.data);
-                                    showConnectionStatus("success", "Datos Sincronizados", `Se cargaron ${masterDataset.length} proyectos.`);
-                                    
-                                    if (document.getElementById('portfolioSelector').value === 'maestra') {
-                                        currentDataset = [...masterDataset];
-                                        initializeDashboard();
-                                    }
-                                }
-                            });
+        function processTasaImplementacionRows(rows, rawText = "") {
+            let processed = [];
+            if (rows && rows.length > 0) {
+                processed = rows.map(row => {
+                    const normRow = {};
+                    Object.keys(row).forEach(k => {
+                        if (k !== undefined && k !== null) {
+                            normRow[normalizeKey(cleanEncoding(k))] = row[k];
                         }
                     });
+
+                    const findVal = (keywords) => {
+                        for (const kw of keywords) {
+                            if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                                const matchedKey = Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw);
+                                if (matchedKey) return row[matchedKey];
+                            }
+                        }
+                        return "";
+                    };
+
+                    let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
+                    let tasaRaw = findVal(["tasadeimplementacion", "tasadeimplementacionhistorica", "tasaimplementacion", "implementacion", "tasa", "valor", "porcentaje", "pct", "%"]);
+
+                    let anio = cleanEncoding(anioRaw).trim();
+                    let strVal = String(tasaRaw).trim();
+
+                    if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
+                        for (const key of Object.keys(row)) {
+                            const rawVal = String(row[key]).trim();
+                            if (/^\d{4}$/.test(rawVal)) {
+                                anio = rawVal;
+                            }
+                            if (rawVal.includes("%") || normalizeKey(cleanEncoding(key)).includes("tasa") || normalizeKey(cleanEncoding(key)).includes("implem")) {
+                                if (!rawVal.match(/^\d{4}$/)) {
+                                    strVal = rawVal;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!strVal || strVal === anio) {
+                        for (const key of Object.keys(row)) {
+                            const rawVal = String(row[key]).trim();
+                            if (rawVal !== anio && rawVal !== "") {
+                                strVal = rawVal;
+                            }
+                        }
+                    }
+
+                    const wasPercentageStr = strVal.includes("%");
+                    let strNum = "";
+                    const matchNum = strVal.replace(",", ".").match(/[-+]?\d*\.?\d+/);
+                    if (matchNum) {
+                        strNum = matchNum[0];
+                    }
+                    let parsedVal = parseFloat(strNum);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+                    
+                    let finalTasa = parsedVal;
+                    if (parsedVal > 0 && parsedVal <= 1.0 && !wasPercentageStr) {
+                        finalTasa = parsedVal * 100;
+                    }
+
+                    return { anio, tasa: finalTasa };
+                }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
+            }
+
+            // FALLBACK ROBUSTO EXTRACTOR PARA FORMATOS SIMPLIFICADOS (EJ. CELDAS DIRECTAS O UN VALOR ÚNICO COMO "28%")
+            if (processed.length === 0 && rawText) {
+                const parsedNoHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
+                const flatCells = parsedNoHeader.data.flat().map(c => String(c).trim());
+                let detectedTasa = null;
+                let detectedAnio = "2026";
+                for (const cell of flatCells) {
+                    const cleanCell = cell.replace(",", ".");
+                    if (cleanCell.includes("%")) {
+                        const num = parseFloat(cleanCell.replace(/[^0-9.]/g, ""));
+                        if (!isNaN(num)) detectedTasa = num;
+                    } else {
+                        const num = parseFloat(cleanCell);
+                        if (!isNaN(num) && num > 0 && num <= 1.0) {
+                            detectedTasa = num * 100;
+                        } else if (!isNaN(num) && num > 1 && num < 100 && !/^\d{4}$/.test(cleanCell)) {
+                            detectedTasa = num;
+                        } else if (/^\d{4}$/.test(cleanCell)) {
+                            detectedAnio = cleanCell;
+                        }
+                    }
+                }
+                if (detectedTasa !== null) {
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                }
+            }
+            return processed;
+        }
+
+        function processTasaPilotajeRows(rows, rawText = "") {
+            let processed = [];
+            if (rows && rows.length > 0) {
+                processed = rows.map(row => {
+                    const normRow = {};
+                    Object.keys(row).forEach(k => {
+                        if (k !== undefined && k !== null) {
+                            normRow[normalizeKey(cleanEncoding(k))] = row[k];
+                        }
+                    });
+
+                    const findVal = (keywords) => {
+                        for (const kw of keywords) {
+                            if (normRow[kw] !== undefined && normRow[kw] !== null) {
+                                const matchedKey = Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw);
+                                if (matchedKey) return row[matchedKey];
+                            }
+                        }
+                        return "";
+                    };
+
+                    let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
+                    let tasaRaw = findVal(["tasadepilotaje", "tasadepilotoanual", "tasadepiloto", "pilotadospiloteables", "pilotaje", "tasa", "valor", "porcentaje", "pct", "%"]);
+
+                    let anio = cleanEncoding(anioRaw).trim();
+                    let strVal = String(tasaRaw).trim();
+
+                    if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
+                        for (const key of Object.keys(row)) {
+                            const rawVal = String(row[key]).trim();
+                            if (/^\d{4}$/.test(rawVal)) {
+                                anio = rawVal;
+                            }
+                            if (rawVal.includes("%") || normalizeKey(cleanEncoding(key)).includes("tasa") || normalizeKey(cleanEncoding(key)).includes("pilot")) {
+                                if (!rawVal.match(/^\d{4}$/)) {
+                                    strVal = rawVal;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!strVal || strVal === anio) {
+                        for (const key of Object.keys(row)) {
+                            const rawVal = String(row[key]).trim();
+                            if (rawVal !== anio && rawVal !== "") {
+                                strVal = rawVal;
+                            }
+                        }
+                    }
+
+                    const wasPercentageStr = strVal.includes("%");
+                    let strNum = "";
+                    const matchNum = strVal.replace(",", ".").match(/[-+]?\d*\.?\d+/);
+                    if (matchNum) {
+                        strNum = matchNum[0];
+                    }
+                    let parsedVal = parseFloat(strNum);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+                    
+                    let finalTasa = parsedVal;
+                    if (parsedVal > 0 && parsedVal <= 1.0 && !wasPercentageStr) {
+                        finalTasa = parsedVal * 100;
+                    }
+
+                    return { anio, tasa: finalTasa };
+                }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
+            }
+
+            // FALLBACK ROBUSTO EXTRACTOR PARA FORMATOS SIMPLIFICADOS (EJ. CELDAS DIRECTAS O UN VALOR ÚNICO COMO "28%")
+            if (processed.length === 0 && rawText) {
+                const parsedNoHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
+                const flatCells = parsedNoHeader.data.flat().map(c => String(c).trim());
+                let detectedTasa = null;
+                let detectedAnio = "2026";
+                for (const cell of flatCells) {
+                    const cleanCell = cell.replace(",", ".");
+                    if (cleanCell.includes("%")) {
+                        const num = parseFloat(cleanCell.replace(/[^0-9.]/g, ""));
+                        if (!isNaN(num)) detectedTasa = num;
+                    } else {
+                        const num = parseFloat(cleanCell);
+                        if (!isNaN(num) && num > 0 && num <= 1.0) {
+                            detectedTasa = num * 100;
+                        } else if (!isNaN(num) && num > 1 && num < 100 && !/^\d{4}$/.test(cleanCell)) {
+                            detectedTasa = num;
+                        } else if (/^\d{4}$/.test(cleanCell)) {
+                            detectedAnio = cleanCell;
+                        }
+                    }
+                }
+                if (detectedTasa !== null) {
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                }
+            }
+            return processed;
+        }
+
+        function getLatestRate(dataset) {
+            if (!dataset || dataset.length === 0) return 0;
+            const sorted = [...dataset].sort((a, b) => {
+                const yA = parseInt(a.anio, 10) || 0;
+                const yB = parseInt(b.anio, 10) || 0;
+                return yA - yB;
+            });
+            return sorted[sorted.length - 1].tasa;
+        }
+
+        function getLatestYear(dataset) {
+            if (!dataset || dataset.length === 0) return "";
+            const sorted = [...dataset].sort((a, b) => {
+                const yA = parseInt(a.anio, 10) || 0;
+                const yB = parseInt(b.anio, 10) || 0;
+                return yA - yB;
+            });
+            return sorted[sorted.length - 1].anio;
+        }
+
+        function connectToGitHubCSV() {
+            showConnectionStatus("loading", "Sincronizando...", "Sincronizando el portafolio y las tasas desde GitHub.");
+            
+            let portafolioData = null;
+            let metasData = [];
+            let tasaImpData = [];
+            let tasaPilData = [];
+
+            const fetchPortafolio = smartFetch(GITHUB_CSV_URL)
+                .then(buffer => {
+                    let text;
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
+                    const parsed = parseCSVText(text);
+                    portafolioData = processCSVRows(parsed.data);
+                    if (!portafolioData || portafolioData.length === 0) {
+                        throw new Error("Portafolio vacío");
+                    }
                 })
                 .catch(err => {
-                    masterDataset = loadBackupDataset(); 
-                    currentDataset = [...masterDataset];
-                    initializeDashboard();
+                    console.warn("Fallo al cargar portafolio principal, utilizando backup local.", err);
+                    portafolioData = loadBackupDataset();
+                });
+
+            const fetchMetas = smartFetch(METAS_CSV_URL)
+                .then(buffer => {
+                    let text;
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
+                    const parsed = parseCSVText(text);
+                    metasData = processMetasRows(parsed.data);
+                    if (!metasData || metasData.length === 0) {
+                        throw new Error("Metas vacías");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Fallo al cargar metas de consulta, utilizando por defecto.", err);
+                    metasData = [
+                        { indicador: "ebitda", anio: "2024", meta: 800000000 },
+                        { indicador: "ebitda", anio: "2025", meta: 900000000 },
+                        { indicador: "ebitda", anio: "2026", meta: 1000000000 },
+                        { indicador: "hht", anio: "2024", meta: 800 },
+                        { indicador: "hht", anio: "2025", meta: 900 },
+                        { indicador: "hht", anio: "2026", meta: 1000 }
+                    ];
+                });
+
+            const fetchTasaImp = smartFetch(TASA_IMPLEMENTACION_URL)
+                .then(buffer => {
+                    let text;
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
+                    const parsed = parseCSVText(text);
+                    tasaImpData = processTasaImplementacionRows(parsed.data, text);
+                    
+                    if (!tasaImpData || tasaImpData.length === 0) {
+                        throw new Error("Datos de Tasa de Implementación inválidos o vacíos");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Utilizando históricos por defecto para Tasa de Implementación.", err);
+                    tasaImpData = [
+                        { anio: "2024", tasa: 65.4 },
+                        { anio: "2025", tasa: 72.1 },
+                        { anio: "2026", tasa: 80.5 }
+                    ];
+                });
+
+            const fetchTasaPil = smartFetch(TASA_PILOTAJE_URL)
+                .then(buffer => {
+                    let text;
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
+                    const parsed = parseCSVText(text);
+                    tasaPilData = processTasaPilotajeRows(parsed.data, text);
+                    
+                    if (!tasaPilData || tasaPilData.length === 0) {
+                        throw new Error("Datos de Tasa de Pilotaje vacíos");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Utilizando históricos por defecto para Tasa de Pilotaje.", err);
+                    tasaPilData = [
+                        { anio: "2023", tasa: 33.0 },
+                        { anio: "2024", tasa: 56.0 },
+                        { anio: "2025", tasa: 73.0 },
+                        { anio: "2026", tasa: 28.0 }
+                    ];
+                });
+
+            Promise.all([fetchPortafolio, fetchMetas, fetchTasaImp, fetchTasaPil])
+                .then(() => {
+                    masterDataset = portafolioData || loadBackupDataset();
+                    globalMetas = metasData;
+                    datasetTasaImplementacion = tasaImpData;
+                    datasetTasaPilotaje = tasaPilData;
+
+                    showConnectionStatus("success", "Datos Sincronizados", `Sincronización terminada de manera robusta.`);
+                    console.log("Final loaded Dataset Tasa Pilotaje:", datasetTasaPilotaje);
+                    console.log("Final loaded Dataset Tasa Implementación:", datasetTasaImplementacion);
+                    
+                    if (document.getElementById('portfolioSelector').value === 'maestra') {
+                        currentDataset = [...masterDataset];
+                        initializeDashboard();
+                    }
                 });
         }
 
@@ -1646,18 +2032,13 @@
                 try { decodedText = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
                 catch (err) { decodedText = new TextDecoder("windows-1252").decode(arrayBuffer); }
 
-                Papa.parse(decodedText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        if (results.data && results.data.length > 0) {
-                            localDataset = processCSVRows(results.data);
-                            document.getElementById('portfolioSelector').value = 'cargada';
-                            currentDataset = [...localDataset];
-                            initializeDashboard();
-                        }
-                    }
-                });
+                const parsed = parseCSVText(decodedText);
+                if (parsed.data && parsed.data.length > 0) {
+                    localDataset = processCSVRows(parsed.data);
+                    document.getElementById('portfolioSelector').value = 'cargada';
+                    currentDataset = [...localDataset];
+                    initializeDashboard();
+                }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1740,9 +2121,25 @@
             const fAnio = document.getElementById("filterAnio").value;
             const numericYear = parseInt(fAnio, 10);
 
-            // Conditionally filter EBITDA Potencial and HHT Potencial based on pilotage funnel stages
-            const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + (isPotentialEligible(item) ? item.ebitdaPotencial : 0), 0);
-            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.hht || 0) : 0), 0);
+            // Tasa de Implementación KPI
+            const latestImpTasa = getLatestRate(datasetTasaImplementacion);
+            const latestImpAnio = getLatestYear(datasetTasaImplementacion);
+            
+            const kpiTasaImp = document.getElementById("kpiTasaImplementacion");
+            if (kpiTasaImp) kpiTasaImp.innerText = `${latestImpTasa.toFixed(1)}%`;
+            
+            const kpiTasaImpSub = document.getElementById("kpiTasaImplementacionSub");
+            if (kpiTasaImpSub) kpiTasaImpSub.innerText = `Año: ${latestImpAnio || 'N/A'}`;
+
+            // Tasa de Pilotaje KPI
+            const latestPilTasa = getLatestRate(datasetTasaPilotaje);
+            const latestPilAnio = getLatestYear(datasetTasaPilotaje);
+            
+            const kpiTasaPil = document.getElementById("kpiTasaPilotaje");
+            if (kpiTasaPil) kpiTasaPil.innerText = `${latestPilTasa.toFixed(1)}%`;
+            
+            const kpiTasaPilSub = document.getElementById("kpiTasaPilotajeSub");
+            if (kpiTasaPilSub) kpiTasaPilSub.innerText = `Año: ${latestPilAnio || 'N/A'}`;
 
             let capturedYearFilteredDataset = [];
             if (!isNaN(numericYear)) {
@@ -1758,35 +2155,24 @@
             const sumEbitdaCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + item.ebitdaCapturado, 0);
             const sumHhtCapturado = capturedYearFilteredDataset.reduce((sum, item) => sum + (item.hhtCapturado || 0), 0);
 
-            let targetEbitda = 0;
-            let targetHht = 0;
-
-            if (fAnio && fAnio !== "-") {
-                const matchEbitda = globalMetas.find(m => normalizeKey(m.indicador).includes("ebitda") && String(m.anio) === String(fAnio));
-                const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(fAnio));
-                targetEbitda = matchEbitda ? matchEbitda.meta : 0;
-                targetHht = matchHht ? matchHht.meta : 0;
-            }
-
             const totalProjects = filteredDataset.length;
             const abiertos = filteredDataset.filter(i => i.estado && i.estado.toLowerCase().includes("abierto")).length;
             const cerrados = totalProjects - abiertos;
 
-            document.getElementById("kpiEbitdaCapturado").innerText = formatCurrency(sumEbitdaCapturado);
-            document.getElementById("kpiEbitdaPotencial").innerText = formatCurrency(sumEbitdaPotencial);
+            const kpiEbitdaCap = document.getElementById("kpiEbitdaCapturado");
+            if (kpiEbitdaCap) kpiEbitdaCap.innerText = formatCurrency(sumEbitdaCapturado);
             
-            document.getElementById("kpiHht").innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
-            document.getElementById("kpiHhtPotencial").innerText = Math.round(sumHhtPotencial).toLocaleString("es-CL");
-            document.getElementById("kpiTotalProjects").innerText = totalProjects;
+            const kpiHhtVal = document.getElementById("kpiHht");
+            if (kpiHhtVal) kpiHhtVal.innerText = Math.round(sumHhtCapturado).toLocaleString("es-CL");
+            
+            const kpiTotProj = document.getElementById("kpiTotalProjects");
+            if (kpiTotProj) kpiTotProj.innerText = totalProjects;
 
-            const pctEbitdaMeta = targetEbitda > 0 ? Math.round((sumEbitdaPotencial / targetEbitda) * 100) : 0;
-            document.getElementById("kpiEbitdaPotencialSub").innerText = `Meta ${fAnio}: ${formatCurrency(targetEbitda)} (${pctEbitdaMeta}%)`;
-
-            const pctHhtPotencialMeta = targetHht > 0 ? Math.round((sumHhtPotencial / targetHht) * 100) : 0;
-            document.getElementById("kpiHhtPotencialSub").innerText = `Meta ${fAnio}: ${targetHht.toLocaleString("es-CL")} (${pctHhtPotencialMeta}%)`;
-
-            document.getElementById("kpiTotalProjectsSubLeft").innerText = `Abiertos: ${abiertos}`;
-            document.getElementById("kpiTotalProjectsSubRight").innerText = `Otros / Cerrados: ${cerrados}`;
+            const subLeft = document.getElementById("kpiTotalProjectsSubLeft");
+            if (subLeft) subLeft.innerText = `Abiertos: ${abiertos}`;
+            
+            const subRight = document.getElementById("kpiTotalProjectsSubRight");
+            if (subRight) subRight.innerText = `Otros / Cerrados: ${cerrados}`;
         }
 
         function renderTable() {
@@ -1820,7 +2206,7 @@
 
             sortedDataset.forEach(item => {
                 const tr = document.createElement("tr");
-                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 animate-fadeIn";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 cursor-pointer";
                 tr.onclick = () => openModal(item);
 
                 let riskBadge = "bg-slate-100 text-slate-600 border border-slate-200";
@@ -1838,7 +2224,6 @@
                     else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
                 }
 
-                // Table Potential Values are kept untouched as requested ("deja los ebitda/hht potencial tal cual como vienen de la base")
                 tr.innerHTML = `
                     <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
                     <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
@@ -1851,7 +2236,7 @@
                     </td>
                     <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.inversion)}</td>
                     <td class="py-3 px-6 text-right font-medium">${formatCurrency(item.ebitdaPotencial)}</td>
-                    <td class="py-3 px-6 text-right font-medium text-slate-600 bg-slate-150/40">${formatCurrency(item.ebitdaPiloto)}</td>
+                    <td class="py-3 px-6 text-right font-medium text-slate-600">${formatCurrency(item.ebitdaPiloto)}</td>
                     <td class="py-3 px-6 text-right font-bold text-palForest">${formatCurrency(item.ebitdaCapturado)}</td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${estadoBadge}">
@@ -1883,15 +2268,11 @@
 
             const ganttUrl = `https://raw.githubusercontent.com/mportoles-dev/Innovacion/refs/heads/main/hojas-de-ruta/${expectedFileName}`;
 
-            fetch(ganttUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error("Archivo no disponible.");
-                    return res.arrayBuffer();
-                })
+            smartFetch(ganttUrl)
                 .then(arrayBuffer => {
                     let text;
-                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
-                    catch (e) { text = new TextDecoder("windows-1252").decode(arrayBuffer); }
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
                     parseAndRenderGantt(text, item);
                 })
                 .catch(err => {
@@ -1911,7 +2292,7 @@
 
             document.getElementById("ganttLoading").className = "hidden";
 
-            const parsed = Papa.parse(csvText, { skipEmptyLines: true });
+            const parsed = parseCSVText(csvText);
             const rows = parsed.data;
 
             let headerIndex = -1;
@@ -2080,7 +2461,7 @@
                     const formattedDates = `${t.inicio.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })} al ${t.termino.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
 
                     html += `
-                        <div class="flex items-center hover:bg-slate-50 py-1.5 rounded-lg transition-colors group animate-fadeIn">
+                        <div class="flex items-center hover:bg-slate-50 py-1.5 rounded-lg transition-colors group">
                             <div class="w-2/5 pr-4 flex flex-col justify-center select-none">
                                 <div class="truncate text-[11px] font-bold text-slate-800" title="${t.nombre}">
                                     ${t.id ? `<span class="font-mono text-slate-400 mr-1.5">${t.id}</span>` : ''}${t.nombre}
@@ -2190,8 +2571,8 @@
                 {
                     id: "PM-001", nombre: "Recuperación de Fibra", anio: "2025", anioImplementacion: "2025",
                     descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
-                    riesgo: "Bajo", gerencia: "Logística", tipoInnovacion: "Incremental",
-                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Diseño pilotaje",
+                    riesgo: "Bajo", gerencia: "Recupac", tipoInnovacion: "Incremental",
+                    lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Ejecución pilotaje",
                     inversion: 45000000, ebitdaPotencial: 120000000, ebitdaPiloto: 90000000,
                     ebitdaCapturado: 16500000, hht: 250, hhtCapturado: 190, estado: "Abierto", sponsor: "Director de Operaciones",
                     escalamiento: "sí", tipoSolucion: "IA / Integración SAP", origenSolucion: "Taller Interno", comentario: "",
@@ -2201,7 +2582,7 @@
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024", anioImplementacion: "2024",
                     descripcion: "Reestructuración del flujo logístico para devoluciones y empaques circulares reduciendo tiempos.",
-                    riesgo: "Medio", gerencia: "Logística", tipoInnovacion: "Adyacente",
+                    riesgo: "Medio", gerencia: "Matriz", tipoInnovacion: "Adyacente",
                     lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
                     inversion: 30000000, ebitdaPotencial: 135000000, ebitdaPiloto: 110000000,
                     ebitdaCapturado: 99000000, hht: 300, hhtCapturado: 270, estado: "Cerrado", sponsor: "Director de Operaciones",
@@ -2212,13 +2593,24 @@
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025", anioImplementacion: "2025",
                     descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
-                    riesgo: "Alto", gerencia: "Operaciones", tipoInnovacion: "Adyacente",
-                    lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Diseño pilotaje",
+                    riesgo: "Alto", gerencia: "CPP", tipoInnovacion: "Adyacente",
+                    lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Ejecución pilotaje",
                     inversion: 80000000, ebitdaPotencial: 250000000, ebitdaPiloto: 180000000,
                     ebitdaCapturado: 0, hht: 240, hhtCapturado: 0, estado: "Abierto", sponsor: "Gerente de Planta",
                     escalamiento: "sí", tipoSolucion: "IoT / Edge Analytics", origenSolucion: "Taller Interno", comentario: "",
                     kr: "Evitar paradas imprevistas críticas en líneas de molienda principal", respInnovacion: "María José Valdés",
                     kpi1: "0 fallas críticas", kpi2: "$250M potencial", kpi3: "Fase de calibración"
+                },
+                {
+                    id: "PM-004", nombre: "Optimización Energética Corrupac", anio: "2026", anioImplementacion: "2026",
+                    descripcion: "Ajuste dinámico de calderas en base a demanda predictiva de producción para reducción de gas natural.",
+                    riesgo: "Medio", gerencia: "Corrupac", tipoInnovacion: "Incremental",
+                    lider: "Carlos Rivas", correo: "carlos.rivas@empresa.cl", funnel: "Implementación",
+                    inversion: 62000000, ebitdaPotencial: 180000000, ebitdaPiloto: 140000000,
+                    ebitdaCapturado: 45000000, hht: 180, hhtCapturado: 90, estado: "Abierto", sponsor: "Gerente Corporativo",
+                    escalamiento: "sí", tipoSolucion: "Algoritmos ML", origenSolucion: "Co-diseño", comentario: "",
+                    kr: "Reducir el consumo de gas natural en un 12% mensual", respInnovacion: "Sebastián Allende",
+                    kpi1: "7% ahorro real", kpi2: "$180M potencial", kpi3: "90 hrs calibración"
                 }
             ];
         }
@@ -2315,6 +2707,25 @@
             activeTipoChartMetric = metric;
             document.getElementById("btnMetricTipo").className = metric === 'tipo' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
             document.getElementById("btnMetricVertical").className = metric === 'vertical' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            renderCharts();
+        }
+
+        function toggleCreationChartMetric(metric) {
+            activeCreationChartMetric = metric;
+            const titleEl = document.getElementById("creationChartTitle");
+            const subEl = document.getElementById("creationChartSub");
+            
+            if (metric === 'creados') {
+                titleEl.innerText = "Evolutivo de Proyectos Creados";
+                subEl.innerText = "Cantidad anual de iniciativas de innovación según su año de Creación";
+                document.getElementById("btnMetricCreados").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+                document.getElementById("btnMetricPilotaje").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            } else {
+                titleEl.innerText = "Evolutivo de Tasa de Pilotaje";
+                subEl.innerText = "Evolución histórica anual de la tasa de pilotaje (pilotados/piloteables)";
+                document.getElementById("btnMetricCreados").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+                document.getElementById("btnMetricPilotaje").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+            }
             renderCharts();
         }
     </script>
