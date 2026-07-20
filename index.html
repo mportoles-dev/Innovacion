@@ -138,25 +138,38 @@
         <div class="px-8 max-w-[1600px] w-full mx-auto">
             <div id="bulletChartsSection" class="bg-white border border-borderBg p-5 rounded-2xl shadow-sm space-y-4">
 
+                <!-- Título Principal de Sección -->
+                <div class="border-b border-slate-100 pb-2">
+                    <h2 class="text-sm font-black uppercase tracking-wider text-slate-800">
+                        AVANCE CUMPLIMIENTO KR
+                    </h2>
+                </div>
+
                 <!-- Encabezados -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- EBITDA -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>EBITDA Potencial (Fases de Piloto)</span>
-                            <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
-                                Total: $0
-                            </span>
+                            <span>EBITDA Potencial</span>
+                            <div class="flex items-center gap-3">
+                                <span id="bulletEbitdaPctLabel" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50">Cumplimiento: 0%</span>
+                                <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
+                                    Total: $0
+                                </span>
+                            </div>
                         </h3>
                     </div>
 
                     <!-- HHT -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>HHT Potencial (Fases de Piloto)</span>
-                            <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
-                                Total: 0 Hrs
-                            </span>
+                            <span>HHT Potencial</span>
+                            <div class="flex items-center gap-3">
+                                <span id="bulletHhtPctLabel" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50">Cumplimiento: 0%</span>
+                                <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
+                                    Total: 0 Hrs
+                                </span>
+                            </div>
                         </h3>
                     </div>
                 </div>
@@ -308,7 +321,7 @@
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaImplementacion">0%</span>
                     </div>
                     <div class="mt-2">
-                        <h3 class="text-xs font-bold text-slate-700">Tasa de Implementación</h3>
+                        <h3 class="text-xs font-bold text-slate-700">Tasa de Implementación Histórica</h3>
                         <!-- Mantener el ID oculto para que el script no falle -->
                         <p class="hidden" id="kpiTasaImplementacionSub">Año: N/A</p>
                     </div>
@@ -941,6 +954,29 @@
 
             const totalEbitda = ebitdaData.reduce((sum, d) => sum + d.value, 0);
             const totalHht = hhtData.reduce((sum, d) => sum + d.value, 0);
+
+            const ebitdaPct = jointEbitdaMeta > 0 ? (totalEbitda / jointEbitdaMeta) * 100 : 0;
+            const hhtPct = jointHhtMeta > 0 ? (totalHht / jointHhtMeta) * 100 : 0;
+
+            const ebitdaPctLabelEl = document.getElementById("bulletEbitdaPctLabel");
+            if (ebitdaPctLabelEl) {
+                ebitdaPctLabelEl.innerText = `Cumplimiento: ${ebitdaPct.toFixed(1)}%`;
+                if (ebitdaPct >= 100) {
+                    ebitdaPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/50";
+                } else {
+                    ebitdaPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50";
+                }
+            }
+
+            const hhtPctLabelEl = document.getElementById("bulletHhtPctLabel");
+            if (hhtPctLabelEl) {
+                hhtPctLabelEl.innerText = `Cumplimiento: ${hhtPct.toFixed(1)}%`;
+                if (hhtPct >= 100) {
+                    hhtPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/50";
+                } else {
+                    hhtPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50";
+                }
+            }
 
             document.getElementById("bulletEbitdaTotalLabel").innerText = `Total: ${formatCurrency(totalEbitda)}`;
             document.getElementById("bulletHhtTotalLabel").innerText = `Total: ${Math.round(totalHht).toLocaleString("es-CL")} Hrs`;
@@ -1730,7 +1766,7 @@
                         for (const key of Object.keys(row)) {
                             const rawVal = String(row[key]).trim();
                             if (/^\d{4}$/.test(rawVal)) {
-                                anio = rawVal;
+                                r_anio = rawVal;
                             }
                             if (rawVal.includes("%") || normalizeKey(cleanEncoding(key)).includes("tasa") || normalizeKey(cleanEncoding(key)).includes("implem")) {
                                 if (!rawVal.match(/^\d{4}$/)) {
