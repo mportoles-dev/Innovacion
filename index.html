@@ -141,7 +141,7 @@
                     <!-- EBITDA -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>EBITDA Potencial</span>
+                            <span>EBITDA Potencial (Pilotaje)</span>
                             <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
                                 Total: $0
                             </span>
@@ -151,7 +151,7 @@
                     <!-- HHT -->
                     <div>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>HHT Potencial</span>
+                            <span>HHT Potencial (Pilotaje)</span>
                             <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
                                 Total: 0 Hrs
                             </span>
@@ -268,12 +268,15 @@
                 </div>
 
                 <!-- EBITDA Potencial (Púrpura Amatista) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Solo suma proyectos en etapa de Ejecución Pilotaje, Implementación o Seguimiento">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaPotencial">$0M</span>
                     </div>
                     <div class="mt-2">
-                        <h3 class="text-xs font-bold text-slate-700">EBITDA Potencial</h3>
+                        <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                            <span>EBITDA Pot. Pilotaje</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400" title="Condicionado a etapas de pilotaje en funnel"></i>
+                        </h3>
                         <p class="text-[10px] text-palPurple font-semibold mt-0.5" id="kpiEbitdaPotencialSub">Meta: $0 (0%)</p>
                     </div>
                 </div>
@@ -289,12 +292,15 @@
                 </div>
 
                 <!-- HHT Potencial Anual (Amarillo Brillante) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Solo suma proyectos en etapa de Ejecución Pilotaje, Implementación o Seguimiento">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHhtPotencial">0</span>
                     </div>
                     <div class="mt-2">
-                        <h3 class="text-xs font-bold text-slate-700">HHT Potencial Anual</h3>
+                        <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                            <span>HHT Pot. Pilotaje</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400" title="Condicionado a etapas de pilotaje en funnel"></i>
+                        </h3>
                         <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiHhtPotencialSub">Meta: 0 (0%)</p>
                     </div>
                 </div>
@@ -315,7 +321,10 @@
                 <!-- EBITDA/HHT POR UNIDAD -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                        <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">EBITDA Potencial vs Capturado por Unidad / Gerencia</h3>
+                        <div>
+                            <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Potencial vs Capturado por Unidad / Gerencia</h3>
+                            <p class="text-[10px] text-slate-500">Los valores de potencial consideran exclusivamente proyectos en fases de pilotaje</p>
+                        </div>
                         <!-- Botón Selector de Métrica (EBITDA / HHT) -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
@@ -420,7 +429,7 @@
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
                             <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su Año de Creación</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su año de Creación</p>
                         </div>
                     </div>
                     <div class="flex-1 min-h-0 relative">
@@ -656,6 +665,9 @@
             "Diseño pilotaje", "Ejecución pilotaje", "Implementación", "Seguimiento"
         ];
 
+        // Advanced stages where potential EBITDA & HHT are eligible to accumulate
+        const PILOTAGE_STAGES = ["Ejecución pilotaje", "Implementación", "Seguimiento"];
+
         function showConnectionStatus(status, title, message) {
             console.log(`[Status: ${status}] ${title} - ${message}`);
         }
@@ -783,6 +795,17 @@
             return "";
         };
 
+        /**
+         * Helper condition: EBITDA/HHT Potentials are only eligible to accumulate
+         * if the project's stage belongs to Advanced/Pilotage stages:
+         * "Ejecución pilotaje", "Implementación" or "Seguimiento".
+         */
+        const isPotentialEligible = (item) => {
+            if (!item) return false;
+            const normStage = normalizeFunnelStage(item.funnel);
+            return PILOTAGE_STAGES.includes(normStage);
+        };
+
         function getUnitColors(unitName) {
             const norm = normalizeKey(unitName);
             if (norm.includes("matriz") || norm.includes("matr") || norm.includes("mtrz")) {
@@ -851,8 +874,9 @@
                     return normGerencia.includes(unit.key);
                 });
 
-                const potentialEbitda = unitProjects.reduce((sum, item) => sum + (item.ebitdaPotencial || 0), 0);
-                const potentialHht = unitProjects.reduce((sum, item) => sum + (item.hht || 0), 0);
+                // Conditional Summing: only count potential EBITDA and HHT if the project is in a pilotage stage
+                const potentialEbitda = unitProjects.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.ebitdaPotencial || 0) : 0), 0);
+                const potentialHht = unitProjects.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.hht || 0) : 0), 0);
                 const colors = getUnitColors(unit.name);
 
                 ebitdaData.push({ name: unit.name, value: potentialEbitda, color: colors.potencial });
@@ -1055,11 +1079,12 @@
                 let valPrimary = 0;
                 let valSecondary = 0;
                 
+                // EBITDA / HHT Potencial (Primary) are conditioned to pilotage stages
                 if (activeMainChartMetric === 'ebitda') {
-                    valPrimary = item.ebitdaPotencial || 0;
+                    valPrimary = isPotentialEligible(item) ? (item.ebitdaPotencial || 0) : 0;
                     valSecondary = item.ebitdaCapturado || 0;
                 } else {
-                    valPrimary = item.hht || 0;
+                    valPrimary = isPotentialEligible(item) ? (item.hht || 0) : 0;
                     valSecondary = item.hhtCapturado || 0;
                 }
 
@@ -1715,8 +1740,9 @@
             const fAnio = document.getElementById("filterAnio").value;
             const numericYear = parseInt(fAnio, 10);
 
-            const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + item.ebitdaPotencial, 0);
-            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (item.hht || 0), 0);
+            // Conditionally filter EBITDA Potencial and HHT Potencial based on pilotage funnel stages
+            const sumEbitdaPotencial = filteredDataset.reduce((sum, item) => sum + (isPotentialEligible(item) ? item.ebitdaPotencial : 0), 0);
+            const sumHhtPotencial = filteredDataset.reduce((sum, item) => sum + (isPotentialEligible(item) ? (item.hht || 0) : 0), 0);
 
             let capturedYearFilteredDataset = [];
             if (!isNaN(numericYear)) {
@@ -1812,6 +1838,7 @@
                     else if (eNorm.includes("cerrado")) estadoBadge = "bg-slate-100 text-slate-500 border border-slate-300";
                 }
 
+                // Table Potential Values are kept untouched as requested ("deja los ebitda/hht potencial tal cual como vienen de la base")
                 tr.innerHTML = `
                     <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
                     <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
