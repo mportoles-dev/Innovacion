@@ -88,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- Fila Inferior: Título del Dashboard y Botones de Acción -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
                 <div>
                     <div class="flex items-center gap-3 border-l-4 border-palLime pl-4">
@@ -127,7 +126,7 @@
             </div>
         </header>
 
-        <!-- Gráficos de Bala / Avance Cumplimiento KR -->
+        <!-- Gráficos de Avance Cumplimiento KR -->
         <div class="px-8 max-w-[1600px] w-full mx-auto">
             <div id="bulletChartsSection" class="bg-white border border-borderBg p-6 rounded-2xl shadow-sm space-y-6">
 
@@ -343,26 +342,35 @@
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
                     <div class="flex flex-col mb-2">
                         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Riesgo ponderado de continuidad</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Índice ponderado según el nivel de riesgo asignado</p>
                     </div>
                     <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
-                        <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
-                            <svg class="w-48 h-24" viewBox="0 0 100 50">
-                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
-                                <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
-                                <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
-                                <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
+                        <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 125px;">
+                            <svg class="w-56 h-28" viewBox="0 0 100 62">
+                                <!-- Arco base gris de fondo -->
+                                <path d="M 14 48 A 36 36 0 0 1 86 48" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
+                                <!-- Segmento Bajo (Verde Bosque) -->
+                                <path d="M 14 48 A 36 36 0 0 1 32 16.8" fill="none" stroke="#0f6f46" stroke-width="9" stroke-linecap="round" />
+                                <!-- Segmento Medio (Amarillo) -->
+                                <path d="M 32 16.8 A 36 36 0 0 1 68 16.8" fill="none" stroke="#facc15" stroke-width="9" />
+                                <!-- Segmento Alto (Naranja Coral) -->
+                                <path d="M 68 16.8 A 36 36 0 0 1 86 48" fill="none" stroke="#f15a24" stroke-width="9" stroke-linecap="round" />
+
+                                <!-- Etiquetas de Escala en negro sin solapamiento: 0, 0.33, 0.66, 1.0 -->
+                                <text x="14" y="59" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0</text>
+                                <text x="32" y="8" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0.33</text>
+                                <text x="68" y="8" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0.66</text>
+                                <text x="86" y="59" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">1.0</text>
                                 
-                                <g id="portfolioNeedleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
-                                    <polygon points="49,50 51,50 50,14" fill="#1e293b" />
+                                <g id="portfolioNeedleGroup" style="transform-origin: 50px 48px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                                    <polygon points="49,48 51,48 50,15" fill="#1e293b" />
                                 </g>
                                 
-                                <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
+                                <circle cx="50" cy="48" r="4" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                             </svg>
                         </div>
-                        <div class="text-center mt-3 flex flex-col items-center">
-                            <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
-                            <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
+                        <div class="text-center mt-2 flex flex-col items-center">
+                            <span id="portfolioRiskNumericValue" class="text-2xl font-black text-slate-800 leading-none">0.00</span>
                         </div>
                     </div>
                     <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
@@ -1511,29 +1519,12 @@
 
             const avgRisk = countWithRisk > 0 ? (totalRiskVal / countWithRisk) : 0;
             const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
-            const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
             const portfolioRiskNumericEl = document.getElementById("portfolioRiskNumericValue");
 
             if (portfolioRiskNumericEl) portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
 
-            if (portfolioRiskLabelEl) {
-                if (countWithRisk === 0) {
-                    portfolioRiskLabelEl.innerText = "N/A";
-                    portfolioRiskLabelEl.className = "text-[10px] font-bold uppercase tracking-widest text-slate-400";
-                } else if (avgRisk < 0.33) {
-                    portfolioRiskLabelEl.innerText = "BAJO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#0f6f46]";
-                } else if (avgRisk < 0.66) {
-                    portfolioRiskLabelEl.innerText = "MEDIO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#d97706]";
-                } else {
-                    portfolioRiskLabelEl.innerText = "ALTO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#f15a24]";
-                }
-            }
-
             if (portfolioNeedleGroup) {
-                const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
+                const rotation = countWithRisk > 0 ? ((avgRisk * 180) - 90) : -90;
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
 
