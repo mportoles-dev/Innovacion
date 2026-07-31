@@ -173,7 +173,7 @@
                     
                     <div class="flex flex-wrap items-center gap-4 text-xs">
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-500">Año de Consulta (Implementación):</span>
+                            <span class="text-slate-500">Año (Implementación):</span>
                             <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-palLime">
                             </select>
                         </div>
@@ -228,7 +228,7 @@
             
             <!-- KPI METRICS GRID -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
                     </div>
@@ -243,7 +243,7 @@
                     </div>
                 </div>
 
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
                     </div>
@@ -252,7 +252,7 @@
                     </div>
                 </div>
 
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
                     </div>
@@ -261,7 +261,7 @@
                     </div>
                 </div>
 
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de pilotaje anual">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de pilotaje anual">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaPilotaje">0%</span>
                     </div>
@@ -288,7 +288,7 @@
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
                             <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Potencial vs Capturado por Unidad / Gerencia</h3>
-                            <p class="text-[10px] text-slate-500">Los valores de potencial consideran exclusivamente proyectos que estén mínimo en fases de pilotaje</p>
+                            <p class="text-[10px] text-slate-500">Considera solo proyectos mínimo en fases de pilotaje</p>
                         </div>
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
@@ -301,8 +301,9 @@
                 </div>
 
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-sm justify-between">
-                    <div class="flex items-center gap-2 mb-2">
+                    <div class="flex flex-col mb-2">
                         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Proyectos por Unidad / Gerencia</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Distribución por unidad responsable</p>
                     </div>
                     <div class="flex-1 relative min-h-0">
                         <canvas id="chartProyectosUnidad"></canvas>
@@ -316,7 +317,7 @@
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
                     <div class="flex items-start justify-between mb-2 gap-2">
                         <div>
-                            <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                            <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Tipo de innovación</h3>
                             <p id="tipoChartSub" class="text-[10px] text-slate-500 mt-0.5">Clasificación según el cambio introducido</p>
                         </div>
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 shrink-0">
@@ -331,16 +332,18 @@
 
                 <!-- ETAPA EN EL FUNNEL -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm">
-                    <div class="flex items-center gap-2 mb-4">
-                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA EN EL FUNNEL</h3>
+                    <div class="flex flex-col mb-3">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA DEL EMBUDO</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Posición dentro de las 7 etapas</p>
                     </div>
                     <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
                 </div>
 
                 <!-- RIESGO PROMEDIO DEL PORTAFOLIO -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                    <div class="flex items-center gap-2 mb-2">
+                    <div class="flex flex-col mb-2">
                         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Riesgo ponderado de continuidad</p>
                     </div>
                     <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
                         <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
@@ -384,8 +387,8 @@
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] shadow-sm">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
-                            <h3 id="creationChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
-                            <p id="creationChartSub" class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su año de Creación</p>
+                            <h3 id="creationChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de proyectos creados</h3>
+                            <p id="creationChartSub" class="text-xs text-slate-500 mt-0.5">Cantidad anual según año de creación</p>
                         </div>
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleCreationChartMetric('creados')" id="btnMetricCreados" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Proyectos Creados</button>
