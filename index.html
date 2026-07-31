@@ -19,17 +19,19 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
                     colors: {
-                        mockupBg: '#f4f6f9',    // Fondo principal claro de alta gama
-                        cardBg: '#ffffff',      // Fondo blanco para tarjetas y contenedores
-                        borderBg: '#e2e8f0',    // Bordes suaves y limneos
-                        palLime: '#9bca3c',     // Verde Limón brillante (Primera franja de la paleta)
-                        palForest: '#0f6f46',   // Verde Bosque profundo (Segunda franja - Bajo)
-                        palYellow: '#facc15',   // Amarillo brillante (Medio)
-                        palOrange: '#f15a24',   // Naranja Coral vibrante (Tercera franja - Alto)
-                        palPurple: '#956eb6',   // Púrpura Amatista (Quinta franja)
-                        palGray: '#6b7c85',     // Gris Pizarra elegante (Séptima franja)
-                        // Mapeos adaptativos para conservar compatibilidad estructural
+                        mockupBg: '#f4f6f9',
+                        cardBg: '#ffffff',
+                        borderBg: '#e2e8f0',
+                        palLime: '#9bca3c',
+                        palForest: '#0f6f46',
+                        palYellow: '#facc15',
+                        palOrange: '#f15a24',
+                        palPurple: '#956eb6',
+                        palGray: '#6b7c85',
                         neonGreen: '#9bca3c',
                         neonCyan: '#9bca3c',
                         neonBlue: '#956eb6',
@@ -41,9 +43,9 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #f4f6f9;
         }
         .custom-scrollbar::-webkit-scrollbar {
@@ -69,10 +71,8 @@
         <!-- HEADER DEL PORTAFOLIO -->
         <header class="px-8 pt-6 pb-4 max-w-[1600px] w-full mx-auto flex flex-col gap-6">
             
-            <!-- Logotipos de Coipsa: Banda de Ancho Completo a lo largo de todo el dashboard -->
+            <!-- Logotipos de Coipsa -->
             <div class="w-full bg-white border border-slate-200/80 px-8 py-2 rounded-2xl flex items-center justify-between shadow-sm">
-
-                <!-- Ajuste del logotipo izquierdo para equilibrio simétrico -->
                 <div class="flex items-center justify-center">
                     <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/00_sistema-de-marca-lineal.png"
                         class="h-20 md:h-22 w-auto object-contain transition-transform hover:scale-105 duration-200"
@@ -81,20 +81,16 @@
 
                 <div class="hidden md:block h-6 w-px bg-slate-200 mx-4"></div>
 
-                <!-- Logotipo derecho Fragua para equilibrio simétrico -->
                 <div class="flex items-center justify-center">
                     <img src="https://raw.githubusercontent.com/mportoles-dev/Innovacion/main/IDENTIDAD%20FRAGUA%20FINAL-04.png"
                         class="h-2 md:h-4 w-auto object-contain transition-transform hover:scale-105 duration-200"
                         onerror="this.src='https://placehold.co/100x30/ffffff/9bca3c?text=FRAGUA'">
                 </div>
-
             </div>
 
-            <!-- Fila Inferior: Título del Dashboard (Izquierda) y Botones de Acción (Derecha) -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
                 <div>
                     <div class="flex items-center gap-3 border-l-4 border-palLime pl-4">
-                        <!-- TÍTULO ENGRANDECIDO PARA MAYOR DESTACAMENTO -->
                         <h1 class="text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-tight">Portafolio de Innovación</h1>
                     </div>
                     <p class="text-xs text-slate-500 pl-4 mt-1.5">Dashboard de seguimiento de proyectos y metas</p>
@@ -102,7 +98,6 @@
 
                 <!-- Botones de Acción y Selectores -->
                 <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
-                    <!-- Selector de Portafolio -->
                     <div class="relative">
                         <select id="portfolioSelector" onchange="handlePortfolioChange()" class="appearance-none pl-4 pr-10 py-2 bg-cardBg border border-borderBg hover:border-palLime text-xs text-slate-700 rounded-xl cursor-pointer focus:outline-none transition-all shadow-sm">
                             <option value="maestra">Portafolio Base Maestra (GitHub)</option>
@@ -113,20 +108,17 @@
                         </div>
                     </div>
 
-                    <!-- Botón Subir Excel -->
                     <label for="csvFileInput" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-palLime hover:bg-[#8bb535] text-slate-950 rounded-xl cursor-pointer transition-all text-xs font-bold shadow-md shadow-palLime/10" title="Subir Excel o CSV">
                         <i data-lucide="upload-cloud" class="w-4 h-4 text-slate-950"></i>
                         <span>Subir Excel/CSV</span>
                     </label>
                     <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
 
-                    <!-- Botón Descargar Excel ZIP Protegido -->
                     <button onclick="downloadSecureZip()" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-cardBg hover:bg-slate-50 text-slate-700 rounded-xl border border-borderBg transition-all text-xs font-semibold shadow-sm" title="Descargar ZIP protegido con clave">
                         <i data-lucide="lock" class="w-4 h-4 text-palOrange animate-pulse"></i>
                         <span>Descargar ZIP Protegido</span>
                     </button>
 
-                    <!-- Botón de Recarga -->
                     <button onclick="resetData()" class="p-2 bg-cardBg hover:bg-slate-50 border border-borderBg text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm" title="Resetear / Conectar de nuevo">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
@@ -134,59 +126,35 @@
             </div>
         </header>
 
-        <!-- Gráficos de Bala Simplificados y Apilados -->
+        <!-- Gráficos de Avance Cumplimiento KR -->
         <div class="px-8 max-w-[1600px] w-full mx-auto">
-            <div id="bulletChartsSection" class="bg-white border border-borderBg p-5 rounded-2xl shadow-sm space-y-4">
+            <div id="bulletChartsSection" class="bg-white border border-borderBg p-6 rounded-2xl shadow-sm space-y-6">
 
                 <!-- Título Principal de Sección -->
-                <div class="border-b border-slate-100 pb-2">
-                    <h2 class="text-sm font-black uppercase tracking-wider text-slate-800">
-                        AVANCE CUMPLIMIENTO KR
+                <div class="space-y-1">
+                    <h2 class="text-lg font-black tracking-tight text-slate-900">
+                        Avance cumplimiento KR
                     </h2>
+                    <p class="text-xs text-slate-500 font-medium">
+                        Desarrollar y gestionar un portafolio de innovación con impacto potencial en:
+                    </p>
                 </div>
 
-                <!-- Encabezados -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- EBITDA -->
-                    <div>
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>EBITDA Potencial</span>
-                            <div class="flex items-center gap-3">
-                                <span id="bulletEbitdaPctLabel" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50">Cumplimiento: 0%</span>
-                                <span id="bulletEbitdaTotalLabel" class="text-slate-900 font-extrabold text-xs">
-                                    Total: $0
-                                </span>
-                            </div>
-                        </h3>
+                <!-- Gráficos (EBITDA y HHT) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-1">
+                    <div id="bullet-col-1" class="relative flex flex-col justify-between">
+                        <!-- Generado dinámicamente -->
                     </div>
 
-                    <!-- HHT -->
-                    <div>
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span>HHT Potencial</span>
-                            <div class="flex items-center gap-3">
-                                <span id="bulletHhtPctLabel" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50">Cumplimiento: 0%</span>
-                                <span id="bulletHhtTotalLabel" class="text-slate-900 font-extrabold text-xs">
-                                    Total: 0 Hrs
-                                </span>
-                            </div>
-                        </h3>
+                    <div id="bullet-col-2" class="relative flex flex-col justify-between">
+                        <!-- Generado dinámicamente -->
                     </div>
                 </div>
 
                 <!-- Leyenda compartida -->
-                <div id="bullet-shared-legend"
-                     class="flex flex-wrap justify-center items-center gap-6 py-2 text-[11px] text-slate-600 font-bold">
-                    <!-- Generado dinámicamente -->
-                </div>
-
-                <!-- Gráficos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div id="bullet-col-1" class="relative">
-                        <!-- Generado dinámicamente -->
-                    </div>
-
-                    <div id="bullet-col-2" class="relative">
+                <div class="border-t border-slate-100 pt-4">
+                    <div id="bullet-shared-legend"
+                         class="flex flex-wrap items-center gap-6 text-xs text-slate-600 font-bold">
                         <!-- Generado dinámicamente -->
                     </div>
                 </div>
@@ -198,21 +166,17 @@
     <!-- SECCIÓN 2: FILTROS -->
     <section class="w-full bg-slate-100 border-b border-slate-200/60 py-6">
         <div class="px-8 max-w-[1600px] w-full mx-auto">
-            <!-- SECCIÓN DE FILTROS -->
             <div class="bg-cardBg border border-borderBg p-4 rounded-xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm">
                 <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-500 border-r border-borderBg pr-6">Filtros</span>
                     
                     <div class="flex flex-wrap items-center gap-4 text-xs">
-                        <!-- Año -->
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-500">Año de Consulta (Implementación):</span>
+                            <span class="text-slate-500">Año (Implementación):</span>
                             <select id="filterAnio" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 font-bold focus:outline-none focus:ring-1 focus:ring-palLime">
-                                <!-- Los años se cargarán dinámicamente -->
                             </select>
                         </div>
 
-                        <!-- Unidad / Gerencia -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Unidad:</span>
                             <select id="filterGerencia" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
@@ -220,7 +184,6 @@
                             </select>
                         </div>
 
-                        <!-- Tipo de Innovación -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Tipo de innovación:</span>
                             <select id="filterTipo" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
@@ -228,7 +191,6 @@
                             </select>
                         </div>
 
-                        <!-- Sponsor -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Sponsor:</span>
                             <select id="filterSponsor" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
@@ -236,7 +198,6 @@
                             </select>
                         </div>
 
-                        <!-- Líder del proyecto -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Líder:</span>
                             <select id="filterLider" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
@@ -244,7 +205,6 @@
                             </select>
                         </div>
 
-                        <!-- Estado del proyecto -->
                         <div class="flex items-center gap-2">
                             <span class="text-slate-500">Estado:</span>
                             <select id="filterEstado" onchange="applyFilters()" class="bg-[#f8fafc] border border-borderBg rounded-lg px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-palLime">
@@ -265,11 +225,9 @@
     <section class="w-full bg-slate-50 border-b border-slate-200/60 py-8">
         <div class="px-8 max-w-[1600px] w-full mx-auto space-y-6">
             
-            <!-- KPI METRICS GRID REORDENADO SEGÚN SOLICITUD -->
+            <!-- KPI METRICS GRID -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                
-                <!-- 1° Total Proyectos (Verde Limón) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palLime p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTotalProjects">0</span>
                     </div>
@@ -284,8 +242,7 @@
                     </div>
                 </div>
 
-                <!-- 2° EBITDA Capturado Real (Verde Bosque) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palForest p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiEbitdaCapturado">$0M</span>
                     </div>
@@ -294,8 +251,7 @@
                     </div>
                 </div>
 
-                <!-- 3° HHT Capturado Real (Naranja Coral) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palOrange p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiHht">0</span>
                     </div>
@@ -304,8 +260,7 @@
                     </div>
                 </div>
 
-                <!-- 4° Tasa de Pilotaje (Amarillo/Ámbar) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palYellow p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de pilotaje anual (último año cargado)">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de pilotaje anual">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaPilotaje">0%</span>
                     </div>
@@ -315,30 +270,25 @@
                     </div>
                 </div>
 
-                <!-- 5° Tasa de Implementación (Púrpura Amatista - SIN AÑO VISIBLE) -->
-                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de implementación histórica (último año cargado)">
+                <div class="bg-cardBg border border-borderBg border-l-[5px] border-l-palPurple p-5 rounded-xl flex flex-col justify-between h-32 shadow-sm" title="Tasa de implementación histórica">
                     <div>
                         <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight" id="kpiTasaImplementacion">0%</span>
                     </div>
                     <div class="mt-2">
                         <h3 class="text-xs font-bold text-slate-700">Tasa de Implementación Histórica</h3>
-                        <!-- Mantener el ID oculto para que el script no falle -->
                         <p class="hidden" id="kpiTasaImplementacionSub">Año: N/A</p>
                     </div>
                 </div>
-
             </div>
 
             <!-- ROW 1 DE GRÁFICOS -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- EBITDA/HHT POR UNIDAD -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-8 shadow-sm">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
                             <h3 id="mainChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Potencial vs Capturado por Unidad / Gerencia</h3>
-                            <p class="text-[10px] text-slate-500">Los valores de potencial consideran exclusivamente proyectos que estén mínimo en fases de pilotaje</p>
+                            <p class="text-[10px] text-slate-500">Considera solo proyectos mínimo en fases de pilotaje</p>
                         </div>
-                        <!-- Botón Selector de Métrica (EBITDA / HHT) -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleMainChartMetric('ebitda')" id="btnMetricEbitda" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">EBITDA</button>
                             <button onclick="toggleMainChartMetric('hht')" id="btnMetricHht" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">HHT</button>
@@ -349,10 +299,10 @@
                     </div>
                 </div>
 
-                <!-- PROYECTOS POR UNIDAD / GERENCIA -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] lg:col-span-4 shadow-sm justify-between">
-                    <div class="flex items-center gap-2 mb-2">
+                    <div class="flex flex-col mb-2">
                         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Proyectos por Unidad / Gerencia</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Distribución por unidad responsable</p>
                     </div>
                     <div class="flex-1 relative min-h-0">
                         <canvas id="chartProyectosUnidad"></canvas>
@@ -364,59 +314,63 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- TIPO DE INNOVACIÓN -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                        <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
-                        <!-- Botón Selector de Métrica -->
-                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                    <div class="flex items-start justify-between mb-2 gap-2">
+                        <div>
+                            <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Tipo de innovación</h3>
+                            <p id="tipoChartSub" class="text-[10px] text-slate-500 mt-0.5">Clasificación según el cambio introducido</p>
+                        </div>
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 shrink-0">
                             <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
                             <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
                         </div>
                     </div>
-                    <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
+                    <div class="flex-1 relative flex items-center justify-center min-h-0 py-2">
                         <canvas id="chartTipoInno"></canvas>
                     </div>
-                    <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2 max-h-[90px] overflow-y-auto custom-scrollbar" id="legendTipoInno"></div>
                 </div>
 
                 <!-- ETAPA EN EL FUNNEL -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm">
-                    <div class="flex items-center gap-2 mb-4">
-                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA EN EL FUNNEL</h3>
+                    <div class="flex flex-col mb-3">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">ETAPA DEL EMBUDO</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Posición dentro de las 7 etapas</p>
                     </div>
                     <div class="flex-1 min-h-0 relative flex flex-col justify-center py-1" id="funnelContainer"></div>
                 </div>
 
                 <!-- RIESGO PROMEDIO DEL PORTAFOLIO -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                    <div class="flex items-center gap-2 mb-2">
+                    <div class="flex flex-col mb-2">
                         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">RIESGO PROMEDIO DEL PORTAFOLIO</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Índice ponderado según el nivel de riesgo asignado</p>
                     </div>
                     <div class="flex-1 relative flex flex-col items-center justify-center min-h-0">
-                        <!-- SVG Velocímetro del Portafolio -->
-                        <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 120px;">
-                            <svg class="w-48 h-24" viewBox="0 0 100 50">
+                        <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 125px;">
+                            <svg class="w-56 h-28" viewBox="0 0 100 62">
                                 <!-- Arco base gris de fondo -->
-                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
+                                <path d="M 14 48 A 36 36 0 0 1 86 48" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
                                 <!-- Segmento Bajo (Verde Bosque) -->
-                                <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
+                                <path d="M 14 48 A 36 36 0 0 1 32 16.8" fill="none" stroke="#0f6f46" stroke-width="9" stroke-linecap="round" />
                                 <!-- Segmento Medio (Amarillo) -->
-                                <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
+                                <path d="M 32 16.8 A 36 36 0 0 1 68 16.8" fill="none" stroke="#facc15" stroke-width="9" />
                                 <!-- Segmento Alto (Naranja Coral) -->
-                                <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
+                                <path d="M 68 16.8 A 36 36 0 0 1 86 48" fill="none" stroke="#f15a24" stroke-width="9" stroke-linecap="round" />
+
+                                <!-- Etiquetas de Escala en negro sin solapamiento: 0, 0.33, 0.66, 1.0 -->
+                                <text x="14" y="59" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0</text>
+                                <text x="32" y="8" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0.33</text>
+                                <text x="68" y="8" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">0.66</text>
+                                <text x="86" y="59" font-size="4.5" font-weight="800" fill="#1e293b" text-anchor="middle">1.0</text>
                                 
-                                <!-- Grupo de Aguja -->
-                                <g id="portfolioNeedleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
-                                    <polygon points="49,50 51,50 50,14" fill="#1e293b" />
+                                <g id="portfolioNeedleGroup" style="transform-origin: 50px 48px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                                    <polygon points="49,48 51,48 50,15" fill="#1e293b" />
                                 </g>
                                 
-                                <!-- Eje Central -->
-                                <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
+                                <circle cx="50" cy="48" r="4" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                             </svg>
                         </div>
-                        <div class="text-center mt-3 flex flex-col items-center">
-                            <!-- Valor promedio numérico del riesgo -->
-                            <span id="portfolioRiskNumericValue" class="text-lg font-black text-slate-800 leading-none">0.00</span>
-                            <span id="portfolioRiskLabel" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-1">N/A</span>
+                        <div class="text-center mt-2 flex flex-col items-center">
+                            <span id="portfolioRiskNumericValue" class="text-2xl font-black text-slate-800 leading-none">0.00</span>
                         </div>
                     </div>
                     <div class="flex justify-center gap-4 text-[10px] text-slate-500 mt-2">
@@ -441,10 +395,9 @@
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[380px] shadow-sm">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
-                            <h3 id="creationChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de Proyectos Creados</h3>
-                            <p id="creationChartSub" class="text-xs text-slate-500 mt-0.5">Cantidad anual de iniciativas de innovación según su año de Creación</p>
+                            <h3 id="creationChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">Evolutivo de proyectos creados</h3>
+                            <p id="creationChartSub" class="text-xs text-slate-500 mt-0.5">Cantidad anual según año de creación</p>
                         </div>
-                        <!-- Botón Selector de Métrica (Proyectos Creados / Tasa de Pilotaje) -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button onclick="toggleCreationChartMetric('creados')" id="btnMetricCreados" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Proyectos Creados</button>
                             <button onclick="toggleCreationChartMetric('pilotaje')" id="btnMetricPilotaje" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Tasa de Pilotaje</button>
@@ -461,7 +414,6 @@
     <!-- SECCIÓN 4: TABLA DE INICIATIVAS -->
     <section class="w-full bg-slate-100 py-8">
         <div class="px-8 max-w-[1600px] w-full mx-auto">
-            <!-- TABLA DE INICIATIVAS -->
             <div class="bg-cardBg border border-borderBg rounded-xl overflow-hidden flex flex-col shadow-sm">
                 <div class="p-5 border-b border-borderBg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -473,14 +425,14 @@
                     </span>
                 </div>
 
-                <!-- Responsive Table Container -->
                 <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse min-w-[900px]">
+                    <table class="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                             <tr class="border-b border-borderBg bg-[#f8fafc] text-xs font-bold uppercase tracking-wider text-slate-500">
                                 <th class="py-4 px-6">ID</th>
                                 <th class="py-4 px-6">Proyecto</th>
                                 <th class="py-4 px-6">Líder</th>
+                                <th class="py-4 px-6">Sponsor</th>
                                 <th class="py-4 px-6">Gerencia / Unidad</th>
                                 <th class="py-4 px-6 text-center">Riesgo</th>
                                 <th class="py-4 px-6 text-right">Inversión Ejec.</th>
@@ -491,6 +443,7 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="text-sm divide-y divide-slate-100 cursor-pointer"></tbody>
+                        <tfoot id="tableFoot" class="bg-slate-50 border-t-2 border-borderBg font-extrabold text-xs text-slate-900"></tfoot>
                     </table>
                 </div>
                 
@@ -517,7 +470,6 @@
                 <h3 id="modalTitle" class="text-xl font-extrabold text-slate-900 leading-tight"></h3>
             </div>
 
-            <!-- Fila Descripción y Velocímetro de Riesgo -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg md:col-span-2 flex flex-col justify-between">
                     <div>
@@ -531,7 +483,6 @@
                     </div>
                 </div>
                 
-                <!-- Nivel de Riesgo -->
                 <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
                     <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Nivel de Riesgo</h4>
                     <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 80px;">
@@ -541,12 +492,10 @@
                             <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
                             <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
                             
-                            <!-- Grupo de Aguja -->
                             <g id="needleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
                                 <polygon points="49,50 51,50 50,14" fill="#1e293b" />
                             </g>
                             
-                            <!-- Eje Central -->
                             <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
                         </svg>
                     </div>
@@ -554,21 +503,17 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DE KPIs INDIVIDUALES EN EL DESPLEGABLE -->
             <div class="border-t border-slate-200 pt-5 space-y-3">
                 <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Base del Registro</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- KPI 1 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 1</span>
                         <span id="modalKpi1" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
                     </div>
-                    <!-- KPI 2 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 2</span>
                         <span id="modalKpi2" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
                     </div>
-                    <!-- KPI 3 -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 3</span>
                         <span id="modalKpi3" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
@@ -576,7 +521,6 @@
                 </div>
             </div>
 
-            <!-- Detalles de la iniciativa -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-slate-200 pt-4">
                 <div class="space-y-1">
                     <span class="text-xs text-slate-500 font-medium">Líder Funcional</span>
@@ -638,13 +582,11 @@
                     <span id="ganttStatus" class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"></span>
                 </div>
                 
-                <!-- Animación de carga -->
                 <div id="ganttLoading" class="hidden text-center py-8 text-xs text-slate-400">
                     <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-palPurple mx-auto mb-2"></div>
                     Sincronizando cronograma del proyecto...
                 </div>
 
-                <!-- Estado sin archivo -->
                 <div id="ganttEmpty" class="hidden bg-[#f8fafc] border border-dashed border-slate-200 rounded-2xl p-4 text-center space-y-2">
                     <div class="flex items-center justify-center gap-2 text-amber-600 text-xs font-bold">
                         <i data-lucide="alert-circle" class="w-4 h-4"></i>
@@ -655,10 +597,8 @@
                     </p>
                 </div>
 
-                <!-- Renderizador de Gráfico Gantt Vectorial/CSS -->
                 <div id="ganttChartWrapper" class="hidden overflow-x-auto border border-slate-100 rounded-2xl bg-[#f8fafc] custom-scrollbar">
                     <div class="min-w-[760px] p-5 text-xs space-y-4" id="ganttTimelineContent">
-                        <!-- Generado dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -688,7 +628,6 @@
             "Diseño pilotaje", "Ejecución pilotaje", "Implementación", "Seguimiento"
         ];
 
-        // Advanced stages where potential EBITDA & HHT are eligible to accumulate
         const PILOTAGE_STAGES = ["Ejecución pilotaje", "Implementación", "Seguimiento"];
 
         async function smartFetch(url) {
@@ -871,7 +810,7 @@
                 return { potencial: '#FE5000', capturado: 'rgba(254, 80, 0, 0.55)', border: '#FE5000' };
             }
             if (norm.includes("recupac")) {
-                return { potencial: '#B1D600', capturado: 'rgba(177, 214, 0, 0.55)', border: '#B1D600' };
+                return { potencial: '#9bca3c', capturado: 'rgba(155, 202, 60, 0.55)', border: '#9bca3c' };
             }
             return { potencial: '#475569', capturado: 'rgba(71, 85, 105, 0.55)', border: '#475569' };
         }
@@ -885,7 +824,6 @@
             return "Otros";
         };
 
-        // Analiza el texto del CSV para ver si utiliza coma (,) o punto y coma (;) y lo procesa
         function parseCSVText(text) {
             let delimiter = ",";
             if (text.includes(";")) {
@@ -918,17 +856,17 @@
             const selectedYear = document.getElementById("filterAnio")?.value || "2026";
             const jointEbitdaMeta = 1000000000;
 
-            let jointHhtMeta = 1000;
+            let jointHhtMeta = 10000;
             if (selectedYear) {
                 const matchHht = globalMetas.find(m => (normalizeKey(m.indicador).includes("hht") || normalizeKey(m.indicador).includes("horas")) && String(m.anio) === String(selectedYear));
                 if (matchHht) jointHhtMeta = matchHht.meta;
             }
 
             const units = [
-                { name: "Matriz", key: "matriz" },
+                { name: "Recupac", key: "recupac" },
                 { name: "CPP", key: "cpp" },
                 { name: "Corrupac", key: "corrupac" },
-                { name: "Recupac", key: "recupac" }
+                { name: "Matriz", key: "matriz" }
             ];
 
             const ebitdaData = [];
@@ -949,6 +887,7 @@
                 hhtData.push({ name: unit.name, value: potentialHht, color: colors.potencial });
             });
 
+            // Ordenar de mayor a menor aporte de potencial
             ebitdaData.sort((a, b) => b.value - a.value);
             hhtData.sort((a, b) => b.value - a.value);
 
@@ -958,107 +897,128 @@
             const ebitdaPct = jointEbitdaMeta > 0 ? (totalEbitda / jointEbitdaMeta) * 100 : 0;
             const hhtPct = jointHhtMeta > 0 ? (totalHht / jointHhtMeta) * 100 : 0;
 
-            const ebitdaPctLabelEl = document.getElementById("bulletEbitdaPctLabel");
-            if (ebitdaPctLabelEl) {
-                ebitdaPctLabelEl.innerText = `Cumplimiento: ${ebitdaPct.toFixed(1)}%`;
-                if (ebitdaPct >= 100) {
-                    ebitdaPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/50";
-                } else {
-                    ebitdaPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50";
-                }
-            }
-
-            const hhtPctLabelEl = document.getElementById("bulletHhtPctLabel");
-            if (hhtPctLabelEl) {
-                hhtPctLabelEl.innerText = `Cumplimiento: ${hhtPct.toFixed(1)}%`;
-                if (hhtPct >= 100) {
-                    hhtPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/50";
-                } else {
-                    hhtPctLabelEl.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600 border border-slate-200/50";
-                }
-            }
-
-            document.getElementById("bulletEbitdaTotalLabel").innerText = `Total: ${formatCurrency(totalEbitda)}`;
-            document.getElementById("bulletHhtTotalLabel").innerText = `Total: ${Math.round(totalHht).toLocaleString("es-CL")} Hrs`;
-
-            // Renderizar EBITDA
-            const maxRangeEbitda = Math.max(totalEbitda, jointEbitdaMeta) * 1.15;
-            const ebitdaMetaMarkerLeft = (jointEbitdaMeta / maxRangeEbitda) * 100;
+            // Render EBITDA Column
+            const ebitdaRangeMax = totalEbitda >= jointEbitdaMeta ? totalEbitda : jointEbitdaMeta;
 
             let ebitdaSegmentsHtml = "";
             ebitdaData.forEach(d => {
                 if (d.value <= 0) return;
-                const widthPct = (d.value / maxRangeEbitda) * 100;
-                const textToShow = widthPct >= 6 ? formatCompactCLP(d.value) : "";
+                const widthPct = (d.value / ebitdaRangeMax) * 100;
                 ebitdaSegmentsHtml += `
                     <div style="width: ${widthPct}%; background-color: ${d.color};" 
-                         class="h-full flex items-center justify-center text-[10px] font-black text-white px-1 truncate transition-all duration-1000 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
+                         class="h-full transition-all duration-700 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
                          title="${d.name}: ${formatCurrency(d.value)}">
-                        ${textToShow}
                     </div>
                 `;
             });
 
+            const ebitdaMetaPosPct = (jointEbitdaMeta / ebitdaRangeMax) * 100;
+
+            let ebitdaAxisHtml = "";
+            if (totalEbitda >= jointEbitdaMeta) {
+                ebitdaAxisHtml = `
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold">
+                        <span class="absolute left-0 top-0">$0</span>
+                        <div class="absolute flex flex-col items-center -translate-x-1/2" style="left: ${ebitdaMetaPosPct}%;">
+                            <span class="text-slate-600 font-bold">$1.000M</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                ebitdaAxisHtml = `
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-between items-center">
+                        <span>$0</span>
+                        <span class="text-slate-600 font-bold">$1.000M</span>
+                    </div>
+                `;
+            }
+
             col1.innerHTML = `
-                <div class="relative w-full h-8 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex">
-                    ${ebitdaSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
-                    <div style="left: ${ebitdaMetaMarkerLeft}%" 
-                         class="absolute top-0 bottom-0 w-1 bg-slate-950 z-10 transition-all duration-1000 shadow-[0_0_3px_rgba(0,0,0,0.4)]" 
-                         title="Meta Conjunta: ${formatCurrency(jointEbitdaMeta)}">
-                         <div class="absolute -top-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
-                         <div class="absolute -bottom-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">EBITDA potencial (CLP)</span>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            ${ebitdaPct.toFixed(1)}%
+                        </span>
+                        <span class="text-xl font-black text-slate-900 tracking-tight">
+                            ${formatCurrency(totalEbitda)}
+                        </span>
                     </div>
                 </div>
-                <div class="relative w-full h-5 mt-1 select-none text-[9px] text-slate-400 font-semibold">
-                    <span class="absolute left-1 top-0">$0</span>
-                    <span class="absolute text-slate-900 font-extrabold -translate-x-1/2 whitespace-nowrap" style="left: ${ebitdaMetaMarkerLeft}%">
-                        Meta: $1.000M
-                    </span>
+                <div class="relative w-full h-5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200/60 shadow-inner">
+                    ${ebitdaSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
+                    <div style="left: ${ebitdaMetaPosPct}%;" 
+                         class="absolute top-0 bottom-0 w-[3px] bg-white z-20 shadow-[0_0_3px_rgba(0,0,0,0.5)]" 
+                         title="Meta: $1.000M">
+                    </div>
                 </div>
+                ${ebitdaAxisHtml}
             `;
 
-            // Renderizar HHT
-            const maxRangeHht = Math.max(totalHht, jointHhtMeta) * 1.15;
-            const hhtMetaMarkerLeft = (jointHhtMeta / maxRangeHht) * 100;
+            // Render HHT Column
+            const hhtRangeMax = totalHht >= jointHhtMeta ? totalHht : jointHhtMeta;
 
             let hhtSegmentsHtml = "";
             hhtData.forEach(d => {
                 if (d.value <= 0) return;
-                const widthPct = (d.value / maxRangeHht) * 100;
-                const textToShow = widthPct >= 6 ? Math.round(d.value).toLocaleString('es-CL') : "";
+                const widthPct = (d.value / hhtRangeMax) * 100;
                 hhtSegmentsHtml += `
                     <div style="width: ${widthPct}%; background-color: ${d.color};" 
-                         class="h-full flex items-center justify-center text-[10px] font-black text-white px-1 truncate transition-all duration-1000 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
+                         class="h-full transition-all duration-700 shadow-[inset_-1px_0_0_rgba(255,255,255,0.2)]"
                          title="${d.name}: ${Math.round(d.value).toLocaleString('es-CL')} Hrs">
-                        ${textToShow}
                     </div>
                 `;
             });
 
+            const hhtMetaPosPct = (jointHhtMeta / hhtRangeMax) * 100;
+
+            let hhtAxisHtml = "";
+            if (totalHht >= jointHhtMeta) {
+                hhtAxisHtml = `
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold">
+                        <span class="absolute left-0 top-0">0</span>
+                        <div class="absolute flex flex-col items-center -translate-x-1/2" style="left: ${hhtMetaPosPct}%;">
+                            <span class="text-slate-600 font-bold">${Math.round(jointHhtMeta).toLocaleString('es-CL')}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                hhtAxisHtml = `
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-between items-center">
+                        <span>0</span>
+                        <span class="text-slate-600 font-bold">${Math.round(jointHhtMeta).toLocaleString('es-CL')}</span>
+                    </div>
+                `;
+            }
+
             col2.innerHTML = `
-                <div class="relative w-full h-8 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex">
-                    ${hhtSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
-                    <div style="left: ${hhtMetaMarkerLeft}%" 
-                         class="absolute top-0 bottom-0 w-1 bg-slate-950 z-10 transition-all duration-1000 shadow-[0_0_3px_rgba(0,0,0,0.4)]" 
-                         title="Meta Conjunta: ${Math.round(jointHhtMeta).toLocaleString('es-CL')} Hrs">
-                         <div class="absolute -top-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
-                         <div class="absolute -bottom-1 -left-1 w-3 h-1.5 bg-slate-950 rounded-full"></div>
+                <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">HHT potencial (horas)</span>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            ${hhtPct.toFixed(1)}%
+                        </span>
+                        <span class="text-xl font-black text-slate-900 tracking-tight">
+                            ${Math.round(totalHht).toLocaleString('es-CL')}
+                        </span>
                     </div>
                 </div>
-                <div class="relative w-full h-5 mt-1 select-none text-[9px] text-slate-400 font-semibold">
-                    <span class="absolute left-1 top-0">0 Hrs</span>
-                    <span class="absolute text-slate-900 font-extrabold -translate-x-1/2 whitespace-nowrap" style="left: ${hhtMetaMarkerLeft}%">
-                        Meta: ${Math.round(jointHhtMeta).toLocaleString('es-CL')} Hrs
-                    </span>
+                <div class="relative w-full h-5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200/60 shadow-inner">
+                    ${hhtSegmentsHtml || '<div class="w-full h-full flex items-center justify-center text-xs text-slate-400">Sin datos</div>'}
+                    <div style="left: ${hhtMetaPosPct}%;" 
+                         class="absolute top-0 bottom-0 w-[3px] bg-white z-20 shadow-[0_0_3px_rgba(0,0,0,0.5)]" 
+                         title="Meta: ${Math.round(jointHhtMeta).toLocaleString('es-CL')} Hrs">
+                    </div>
                 </div>
+                ${hhtAxisHtml}
             `;
 
-            // Construir leyenda compartida
+            // Render shared legend
             units.forEach(unit => {
                 const colors = getUnitColors(unit.name);
                 legendContainer.innerHTML += `
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full shrink-0 shadow-sm border border-black/10" style="background-color: ${colors.potencial};"></span>
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${colors.potencial};"></span>
                         <span class="text-slate-700 font-bold">${unit.name}</span>
                     </div>
                 `;
@@ -1072,8 +1032,8 @@
             afterDraw: (chart) => {
                 const { ctx, scales: { x } } = chart;
                 ctx.save();
-                ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
-                ctx.fillStyle = '#64748b'; // color slate-500
+                ctx.font = 'bold 8px "Poppins", sans-serif';
+                ctx.fillStyle = '#64748b';
                 ctx.textAlign = 'center';
 
                 chart.data.labels.forEach((label, index) => {
@@ -1099,8 +1059,8 @@
                 if (chart.config.type !== 'bar') return;
                 const { ctx, scales: { x, y } } = chart;
                 ctx.save();
-                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-                ctx.fillStyle = '#1e293b'; // slate-800
+                ctx.font = 'bold 11px "Poppins", sans-serif';
+                ctx.fillStyle = '#1e293b';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
 
@@ -1139,9 +1099,90 @@
             }
         };
 
+        const doughnutCalloutLinesPlugin = {
+            id: 'doughnutCalloutLines',
+            afterDraw(chart) {
+                if (chart.config.type !== 'doughnut') return;
+                const { ctx } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data || meta.data.length === 0) return;
+
+                ctx.save();
+                ctx.font = 'bold 8.5px "Poppins", sans-serif';
+
+                const wrapText = (text, maxChars) => {
+                    if (!text) return [];
+                    const words = text.split(' ');
+                    const lines = [];
+                    let currentLine = '';
+
+                    words.forEach(word => {
+                        if ((currentLine + ' ' + word).trim().length <= maxChars) {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        } else {
+                            if (currentLine) lines.push(currentLine);
+                            currentLine = word;
+                        }
+                    });
+                    if (currentLine) lines.push(currentLine);
+                    return lines.length > 0 ? lines : [text];
+                };
+
+                meta.data.forEach((element, i) => {
+                    const value = chart.data.datasets[0].data[i];
+                    if (!value || value <= 0) return;
+
+                    const label = chart.data.labels[i] || '';
+                    const color = chart.data.datasets[0].backgroundColor[i % chart.data.datasets[0].backgroundColor.length];
+
+                    const centerAngle = element.startAngle + (element.endAngle - element.startAngle) / 2;
+                    const outerRadius = element.outerRadius;
+
+                    const xStart = element.x + Math.cos(centerAngle) * outerRadius;
+                    const yStart = element.y + Math.sin(centerAngle) * outerRadius;
+
+                    const lineLength = 8;
+                    const xMid = element.x + Math.cos(centerAngle) * (outerRadius + lineLength);
+                    const yMid = element.y + Math.sin(centerAngle) * (outerRadius + lineLength);
+
+                    const isRight = Math.cos(centerAngle) >= 0;
+                    const xEnd = isRight ? xMid + 6 : xMid - 6;
+                    const yEnd = yMid;
+
+                    ctx.beginPath();
+                    ctx.moveTo(xStart, yStart);
+                    ctx.lineTo(xMid, yMid);
+                    ctx.lineTo(xEnd, yEnd);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(xStart, yStart, 2, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+
+                    ctx.fillStyle = '#334155';
+                    ctx.textAlign = isRight ? 'left' : 'right';
+                    ctx.textBaseline = 'middle';
+                    const textX = isRight ? xEnd + 3 : xEnd - 3;
+
+                    const lines = wrapText(label, 14);
+                    const lineHeight = 10;
+                    const startY = yEnd - ((lines.length - 1) * lineHeight) / 2;
+
+                    lines.forEach((lineText, lineIdx) => {
+                        ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                    });
+                });
+
+                ctx.restore();
+            }
+        };
+
         function initChartsContainer() {
             Chart.defaults.color = '#475569';
-            Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
+            Chart.defaults.font.family = 'Poppins, sans-serif';
             Chart.defaults.borderColor = '#e2e8f0';
         }
 
@@ -1192,7 +1233,7 @@
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
                 type: 'bar',
-                plugins: [customXAxisLabelsPlugin],
+                plugins: [customXAxisLabelsPlugin, ChartDataLabels],
                 data: {
                     labels: sortedGerencias,
                     datasets: [
@@ -1219,12 +1260,28 @@
                     maintainAspectRatio: false,
                     layout: {
                         padding: {
+                            top: 24,
                             bottom: 12
                         }
                     },
                     plugins: { 
                         legend: { display: false }, 
-                        datalabels: { display: false },
+                        datalabels: {
+                            display: true,
+                            color: '#1e293b',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 2,
+                            font: { family: 'Poppins, sans-serif', weight: '700', size: 9 },
+                            formatter: (value) => {
+                                if (!value || value <= 0) return '';
+                                if (activeMainChartMetric === 'ebitda') {
+                                    return formatCompactCLP(value);
+                                } else {
+                                    return Math.round(value).toLocaleString('es-CL');
+                                }
+                            }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -1298,10 +1355,12 @@
             });
 
             const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b] - proyectosByGerencia[a]);
+            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia), 0);
 
             const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
             chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
                 type: 'bar',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: sortedProyectosGerencias,
                     datasets: [{
@@ -1317,12 +1376,26 @@
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: { right: 28 }
+                    },
                     plugins: { 
                         legend: { display: false },
-                        datalabels: { display: false }
+                        datalabels: {
+                            display: true,
+                            color: '#1e293b',
+                            anchor: 'end',
+                            align: 'right',
+                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                            formatter: (val) => val > 0 ? val : ''
+                        }
                     },
                     scales: {
-                        x: { grid: { color: 'rgba(107, 124, 133, 0.12)' }, ticks: { precision: 0, font: { size: 9 } } },
+                        x: { 
+                            grid: { color: 'rgba(107, 124, 133, 0.12)' }, 
+                            ticks: { precision: 0, font: { size: 9 } },
+                            suggestedMax: maxProjectVal > 0 ? maxProjectVal + 1 : 5
+                        },
                         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     }
                 }
@@ -1350,7 +1423,7 @@
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
             chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
-                plugins: [ChartDataLabels],
+                plugins: [ChartDataLabels, doughnutCalloutLinesPlugin],
                 data: {
                     labels: Object.keys(chartDataCount),
                     datasets: [{
@@ -1362,11 +1435,19 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 70,
+                            right: 70,
+                            top: 15,
+                            bottom: 15
+                        }
+                    },
                     plugins: { 
                         legend: { display: false },
                         datalabels: {
                             color: '#ffffff',
-                            font: { family: 'Plus Jakarta Sans, sans-serif', weight: '800', size: 11 },
+                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
                             formatter: (value, ctx) => {
                                 let sum = 0;
                                 let dataArr = ctx.chart.data.datasets[0].data;
@@ -1378,19 +1459,8 @@
                             textShadowBlur: 4
                         }
                     },
-                    cutout: '72%'
+                    cutout: '62%'
                 }
-            });
-
-            const legendTipo = document.getElementById("legendTipoInno");
-            legendTipo.innerHTML = "";
-            Object.keys(chartDataCount).forEach((category, index) => {
-                legendTipo.innerHTML += `
-                    <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${bluePalette[index % bluePalette.length]};"></span>
-                        <span class="font-bold text-slate-700 truncate">${category}</span>
-                    </div>
-                `;
             });
 
             // 4. Etapas del Funnel
@@ -1449,33 +1519,16 @@
 
             const avgRisk = countWithRisk > 0 ? (totalRiskVal / countWithRisk) : 0;
             const portfolioNeedleGroup = document.getElementById("portfolioNeedleGroup");
-            const portfolioRiskLabelEl = document.getElementById("portfolioRiskLabel");
             const portfolioRiskNumericEl = document.getElementById("portfolioRiskNumericValue");
 
             if (portfolioRiskNumericEl) portfolioRiskNumericEl.innerText = avgRisk.toFixed(2);
 
-            if (portfolioRiskLabelEl) {
-                if (countWithRisk === 0) {
-                    portfolioRiskLabelEl.innerText = "N/A";
-                    portfolioRiskLabelEl.className = "text-[10px] font-bold uppercase tracking-widest text-slate-400";
-                } else if (avgRisk < 0.33) {
-                    portfolioRiskLabelEl.innerText = "BAJO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#0f6f46]";
-                } else if (avgRisk < 0.66) {
-                    portfolioRiskLabelEl.innerText = "MEDIO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#d97706]";
-                } else {
-                    portfolioRiskLabelEl.innerText = "ALTO";
-                    portfolioRiskLabelEl.className = "text-[10px] font-extrabold uppercase tracking-widest text-[#f15a24]";
-                }
-            }
-
             if (portfolioNeedleGroup) {
-                const rotation = countWithRisk > 0 ? ((avgRisk * 120) - 60) : -60;
+                const rotation = countWithRisk > 0 ? ((avgRisk * 180) - 90) : -90;
                 portfolioNeedleGroup.style.transform = `rotate(${rotation}deg)`;
             }
 
-            // 6. Evolutivo Anual (Proyectos Creados vs Tasa de Pilotaje)
+            // 6. Evolutivo Anual
             if (activeCreationChartMetric === 'creados') {
                 const creationYearsSet = new Set();
                 filteredDataset.forEach(item => {
@@ -1519,7 +1572,7 @@
                 const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
                 chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
                     type: 'bar',
-                    plugins: [chartCreatedProjectsTotalsPlugin],
+                    plugins: [chartCreatedProjectsTotalsPlugin, ChartDataLabels],
                     data: {
                         labels: sortedCreationYears,
                         datasets: datasetsCreated
@@ -1527,16 +1580,22 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: { padding: { top: 20 } },
                         plugins: {
                             legend: {
                                 display: true,
                                 position: 'top',
                                 labels: {
                                     boxWidth: 12,
-                                    font: { size: 10, weight: 'bold' }
+                                    font: { family: 'Poppins, sans-serif', size: 10, weight: 'bold' }
                                 }
                             },
-                            datalabels: { display: false }
+                            datalabels: { 
+                                display: true,
+                                color: '#ffffff',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 9 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
                         },
                         scales: {
                             x: {
@@ -1545,10 +1604,7 @@
                             },
                             y: {
                                 grid: { color: 'rgba(107, 124, 133, 0.12)' },
-                                ticks: {
-                                    precision: 0,
-                                    font: { size: 10 }
-                                },
+                                ticks: { precision: 0, font: { size: 10 } },
                                 suggestedMax: (() => {
                                     let maxYearTotal = 0;
                                     sortedCreationYears.forEach(y => {
@@ -1565,7 +1621,6 @@
                     }
                 });
             } else {
-                // Gráfico de Línea: Evolución de Tasa de Pilotaje Anual
                 const sortedRates = [...datasetTasaPilotaje].sort((a, b) => {
                     const yA = parseInt(a.anio, 10) || 0;
                     const yB = parseInt(b.anio, 10) || 0;
@@ -1578,12 +1633,13 @@
                 const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
                 chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
                     type: 'line',
+                    plugins: [ChartDataLabels],
                     data: {
                         labels: years,
                         datasets: [{
                             label: 'Tasa de Pilotaje (%)',
                             data: values,
-                            borderColor: '#956eb6', // Amatista
+                            borderColor: '#956eb6',
                             backgroundColor: 'rgba(149, 110, 182, 0.15)',
                             borderWidth: 3,
                             fill: true,
@@ -1598,13 +1654,14 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: { padding: { top: 20 } },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
                                 display: true,
                                 color: '#1e293b',
                                 align: 'top',
-                                font: { weight: 'bold', size: 11 },
+                                font: { family: 'Poppins, sans-serif', weight: 'bold', size: 11 },
                                 formatter: (val) => `${val.toFixed(1)}%`
                             }
                         },
@@ -1615,10 +1672,7 @@
                             },
                             y: {
                                 grid: { color: 'rgba(107, 124, 133, 0.12)' },
-                                ticks: {
-                                    font: { size: 10 },
-                                    callback: (v) => `${v}%`
-                                },
+                                ticks: { font: { size: 10 }, callback: (v) => `${v}%` },
                                 min: 0,
                                 max: 100
                             }
@@ -1805,7 +1859,6 @@
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
-            // FALLBACK ROBUSTO EXTRACTOR PARA FORMATOS SIMPLIFICADOS (EJ. CELDAS DIRECTAS O UN VALOR ÚNICO COMO "28%")
             if (processed.length === 0 && rawText) {
                 const parsedNoHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
                 const flatCells = parsedNoHeader.data.flat().map(c => String(c).trim());
@@ -1902,7 +1955,6 @@
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
-            // FALLBACK ROBUSTO EXTRACTOR PARA FORMATOS SIMPLIFICADOS (EJ. CELDAS DIRECTAS O UN VALOR ÚNICO COMO "28%")
             if (processed.length === 0 && rawText) {
                 const parsedNoHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
                 const flatCells = parsedNoHeader.data.flat().map(c => String(c).trim());
@@ -1994,7 +2046,7 @@
                         { indicador: "ebitda", anio: "2026", meta: 1000000000 },
                         { indicador: "hht", anio: "2024", meta: 800 },
                         { indicador: "hht", anio: "2025", meta: 900 },
-                        { indicador: "hht", anio: "2026", meta: 1000 }
+                        { indicador: "hht", anio: "2026", meta: 10000 }
                     ];
                 });
 
@@ -2049,8 +2101,6 @@
                     datasetTasaPilotaje = tasaPilData;
 
                     showConnectionStatus("success", "Datos Sincronizados", `Sincronización terminada de manera robusta.`);
-                    console.log("Final loaded Dataset Tasa Pilotaje:", datasetTasaPilotaje);
-                    console.log("Final loaded Dataset Tasa Implementación:", datasetTasaImplementacion);
                     
                     if (document.getElementById('portfolioSelector').value === 'maestra') {
                         currentDataset = [...masterDataset];
@@ -2159,7 +2209,6 @@
             const fAnio = document.getElementById("filterAnio").value;
             const numericYear = parseInt(fAnio, 10);
 
-            // Tasa de Implementación KPI
             const latestImpTasa = getLatestRate(datasetTasaImplementacion);
             const latestImpAnio = getLatestYear(datasetTasaImplementacion);
             
@@ -2169,7 +2218,6 @@
             const kpiTasaImpSub = document.getElementById("kpiTasaImplementacionSub");
             if (kpiTasaImpSub) kpiTasaImpSub.innerText = `Año: ${latestImpAnio || 'N/A'}`;
 
-            // Tasa de Pilotaje KPI
             const latestPilTasa = getLatestRate(datasetTasaPilotaje);
             const latestPilAnio = getLatestYear(datasetTasaPilotaje);
             
@@ -2215,8 +2263,10 @@
 
         function renderTable() {
             const tbody = document.getElementById("tableBody");
+            const tfoot = document.getElementById("tableFoot");
             const emptyState = document.getElementById("tableEmptyState");
             tbody.innerHTML = "";
+            if (tfoot) tfoot.innerHTML = "";
 
             document.getElementById("tableRecordCount").innerText = `Mostrando ${filteredDataset.length} registros`;
 
@@ -2242,7 +2292,17 @@
                 return (b.ebitdaPotencial || 0) - (a.ebitdaPotencial || 0);
             });
 
+            let sumInversion = 0;
+            let sumEbitdaPotencial = 0;
+            let sumEbitdaPiloto = 0;
+            let sumEbitdaCapturado = 0;
+
             sortedDataset.forEach(item => {
+                sumInversion += (item.inversion || 0);
+                sumEbitdaPotencial += (item.ebitdaPotencial || 0);
+                sumEbitdaPiloto += (item.ebitdaPiloto || 0);
+                sumEbitdaCapturado += (item.ebitdaCapturado || 0);
+
                 const tr = document.createElement("tr");
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 cursor-pointer";
                 tr.onclick = () => openModal(item);
@@ -2266,6 +2326,7 @@
                     <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
                     <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
                     <td class="py-3 px-6">${item.lider || 'N/A'}</td>
+                    <td class="py-3 px-6 text-slate-600">${item.sponsor || 'N/A'}</td>
                     <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
@@ -2284,6 +2345,20 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            if (tfoot) {
+                const footTr = document.createElement("tr");
+                footTr.className = "bg-slate-100 border-t-2 border-slate-300 font-black text-slate-900";
+                footTr.innerHTML = `
+                    <td colspan="6" class="py-4 px-6 text-right uppercase tracking-wider text-xs font-black">Total Portafolio Filtrado:</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumInversion)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-900">${formatCurrency(sumEbitdaPotencial)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumEbitdaPiloto)}</td>
+                    <td class="py-4 px-6 text-right font-extrabold text-palForest">${formatCurrency(sumEbitdaCapturado)}</td>
+                    <td class="py-4 px-6"></td>
+                `;
+                tfoot.appendChild(footTr);
+            }
         }
 
         function loadProjectGantt(item) {
@@ -2309,8 +2384,8 @@
             smartFetch(ganttUrl)
                 .then(arrayBuffer => {
                     let text;
-                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(buffer); } 
-                    catch (e) { text = new TextDecoder("windows-1252").decode(buffer); }
+                    try { text = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer); } 
+                    catch (e) { text = new TextDecoder("windows-1252").decode(arrayBuffer); }
                     parseAndRenderGantt(text, item);
                 })
                 .catch(err => {
@@ -2743,8 +2818,16 @@
 
         function toggleTipoChartMetric(metric) {
             activeTipoChartMetric = metric;
-            document.getElementById("btnMetricTipo").className = metric === 'tipo' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
-            document.getElementById("btnMetricVertical").className = metric === 'vertical' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            const titleEl = document.getElementById("tipoChartTitle");
+            if (metric === 'tipo') {
+                titleEl.innerText = "TIPO DE INNOVACIÓN";
+                document.getElementById("btnMetricTipo").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+                document.getElementById("btnMetricVertical").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            } else {
+                titleEl.innerText = "TIPO DE VERTICAL";
+                document.getElementById("btnMetricTipo").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+                document.getElementById("btnMetricVertical").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+            }
             renderCharts();
         }
 
