@@ -367,18 +367,21 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- TIPO DE INNOVACIÓN -->
                 <div class="bg-cardBg border border-borderBg p-5 rounded-xl flex flex-col h-[360px] shadow-sm justify-between">
-                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                        <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                    <div class="flex items-start justify-between mb-2 gap-2">
+                        <div>
+                            <h3 id="tipoChartTitle" class="font-bold text-xs uppercase tracking-wider text-slate-600">TIPO DE INNOVACIÓN</h3>
+                            <p id="tipoChartSub" class="text-[10px] text-slate-500 mt-0.5">Clasificación según el cambio introducido</p>
+                        </div>
                         <!-- Botón Selector de Métrica -->
-                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 shrink-0">
                             <button onclick="toggleTipoChartMetric('tipo')" id="btnMetricTipo" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm">Tipo</button>
                             <button onclick="toggleTipoChartMetric('vertical')" id="btnMetricVertical" class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800">Vertical</button>
                         </div>
                     </div>
-                    <div class="flex-1 relative flex items-center justify-center min-h-0 max-h-[240px]">
+                    <div class="flex-1 relative flex items-center justify-center min-h-0 py-2">
                         <canvas id="chartTipoInno"></canvas>
                     </div>
-                    <div class="flex flex-col justify-center gap-1.5 text-[10px] text-slate-500 mt-2 max-h-[90px] overflow-y-auto custom-scrollbar" id="legendTipoInno"></div>
+                    <!-- Eliminada la leyenda inferior para dar espacio completo a las líneas de llamada -->
                 </div>
 
                 <!-- ETAPA EN EL FUNNEL -->
@@ -1144,6 +1147,96 @@
             }
         };
 
+        // Plugin para dibujar líneas conectoras y etiquetas externas en el gráfico de dona
+        const doughnutCalloutLinesPlugin = {
+            id: 'doughnutCalloutLines',
+            afterDraw(chart) {
+                if (chart.config.type !== 'doughnut') return;
+                const { ctx, chartArea: { left, top, width, height } } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data || meta.data.length === 0) return;
+
+                ctx.save();
+                ctx.font = 'bold 8.5px "Poppins", sans-serif';
+
+                // Función auxiliar para dividir el texto en múltiples líneas si supera cierta longitud
+                const wrapText = (text, maxChars) => {
+                    if (!text) return [];
+                    const words = text.split(' ');
+                    const lines = [];
+                    let currentLine = '';
+
+                    words.forEach(word => {
+                        // Si la palabra sola es muy larga o tiene /, la dividimos si es necesario
+                        if ((currentLine + ' ' + word).trim().length <= maxChars) {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        } else {
+                            if (currentLine) lines.push(currentLine);
+                            currentLine = word;
+                        }
+                    });
+                    if (currentLine) lines.push(currentLine);
+                    return lines.length > 0 ? lines : [text];
+                };
+
+                meta.data.forEach((element, i) => {
+                    const value = chart.data.datasets[0].data[i];
+                    if (!value || value <= 0) return;
+
+                    const label = chart.data.labels[i] || '';
+                    const color = chart.data.datasets[0].backgroundColor[i % chart.data.datasets[0].backgroundColor.length];
+
+                    const centerAngle = element.startAngle + (element.endAngle - element.startAngle) / 2;
+                    const outerRadius = element.outerRadius;
+                    const innerRadius = element.innerRadius;
+
+                    // Puntos de la línea
+                    const xStart = element.x + Math.cos(centerAngle) * outerRadius;
+                    const yStart = element.y + Math.sin(centerAngle) * outerRadius;
+
+                    const lineLength = 8;
+                    const xMid = element.x + Math.cos(centerAngle) * (outerRadius + lineLength);
+                    const yMid = element.y + Math.sin(centerAngle) * (outerRadius + lineLength);
+
+                    const isRight = Math.cos(centerAngle) >= 0;
+                    const xEnd = isRight ? xMid + 6 : xMid - 6;
+                    const yEnd = yMid;
+
+                    // Dibujar la línea conectora
+                    ctx.beginPath();
+                    ctx.moveTo(xStart, yStart);
+                    ctx.lineTo(xMid, yMid);
+                    ctx.lineTo(xEnd, yEnd);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+
+                    // Dibujar pequeño punto indicador en el origen de la barra
+                    ctx.beginPath();
+                    ctx.arc(xStart, yStart, 2, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+
+                    // Dibujar el texto externo con el nombre de la categoría (multilínea)
+                    ctx.fillStyle = '#334155'; // slate-700
+                    ctx.textAlign = isRight ? 'left' : 'right';
+                    ctx.textBaseline = 'middle';
+                    const textX = isRight ? xEnd + 3 : xEnd - 3;
+
+                    // Dividir etiquetas largas en líneas de máx ~14 caracteres
+                    const lines = wrapText(label, 14);
+                    const lineHeight = 10;
+                    const startY = yEnd - ((lines.length - 1) * lineHeight) / 2;
+
+                    lines.forEach((lineText, lineIdx) => {
+                        ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                    });
+                });
+
+                ctx.restore();
+            }
+        };
+
         function initChartsContainer() {
             Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Poppins, sans-serif';
@@ -1390,7 +1483,7 @@
             const ctxTipo = document.getElementById("chartTipoInno").getContext("2d");
             chartTipoInstance = new Chart(ctxTipo, {
                 type: 'doughnut',
-                plugins: [ChartDataLabels],
+                plugins: [ChartDataLabels, doughnutCalloutLinesPlugin],
                 data: {
                     labels: Object.keys(chartDataCount),
                     datasets: [{
@@ -1402,11 +1495,19 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 70,
+                            right: 70,
+                            top: 15,
+                            bottom: 15
+                        }
+                    },
                     plugins: { 
                         legend: { display: false },
                         datalabels: {
                             color: '#ffffff',
-                            font: { family: 'Poppins, sans-serif', weight: '800', size: 11 },
+                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
                             formatter: (value, ctx) => {
                                 let sum = 0;
                                 let dataArr = ctx.chart.data.datasets[0].data;
@@ -1418,19 +1519,8 @@
                             textShadowBlur: 4
                         }
                     },
-                    cutout: '72%'
+                    cutout: '62%'
                 }
-            });
-
-            const legendTipo = document.getElementById("legendTipoInno");
-            legendTipo.innerHTML = "";
-            Object.keys(chartDataCount).forEach((category, index) => {
-                legendTipo.innerHTML += `
-                    <div class="flex items-center gap-1.5 border-b border-slate-100 pb-1">
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${bluePalette[index % bluePalette.length]};"></span>
-                        <span class="font-bold text-slate-700 truncate">${category}</span>
-                    </div>
-                `;
             });
 
             // 4. Etapas del Funnel
@@ -2828,8 +2918,16 @@
 
         function toggleTipoChartMetric(metric) {
             activeTipoChartMetric = metric;
-            document.getElementById("btnMetricTipo").className = metric === 'tipo' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
-            document.getElementById("btnMetricVertical").className = metric === 'vertical' ? 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm' : 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            const titleEl = document.getElementById("tipoChartTitle");
+            if (metric === 'tipo') {
+                titleEl.innerText = "TIPO DE INNOVACIÓN";
+                document.getElementById("btnMetricTipo").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+                document.getElementById("btnMetricVertical").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+            } else {
+                titleEl.innerText = "TIPO DE VERTICAL";
+                document.getElementById("btnMetricTipo").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-800';
+                document.getElementById("btnMetricVertical").className = 'px-2.5 py-1 text-[10px] font-bold rounded-md transition-all bg-white text-slate-800 shadow-sm';
+            }
             renderCharts();
         }
 
