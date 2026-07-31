@@ -154,7 +154,7 @@
                 <!-- Leyenda compartida -->
                 <div class="border-t border-slate-100 pt-4">
                     <div id="bullet-shared-legend"
-                         class="flex flex-wrap items-center gap-6 text-xs text-slate-600 font-bold">
+                         class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-600 font-bold">
                         <!-- Generado dinámicamente -->
                     </div>
                 </div>
@@ -457,129 +457,125 @@
 
     <!-- Modal Detalle Proyecto -->
     <div id="projectModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-4xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800">
+        <div class="bg-cardBg border border-borderBg rounded-3xl max-w-4xl w-full p-6 md:p-8 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl text-slate-800">
             <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             
-            <div class="space-y-2 pr-8">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span id="modalGerencia" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full font-bold"></span>
-                    <span id="modalFunnel" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full font-bold"></span>
+            <!-- Encabezado Modal -->
+            <div class="flex items-start justify-between gap-4 pr-8">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="modalGerencia" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-full font-bold"></span>
+                        <span id="modalFunnel" class="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-full font-bold"></span>
+                    </div>
+                    <h3 id="modalTitle" class="text-2xl font-black text-slate-900 leading-tight"></h3>
                 </div>
-                <h3 id="modalTitle" class="text-xl font-extrabold text-slate-900 leading-tight"></h3>
+
+                <div class="text-right shrink-0">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">RIESGO</span>
+                    <span id="modalRiskLabel" class="text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full inline-block mt-1">MEDIO</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg md:col-span-2 flex flex-col justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Descripción</h4>
-                        <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed"></p>
-                    </div>
-                    
-                    <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-slate-200 hidden">
-                        <h5 class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1">Comentario de Control</h5>
-                        <p id="modalComment" class="text-xs text-slate-600 italic leading-relaxed"></p>
-                    </div>
-                </div>
+            <!-- Descripción -->
+            <div class="bg-[#f8fafc] p-4 md:p-5 rounded-2xl border border-borderBg space-y-1.5">
+                <h4 class="text-[11px] font-extrabold uppercase text-slate-500 tracking-wider">DESCRIPCIÓN</h4>
+                <p id="modalDesc" class="text-xs md:text-sm text-slate-700 font-medium leading-relaxed"></p>
                 
-                <div class="bg-[#f8fafc] p-4 rounded-xl border border-borderBg flex flex-col items-center justify-center text-center">
-                    <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Nivel de Riesgo</h4>
-                    <div class="relative w-full flex items-center justify-center overflow-hidden" style="height: 80px;">
-                        <svg class="w-32 h-16" viewBox="0 0 100 50">
-                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round" />
-                            <path d="M 10 50 A 40 40 0 0 1 30 15.36" fill="none" stroke="#0f6f46" stroke-width="12" stroke-linecap="round" />
-                            <path d="M 30 15.36 A 40 40 0 0 1 70 15.36" fill="none" stroke="#facc15" stroke-width="12" />
-                            <path d="M 70 15.36 A 40 40 0 0 1 90 50" fill="none" stroke="#f15a24" stroke-width="12" stroke-linecap="round" />
-                            
-                            <g id="needleGroup" style="transform-origin: 50px 50px; transform-box: view-box; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);">
-                                <polygon points="49,50 51,50 50,14" fill="#1e293b" />
-                            </g>
-                            
-                            <circle cx="50" cy="50" r="5" fill="#9bca3c" stroke="#ffffff" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <span id="modalRiskLabel" class="text-xs font-extrabold uppercase tracking-widest mt-1">MEDIO</span>
+                <div id="modalCommentContainer" class="mt-4 pt-3 border-t border-slate-200 hidden">
+                    <h5 class="text-[10px] font-bold uppercase text-slate-500 tracking-wider mb-1">Comentario de Control</h5>
+                    <p id="modalComment" class="text-xs text-slate-600 italic leading-relaxed"></p>
                 </div>
             </div>
 
-            <div class="border-t border-slate-200 pt-5 space-y-3">
-                <h4 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Métricas Base del Registro</h4>
+            <!-- Campo Avance (Borde Punteado) -->
+            <div id="modalAvanceContainer" class="bg-white p-4 md:p-5 rounded-2xl border border-dashed border-slate-300 space-y-1.5 min-h-[70px]">
+                <h4 class="text-[11px] font-extrabold uppercase text-slate-500 tracking-wider">AVANCE</h4>
+                <p id="modalAvance" class="text-xs md:text-sm text-slate-700 font-medium leading-relaxed"></p>
+            </div>
+
+            <!-- Campo Próximos Pasos (Borde Punteado) -->
+            <div id="modalProximosPasosContainer" class="bg-white p-4 md:p-5 rounded-2xl border border-dashed border-slate-300 space-y-1.5 min-h-[70px]">
+                <h4 class="text-[11px] font-extrabold uppercase text-slate-500 tracking-wider">PRÓXIMOS PASOS</h4>
+                <p id="modalProximosPasos" class="text-xs md:text-sm text-slate-700 font-medium leading-relaxed"></p>
+            </div>
+
+            <!-- Sección Impacto Potencial -->
+            <div class="space-y-4">
+                <h4 class="text-xs font-extrabold uppercase text-slate-500 tracking-wider">IMPACTO POTENCIAL</h4>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-[#f3e8ff]/60 border-2 border-[#956eb6]/30 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                        <span class="text-xs font-bold text-[#956eb6] uppercase tracking-wider mb-1">EBITDA potencial</span>
+                        <span id="modalEbitdaPotencial" class="text-lg md:text-xl font-black text-slate-900">$0</span>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">HHT potencial</span>
+                        <span id="modalHhtPotencial" class="text-lg md:text-xl font-black text-slate-900">0 Hrs</span>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 1</span>
-                        <span id="modalKpi1" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">KPI 1</span>
+                        <span id="modalKpi1" class="text-sm font-extrabold text-slate-900 mt-1">N/R</span>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 2</span>
-                        <span id="modalKpi2" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">KPI 2</span>
+                        <span id="modalKpi2" class="text-sm font-extrabold text-slate-900 mt-1">N/R</span>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 flex flex-col justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">KPI 3</span>
-                        <span id="modalKpi3" class="text-base font-extrabold text-slate-950 mt-1">N/A</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">KPI 3</span>
+                        <span id="modalKpi3" class="text-sm font-extrabold text-slate-900 mt-1">N/R</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-slate-200 pt-4">
-                <div class="space-y-1">
-                    <span class="text-xs text-slate-500 font-medium">Líder Funcional</span>
-                    <p class="text-sm text-slate-800 flex items-center gap-2">
-                        <i data-lucide="user" class="w-4 h-4 text-slate-500"></i>
-                        <span id="modalLeader" class="font-semibold text-slate-900"></span>
-                    </p>
-                    <a id="modalEmail" href="#" class="text-xs text-palForest font-bold block pl-6 hover:underline"></a>
-                </div>
+            <!-- Sección Gobernanza -->
+            <div class="space-y-3 pt-2">
+                <h4 class="text-xs font-extrabold uppercase text-slate-500 tracking-wider">GOBERNANZA</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-xs">
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">Líder funcional</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalLeader"></p>
+                        <a id="modalEmail" href="#" class="text-xs text-palForest font-bold block hover:underline"></a>
+                    </div>
 
-                <div class="space-y-1">
-                    <span class="text-xs text-slate-500 font-medium">Responsable de Innovación</span>
-                    <p class="text-sm text-slate-800 flex items-center gap-2">
-                        <i data-lucide="user-check" class="w-4 h-4 text-slate-500"></i>
-                        <span id="modalRespInnovacion" class="font-semibold text-slate-900"></span>
-                    </p>
-                </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">Responsable de innovación</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalRespInnovacion"></p>
+                    </div>
 
-                <div class="space-y-1 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
-                    <span class="text-xs text-slate-500 font-medium">Sponsor del Proyecto</span>
-                    <p class="text-sm text-slate-800 flex items-center gap-2">
-                        <i data-lucide="award" class="w-4 h-4 text-slate-500"></i>
-                        <span id="modalSponsor" class="font-semibold text-slate-900"></span>
-                    </p>
-                </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">Sponsor</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalSponsor"></p>
+                    </div>
 
-                <div class="space-y-1 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
-                    <span class="text-xs text-slate-500 font-medium">Origen de Solución</span>
-                    <p id="modalOrigen" class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                        <i data-lucide="lightbulb" class="w-4 h-4 text-slate-500"></i>
-                        <span class="text-slate-900 font-semibold"></span>
-                    </p>
-                </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">Origen de solución</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalOrigen"></p>
+                    </div>
 
-                <div class="space-y-1 border-t border-slate-100 pt-3">
-                    <span class="text-xs text-slate-500 font-medium">Tipo de Solución / Gobernanza TD</span>
-                    <p id="modalGovernance" class="text-sm text-slate-800 font-semibold flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-4 h-4 text-slate-500"></i>
-                        <span class="text-slate-900 font-semibold"></span>
-                    </p>
-                </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">Tipo de solución</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalGovernance"></p>
+                    </div>
 
-                <div class="space-y-1 border-t border-slate-100 pt-3">
-                    <span class="text-xs text-slate-500 font-medium">KR (Key Result)</span>
-                    <p id="modalKR" class="text-sm text-slate-800 font-semibold flex items-center gap-2">
-                        <i data-lucide="target" class="w-4 h-4 text-slate-500"></i>
-                        <span class="text-slate-900 font-semibold"></span>
-                    </p>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 font-medium block">KR (key result)</span>
+                        <p class="text-slate-900 font-bold text-sm" id="modalKR"></p>
+                    </div>
                 </div>
             </div>
 
             <!-- CARTA GANTT DE SEGUIMIENTO -->
             <div id="modalGanttContainer" class="border-t border-slate-200 pt-5 space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
-                        <i data-lucide="calendar-range" class="w-4 h-4 text-palPurple"></i>
-                        Cronograma y Carta Gantt (Estructurado por Objetivo)
+                    <span class="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        PLANIFICACIÓN · CRONOGRAMA
                     </span>
-                    <span id="ganttStatus" class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"></span>
+                    <span id="ganttStatus" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider"></span>
                 </div>
                 
                 <div id="ganttLoading" class="hidden text-center py-8 text-xs text-slate-400">
@@ -918,7 +914,6 @@
             if (totalEbitda >= jointEbitdaMeta) {
                 ebitdaAxisHtml = `
                     <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold">
-                        <span class="absolute left-0 top-0">$0</span>
                         <div class="absolute flex flex-col items-center -translate-x-1/2" style="left: ${ebitdaMetaPosPct}%;">
                             <span class="text-slate-600 font-bold">$1.000M</span>
                         </div>
@@ -926,8 +921,7 @@
                 `;
             } else {
                 ebitdaAxisHtml = `
-                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-between items-center">
-                        <span>$0</span>
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-end items-center">
                         <span class="text-slate-600 font-bold">$1.000M</span>
                     </div>
                 `;
@@ -976,7 +970,6 @@
             if (totalHht >= jointHhtMeta) {
                 hhtAxisHtml = `
                     <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold">
-                        <span class="absolute left-0 top-0">0</span>
                         <div class="absolute flex flex-col items-center -translate-x-1/2" style="left: ${hhtMetaPosPct}%;">
                             <span class="text-slate-600 font-bold">${Math.round(jointHhtMeta).toLocaleString('es-CL')}</span>
                         </div>
@@ -984,8 +977,7 @@
                 `;
             } else {
                 hhtAxisHtml = `
-                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-between items-center">
-                        <span>0</span>
+                    <div class="relative w-full h-5 mt-1 select-none text-[11px] text-slate-500 font-semibold flex justify-end items-center">
                         <span class="text-slate-600 font-bold">${Math.round(jointHhtMeta).toLocaleString('es-CL')}</span>
                     </div>
                 `;
@@ -1721,6 +1713,9 @@
                 if (!anioImplementacion) anioImplementacion = anio;
 
                 const descripcion = cleanEncoding(findVal(["descripcion", "detalle"]));
+                const estadoAvance = cleanEncoding(findVal(["estadodeavance", "estadoavance", "avance", "estadodeavanceactual"]));
+                const proximosPasos = cleanEncoding(findVal(["proximospasos", "proximos_pasos", "proximos", "pasos"]));
+
                 const riesgo = cleanEncoding(findVal(["nivelderiesgo", "riesgo"]));
                 const gerencia = cleanEncoding(findVal(["unidad", "gerencia", "unidadgerencia"]));
                 const tipoInnovacion = cleanEncoding(findVal(["tipodeinnovacion", "tipoinnovacion", "tipo"]));
@@ -1755,7 +1750,7 @@
                 const kpi3 = cleanEncoding(findVal(["kpi3", "kpi_3", "kpi 3"]));
 
                 return {
-                    id, nombre, anio, anioImplementacion, descripcion, riesgo, gerencia, tipoInnovacion, vertical,
+                    id, nombre, anio, anioImplementacion, descripcion, estadoAvance, proximosPasos, riesgo, gerencia, tipoInnovacion, vertical,
                     lider, correo, funnel, inversion, ebitdaPotencial, ebitdaPiloto,
                     ebitdaCapturado, hht, hhtCapturado, estado, sponsor,
                     escalamiento, tipoSolucion, origenSolucion, comentario, requiereGobernanza,
@@ -2615,22 +2610,43 @@
             document.getElementById("modalGerencia").innerText = item.gerencia || "Sin asignar";
             document.getElementById("modalFunnel").innerText = item.funnel || "No definida";
             document.getElementById("modalDesc").innerText = item.descripcion || "Sin descripción detallada.";
-            document.getElementById("modalLeader").innerText = item.lider || "No asignado";
-            document.getElementById("modalEmail").innerText = item.correo || "No registra correo";
-            document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
-            document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
             
-            document.querySelector("#modalOrigen span").innerText = item.origenSolucion || "No especificado";
-            document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
-            document.querySelector("#modalKR span").innerText = item.kr || "No especificado";
+            const avanceContainer = document.getElementById("modalAvanceContainer");
+            if (avanceContainer) {
+                if (item.estadoAvance && item.estadoAvance.trim() !== "" && item.estadoAvance.trim() !== "-") {
+                    document.getElementById("modalAvance").innerText = item.estadoAvance;
+                } else {
+                    document.getElementById("modalAvance").innerText = "";
+                }
+            }
+
+            const proxContainer = document.getElementById("modalProximosPasosContainer");
+            if (proxContainer) {
+                if (item.proximosPasos && item.proximosPasos.trim() !== "" && item.proximosPasos.trim() !== "-") {
+                    document.getElementById("modalProximosPasos").innerText = item.proximosPasos;
+                } else {
+                    document.getElementById("modalProximosPasos").innerText = "";
+                }
+            }
+
+            document.getElementById("modalEbitdaPotencial").innerText = formatCurrency(item.ebitdaPotencial);
+            document.getElementById("modalHhtPotencial").innerText = `${Math.round(item.hht || 0).toLocaleString('es-CL')} Hrs`;
 
             document.getElementById("modalKpi1").innerText = item.kpi1 && item.kpi1.trim() !== "" ? item.kpi1 : "N/R";
             document.getElementById("modalKpi2").innerText = item.kpi2 && item.kpi2.trim() !== "" ? item.kpi2 : "N/R";
             document.getElementById("modalKpi3").innerText = item.kpi3 && item.kpi3.trim() !== "" ? item.kpi3 : "N/R";
 
+            document.getElementById("modalLeader").innerText = item.lider || "No asignado";
+            document.getElementById("modalEmail").innerText = item.correo || "";
+            document.getElementById("modalEmail").href = item.correo ? `mailto:${item.correo}` : "#";
+            document.getElementById("modalSponsor").innerText = item.sponsor || "No asignado";
+            document.getElementById("modalRespInnovacion").innerText = item.respInnovacion || "No asignado";
+            document.getElementById("modalOrigen").innerText = item.origenSolucion || "No especificado";
+            document.getElementById("modalKR").innerText = item.kr || "No especificado";
+
             let govText = item.tipoSolucion || "No especificado";
-            if (item.requiereGobernanza) govText += ` (Gobernanza TD: ${item.requiereGobernanza})`;
-            document.querySelector("#modalGovernance span").innerText = govText;
+            if (item.requiereGobernanza) govText += ` (Gob. TD: ${item.requiereGobernanza})`;
+            document.getElementById("modalGovernance").innerText = govText;
 
             const commContainer = document.getElementById("modalCommentContainer");
             const commText = document.getElementById("modalComment");
@@ -2643,36 +2659,27 @@
                 }
             }
 
-            const needleGroup = document.getElementById("needleGroup");
             const riskLabel = document.getElementById("modalRiskLabel");
-            let rotation = 0;
-
             if (item.riesgo) {
                 const rNorm = item.riesgo.toLowerCase();
                 if (rNorm.includes("bajo")) {
-                    rotation = -60;
-                    riskLabel.innerText = "BAJO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-palForest";
+                    riskLabel.innerText = "Bajo";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full inline-block mt-1 bg-emerald-100 text-emerald-800 border border-emerald-200";
                 } else if (rNorm.includes("alto")) {
-                    rotation = 60;
-                    riskLabel.innerText = "ALTO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-palOrange";
+                    riskLabel.innerText = "Alto";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full inline-block mt-1 bg-rose-100 text-rose-800 border border-rose-200";
                 } else {
-                    rotation = 0;
-                    riskLabel.innerText = "MEDIO";
-                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-[#d97706]";
+                    riskLabel.innerText = "Medio";
+                    riskLabel.className = "text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full inline-block mt-1 bg-amber-100 text-amber-800 border border-amber-200";
                 }
             } else {
-                rotation = 0;
                 riskLabel.innerText = "N/A";
-                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest mt-1 text-slate-400";
+                riskLabel.className = "text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full inline-block mt-1 bg-slate-100 text-slate-500 border border-slate-200";
             }
 
-            if (needleGroup) needleGroup.style.transform = `rotate(${rotation}deg)`;
-            
             loadProjectGantt(item);
             document.getElementById("projectModal").classList.remove("hidden");
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         function closeModal() {
@@ -2684,6 +2691,8 @@
                 {
                     id: "PM-001", nombre: "Recuperación de Fibra", anio: "2025", anioImplementacion: "2025",
                     descripcion: "Estrategia de reciclaje y recuperación de fibras textiles de alta resistencia en centros de distribución.",
+                    estadoAvance: "Fase de pilotaje en curso en Planta 1 con un 85% de avance acumulado.",
+                    proximosPasos: "Iniciar pruebas de escalamiento operacional y validación de calidad en Planta 2.",
                     riesgo: "Bajo", gerencia: "Recupac", tipoInnovacion: "Incremental",
                     lider: "Eduardo Fuentes", correo: "eduardo.fuentes@empresa.cl", funnel: "Ejecución pilotaje",
                     inversion: 45000000, ebitdaPotencial: 120000000, ebitdaPiloto: 90000000,
@@ -2695,6 +2704,8 @@
                 {
                     id: "PM-002", nombre: "Logística Inversa Eficiente", anio: "2024", anioImplementacion: "2024",
                     descripcion: "Reestructuración del flujo logístico para devoluciones y empaques circulares reduciendo tiempos.",
+                    estadoAvance: "Proyecto cerrado exitosamente e incorporado a la operación habitual.",
+                    proximosPasos: "Monitoreo continuo en reuniones de control operativo mensual.",
                     riesgo: "Medio", gerencia: "Matriz", tipoInnovacion: "Adyacente",
                     lider: "Andrea Gómez", correo: "andrea.gomez@empresa.cl", funnel: "Seguimiento",
                     inversion: 30000000, ebitdaPotencial: 135000000, ebitdaPiloto: 110000000,
@@ -2706,6 +2717,8 @@
                 {
                     id: "PM-003", nombre: "Sensorización IoT Planta", anio: "2025", anioImplementacion: "2025",
                     descripcion: "Despliegue de sensores de vibración y temperatura en molienda para prevenir fallas catastróficas.",
+                    estadoAvance: "",
+                    proximosPasos: "",
                     riesgo: "Alto", gerencia: "CPP", tipoInnovacion: "Adyacente",
                     lider: "Isidora González", correo: "isidora.gonzalez@empresa.cl", funnel: "Ejecución pilotaje",
                     inversion: 80000000, ebitdaPotencial: 250000000, ebitdaPiloto: 180000000,
@@ -2717,6 +2730,8 @@
                 {
                     id: "PM-004", nombre: "Optimización Energética Corrupac", anio: "2026", anioImplementacion: "2026",
                     descripcion: "Ajuste dinámico de calderas en base a demanda predictiva de producción para reducción de gas natural.",
+                    estadoAvance: "Calibración del modelo predictivo con datos de consumo en tiempo real.",
+                    proximosPasos: "Presentación de resultados del primer trimestre al comité de innovación.",
                     riesgo: "Medio", gerencia: "Corrupac", tipoInnovacion: "Incremental",
                     lider: "Carlos Rivas", correo: "carlos.rivas@empresa.cl", funnel: "Implementación",
                     inversion: 62000000, ebitdaPotencial: 180000000, ebitdaPiloto: 140000000,
