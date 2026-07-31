@@ -19,6 +19,9 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
                     colors: {
                         mockupBg: '#f4f6f9',    // Fondo principal claro de alta gama
                         cardBg: '#ffffff',      // Fondo blanco para tarjetas y contenedores
@@ -41,9 +44,9 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #f4f6f9;
         }
         .custom-scrollbar::-webkit-scrollbar {
@@ -475,12 +478,13 @@
 
                 <!-- Responsive Table Container -->
                 <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse min-w-[900px]">
+                    <table class="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                             <tr class="border-b border-borderBg bg-[#f8fafc] text-xs font-bold uppercase tracking-wider text-slate-500">
                                 <th class="py-4 px-6">ID</th>
                                 <th class="py-4 px-6">Proyecto</th>
                                 <th class="py-4 px-6">Líder</th>
+                                <th class="py-4 px-6">Sponsor</th>
                                 <th class="py-4 px-6">Gerencia / Unidad</th>
                                 <th class="py-4 px-6 text-center">Riesgo</th>
                                 <th class="py-4 px-6 text-right">Inversión Ejec.</th>
@@ -491,6 +495,7 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="text-sm divide-y divide-slate-100 cursor-pointer"></tbody>
+                        <tfoot id="tableFoot" class="bg-slate-50 border-t-2 border-borderBg font-extrabold text-xs text-slate-900"></tfoot>
                     </table>
                 </div>
                 
@@ -1072,7 +1077,7 @@
             afterDraw: (chart) => {
                 const { ctx, scales: { x } } = chart;
                 ctx.save();
-                ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
+                ctx.font = 'bold 8px "Poppins", sans-serif';
                 ctx.fillStyle = '#64748b'; // color slate-500
                 ctx.textAlign = 'center';
 
@@ -1099,7 +1104,7 @@
                 if (chart.config.type !== 'bar') return;
                 const { ctx, scales: { x, y } } = chart;
                 ctx.save();
-                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.font = 'bold 11px "Poppins", sans-serif';
                 ctx.fillStyle = '#1e293b'; // slate-800
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
@@ -1141,7 +1146,7 @@
 
         function initChartsContainer() {
             Chart.defaults.color = '#475569';
-            Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
+            Chart.defaults.font.family = 'Poppins, sans-serif';
             Chart.defaults.borderColor = '#e2e8f0';
         }
 
@@ -1192,7 +1197,7 @@
             const ctxEbitda = document.getElementById("chartEbitdaProyecto").getContext("2d");
             chartEbitdaInstance = new Chart(ctxEbitda, {
                 type: 'bar',
-                plugins: [customXAxisLabelsPlugin],
+                plugins: [customXAxisLabelsPlugin, ChartDataLabels],
                 data: {
                     labels: sortedGerencias,
                     datasets: [
@@ -1219,12 +1224,28 @@
                     maintainAspectRatio: false,
                     layout: {
                         padding: {
+                            top: 24,
                             bottom: 12
                         }
                     },
                     plugins: { 
                         legend: { display: false }, 
-                        datalabels: { display: false },
+                        datalabels: {
+                            display: true,
+                            color: '#1e293b',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 2,
+                            font: { family: 'Poppins, sans-serif', weight: '700', size: 9 },
+                            formatter: (value) => {
+                                if (!value || value <= 0) return '';
+                                if (activeMainChartMetric === 'ebitda') {
+                                    return formatCompactCLP(value);
+                                } else {
+                                    return Math.round(value).toLocaleString('es-CL');
+                                }
+                            }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -1299,9 +1320,12 @@
 
             const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b] - proyectosByGerencia[a]);
 
+            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia), 0);
+
             const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
             chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
                 type: 'bar',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: sortedProyectosGerencias,
                     datasets: [{
@@ -1317,12 +1341,28 @@
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            right: 28
+                        }
+                    },
                     plugins: { 
                         legend: { display: false },
-                        datalabels: { display: false }
+                        datalabels: {
+                            display: true,
+                            color: '#1e293b',
+                            anchor: 'end',
+                            align: 'right',
+                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                            formatter: (val) => val > 0 ? val : ''
+                        }
                     },
                     scales: {
-                        x: { grid: { color: 'rgba(107, 124, 133, 0.12)' }, ticks: { precision: 0, font: { size: 9 } } },
+                        x: { 
+                            grid: { color: 'rgba(107, 124, 133, 0.12)' }, 
+                            ticks: { precision: 0, font: { size: 9 } },
+                            suggestedMax: maxProjectVal > 0 ? maxProjectVal + 1 : 5
+                        },
                         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     }
                 }
@@ -1366,7 +1406,7 @@
                         legend: { display: false },
                         datalabels: {
                             color: '#ffffff',
-                            font: { family: 'Plus Jakarta Sans, sans-serif', weight: '800', size: 11 },
+                            font: { family: 'Poppins, sans-serif', weight: '800', size: 11 },
                             formatter: (value, ctx) => {
                                 let sum = 0;
                                 let dataArr = ctx.chart.data.datasets[0].data;
@@ -1519,7 +1559,7 @@
                 const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
                 chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
                     type: 'bar',
-                    plugins: [chartCreatedProjectsTotalsPlugin],
+                    plugins: [chartCreatedProjectsTotalsPlugin, ChartDataLabels],
                     data: {
                         labels: sortedCreationYears,
                         datasets: datasetsCreated
@@ -1527,16 +1567,26 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 20
+                            }
+                        },
                         plugins: {
                             legend: {
                                 display: true,
                                 position: 'top',
                                 labels: {
                                     boxWidth: 12,
-                                    font: { size: 10, weight: 'bold' }
+                                    font: { family: 'Poppins, sans-serif', size: 10, weight: 'bold' }
                                 }
                             },
-                            datalabels: { display: false }
+                            datalabels: { 
+                                display: true,
+                                color: '#ffffff',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 9 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
                         },
                         scales: {
                             x: {
@@ -1578,6 +1628,7 @@
                 const ctxProyectosCreados = document.getElementById("chartProyectosCreados").getContext("2d");
                 chartProyectosCreadosInstance = new Chart(ctxProyectosCreados, {
                     type: 'line',
+                    plugins: [ChartDataLabels],
                     data: {
                         labels: years,
                         datasets: [{
@@ -1598,13 +1649,18 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 20
+                            }
+                        },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
                                 display: true,
                                 color: '#1e293b',
                                 align: 'top',
-                                font: { weight: 'bold', size: 11 },
+                                font: { family: 'Poppins, sans-serif', weight: 'bold', size: 11 },
                                 formatter: (val) => `${val.toFixed(1)}%`
                             }
                         },
@@ -2215,8 +2271,10 @@
 
         function renderTable() {
             const tbody = document.getElementById("tableBody");
+            const tfoot = document.getElementById("tableFoot");
             const emptyState = document.getElementById("tableEmptyState");
             tbody.innerHTML = "";
+            if (tfoot) tfoot.innerHTML = "";
 
             document.getElementById("tableRecordCount").innerText = `Mostrando ${filteredDataset.length} registros`;
 
@@ -2242,7 +2300,18 @@
                 return (b.ebitdaPotencial || 0) - (a.ebitdaPotencial || 0);
             });
 
+            // Acumuladores para el totalizador
+            let sumInversion = 0;
+            let sumEbitdaPotencial = 0;
+            let sumEbitdaPiloto = 0;
+            let sumEbitdaCapturado = 0;
+
             sortedDataset.forEach(item => {
+                sumInversion += (item.inversion || 0);
+                sumEbitdaPotencial += (item.ebitdaPotencial || 0);
+                sumEbitdaPiloto += (item.ebitdaPiloto || 0);
+                sumEbitdaCapturado += (item.ebitdaCapturado || 0);
+
                 const tr = document.createElement("tr");
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs text-slate-700 cursor-pointer";
                 tr.onclick = () => openModal(item);
@@ -2266,6 +2335,7 @@
                     <td class="py-3 px-6 font-mono font-bold text-palForest">${item.id}</td>
                     <td class="py-3 px-6 font-extrabold text-slate-900 max-w-[200px] truncate">${item.nombre || 'N/A'}</td>
                     <td class="py-3 px-6">${item.lider || 'N/A'}</td>
+                    <td class="py-3 px-6 text-slate-600">${item.sponsor || 'N/A'}</td>
                     <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
@@ -2284,6 +2354,21 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Fila de Totalizador en TFOOT
+            if (tfoot) {
+                const footTr = document.createElement("tr");
+                footTr.className = "bg-slate-100 border-t-2 border-slate-300 font-black text-slate-900";
+                footTr.innerHTML = `
+                    <td colspan="6" class="py-4 px-6 text-right uppercase tracking-wider text-xs font-black">Total Portafolio Filtrado:</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumInversion)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-900">${formatCurrency(sumEbitdaPotencial)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumEbitdaPiloto)}</td>
+                    <td class="py-4 px-6 text-right font-extrabold text-palForest">${formatCurrency(sumEbitdaCapturado)}</td>
+                    <td class="py-4 px-6"></td>
+                `;
+                tfoot.appendChild(footTr);
+            }
         }
 
         function loadProjectGantt(item) {
