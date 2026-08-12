@@ -1809,9 +1809,23 @@
 
                     let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
                     let tasaRaw = findVal(["tasadeimplementacion", "tasadeimplementacionhistorica", "tasaimplementacion", "implementacion", "tasa", "valor", "porcentaje", "pct", "%"]);
+                    let rawPiloteados = findVal(["nproyectospiloteados", "proyectospiloteados", "piloteados", "numpiloteados"]);
+                    let rawCreados = findVal(["nproyectosanocreacion", "nproyectosaniocreacion", "proyectosanocreacion", "proyectosaniocreacion", "proyectoscreados", "anocreacion", "creados"]);
 
                     let anio = cleanEncoding(anioRaw).trim();
                     let strVal = String(tasaRaw).trim();
+
+                    if (!rawPiloteados || !rawCreados) {
+                        for (const key of Object.keys(row)) {
+                            const normK = normalizeKey(cleanEncoding(key));
+                            if (normK.includes("pilotead")) {
+                                rawPiloteados = row[key];
+                            }
+                            if (normK.includes("creacion") || normK.includes("creado")) {
+                                rawCreados = row[key];
+                            }
+                        }
+                    }
 
                     if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
                         for (const key of Object.keys(row)) {
@@ -1850,7 +1864,14 @@
                         finalTasa = parsedVal * 100;
                     }
 
-                    return { anio, tasa: finalTasa };
+                    let numPiloteados = parseNumeric(rawPiloteados);
+                    let numCreados = parseNumeric(rawCreados);
+
+                    if (numCreados > 0) {
+                        finalTasa = (numPiloteados / numCreados) * 100;
+                    }
+
+                    return { anio, tasa: finalTasa, proyectosPiloteados: numPiloteados, proyectosCreacion: numCreados };
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
@@ -1876,7 +1897,7 @@
                     }
                 }
                 if (detectedTasa !== null) {
-                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa, proyectosPiloteados: 0, proyectosCreacion: 0 }];
                 }
             }
             return processed;
@@ -1905,9 +1926,23 @@
 
                     let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
                     let tasaRaw = findVal(["tasadepilotaje", "tasadepilotoanual", "tasadepiloto", "pilotadospiloteables", "pilotaje", "tasa", "valor", "porcentaje", "pct", "%"]);
+                    let rawPiloteados = findVal(["nproyectospiloteados", "proyectospiloteados", "piloteados", "numpiloteados"]);
+                    let rawCreados = findVal(["nproyectosanocreacion", "nproyectosaniocreacion", "proyectosanocreacion", "proyectosaniocreacion", "proyectoscreados", "anocreacion", "creados"]);
 
                     let anio = cleanEncoding(anioRaw).trim();
                     let strVal = String(tasaRaw).trim();
+
+                    if (!rawPiloteados || !rawCreados) {
+                        for (const key of Object.keys(row)) {
+                            const normK = normalizeKey(cleanEncoding(key));
+                            if (normK.includes("pilotead")) {
+                                rawPiloteados = row[key];
+                            }
+                            if (normK.includes("creacion") || normK.includes("creado")) {
+                                rawCreados = row[key];
+                            }
+                        }
+                    }
 
                     if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
                         for (const key of Object.keys(row)) {
@@ -1946,7 +1981,14 @@
                         finalTasa = parsedVal * 100;
                     }
 
-                    return { anio, tasa: finalTasa };
+                    let numPiloteados = parseNumeric(rawPiloteados);
+                    let numCreados = parseNumeric(rawCreados);
+
+                    if (numCreados > 0) {
+                        finalTasa = (numPiloteados / numCreados) * 100;
+                    }
+
+                    return { anio, tasa: finalTasa, proyectosPiloteados: numPiloteados, proyectosCreacion: numCreados };
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
@@ -1972,7 +2014,7 @@
                     }
                 }
                 if (detectedTasa !== null) {
-                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa, proyectosPiloteados: 0, proyectosCreacion: 0 }];
                 }
             }
             return processed;
@@ -2213,14 +2255,28 @@
             const kpiTasaImpSub = document.getElementById("kpiTasaImplementacionSub");
             if (kpiTasaImpSub) kpiTasaImpSub.innerText = `Año: ${latestImpAnio || 'N/A'}`;
 
-            const latestPilTasa = getLatestRate(datasetTasaPilotaje);
-            const latestPilAnio = getLatestYear(datasetTasaPilotaje);
-            
+            let pilMatch = datasetTasaPilotaje.find(d => String(d.anio) === String(fAnio));
+            if (!pilMatch && datasetTasaPilotaje.length > 0) {
+                const sortedPil = [...datasetTasaPilotaje].sort((a, b) => (parseInt(a.anio, 10) || 0) - (parseInt(b.anio, 10) || 0));
+                pilMatch = sortedPil[sortedPil.length - 1];
+            }
+
             const kpiTasaPil = document.getElementById("kpiTasaPilotaje");
-            if (kpiTasaPil) kpiTasaPil.innerText = `${latestPilTasa.toFixed(1)}%`;
-            
             const kpiTasaPilSub = document.getElementById("kpiTasaPilotajeSub");
-            if (kpiTasaPilSub) kpiTasaPilSub.innerText = `Año: ${latestPilAnio || 'N/A'}`;
+
+            if (pilMatch) {
+                if (kpiTasaPil) kpiTasaPil.innerText = `${pilMatch.tasa.toFixed(1)}%`;
+                if (kpiTasaPilSub) {
+                    if (pilMatch.proyectosCreacion !== undefined && pilMatch.proyectosCreacion > 0) {
+                        kpiTasaPilSub.innerText = `${pilMatch.proyectosPiloteados} proyectos piloteados / ${pilMatch.proyectosCreacion} proyectos creados`;
+                    } else {
+                        kpiTasaPilSub.innerText = `Año: ${pilMatch.anio || 'N/A'}`;
+                    }
+                }
+            } else {
+                if (kpiTasaPil) kpiTasaPil.innerText = `0%`;
+                if (kpiTasaPilSub) kpiTasaPilSub.innerText = `Año: N/A`;
+            }
 
             let capturedYearFilteredDataset = [];
             if (!isNaN(numericYear)) {
