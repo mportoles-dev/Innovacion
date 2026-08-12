@@ -1164,16 +1164,50 @@
                     const startY = yEnd - ((lines.length - 1) * lineHeight) / 2;
 
                     lines.forEach((lineText, lineIdx) => {
-                        ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
-                    });
+                    ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                });
+            });
+
+            ctx.restore();
+        }
+    };
+
+    const chartProyectosUnidadTotalsPlugin = {
+        id: 'chartProyectosUnidadTotals',
+        afterDraw(chart) {
+            if (chart.config.type !== 'bar' || chart.config.options.indexAxis !== 'y') return;
+            const { ctx, scales: { y } } = chart;
+            ctx.save();
+            ctx.font = 'bold 10px "Poppins", sans-serif';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            chart.data.labels.forEach((label, index) => {
+                let maxX = 0;
+                let total = 0;
+
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                    const meta = chart.getDatasetMeta(datasetIndex);
+                    if (meta && meta.data[index] && !meta.hidden) {
+                        const model = meta.data[index];
+                        if (model.x > maxX) {
+                            maxX = model.x;
+                        }
+                        total += (dataset.data[index] || 0);
+                    }
                 });
 
-                ctx.restore();
-            }
-        };
+                if (total > 0 && maxX > 0) {
+                    ctx.fillText(`${total}`, maxX + 6, y.getPixelForValue(index));
+                }
+            });
+            ctx.restore();
+        }
+    };
 
-        function initChartsContainer() {
-            Chart.defaults.color = '#475569';
+    function initChartsContainer() {
+        Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Poppins, sans-serif';
             Chart.defaults.borderColor = '#e2e8f0';
         }
@@ -1343,26 +1377,58 @@
             const proyectosByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
-                proyectosByGerencia[gerencia] = (proyectosByGerencia[gerencia] || 0) + 1;
+                if (!proyectosByGerencia[gerencia]) {
+                    proyectosByGerencia[gerencia] = { pilotage: 0, earlier: 0, total: 0 };
+                }
+                if (isPotentialEligible(item)) {
+                    proyectosByGerencia[gerencia].pilotage += 1;
+                } else {
+                    proyectosByGerencia[gerencia].earlier += 1;
+                }
+                proyectosByGerencia[gerencia].total += 1;
             });
 
-            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b] - proyectosByGerencia[a]);
-            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia), 0);
+            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b].total - proyectosByGerencia[a].total);
+            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia).map(g => g.total), 0);
 
             const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
             chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
                 type: 'bar',
-                plugins: [ChartDataLabels],
+                plugins: [chartProyectosUnidadTotalsPlugin, ChartDataLabels],
                 data: {
                     labels: sortedProyectosGerencias,
-                    datasets: [{
-                        label: 'Proyectos',
-                        data: sortedProyectosGerencias.map(g => proyectosByGerencia[g]),
-                        backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).potencial),
-                        borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
+                    datasets: [
+                        {
+                            label: 'Ejecución Pilotaje, Impl. y Seguimiento',
+                            data: sortedProyectosGerencias.map(g => proyectosByGerencia[g].pilotage),
+                            backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).potencial),
+                            borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            datalabels: {
+                                color: '#ffffff',
+                                anchor: 'center',
+                                align: 'center',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
+                        },
+                        {
+                            label: 'Etapas Anteriores',
+                            data: sortedProyectosGerencias.map(g => proyectosByGerencia[g].earlier),
+                            backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).capturado),
+                            borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            datalabels: {
+                                color: '#1e293b',
+                                anchor: 'center',
+                                align: 'center',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
+                        }
+                    ]
                 },
                 options: {
                     indexAxis: 'y',
@@ -1373,22 +1439,26 @@
                     },
                     plugins: { 
                         legend: { display: false },
-                        datalabels: {
-                            display: true,
-                            color: '#1e293b',
-                            anchor: 'end',
-                            align: 'right',
-                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
-                            formatter: (val) => val > 0 ? val : ''
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: { 
+                            stacked: true,
                             grid: { color: 'rgba(107, 124, 133, 0.12)' }, 
                             ticks: { precision: 0, font: { size: 9 } },
                             suggestedMax: maxProjectVal > 0 ? maxProjectVal + 1 : 5
                         },
-                        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        y: { 
+                            stacked: true,
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10 } } 
+                        }
                     }
                 }
             });
@@ -1809,9 +1879,23 @@
 
                     let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
                     let tasaRaw = findVal(["tasadeimplementacion", "tasadeimplementacionhistorica", "tasaimplementacion", "implementacion", "tasa", "valor", "porcentaje", "pct", "%"]);
+                    let rawPiloteados = findVal(["nproyectospiloteados", "proyectospiloteados", "piloteados", "numpiloteados"]);
+                    let rawCreados = findVal(["nproyectosanocreacion", "nproyectosaniocreacion", "proyectosanocreacion", "proyectosaniocreacion", "proyectoscreados", "anocreacion", "creados"]);
 
                     let anio = cleanEncoding(anioRaw).trim();
                     let strVal = String(tasaRaw).trim();
+
+                    if (!rawPiloteados || !rawCreados) {
+                        for (const key of Object.keys(row)) {
+                            const normK = normalizeKey(cleanEncoding(key));
+                            if (normK.includes("pilotead")) {
+                                rawPiloteados = row[key];
+                            }
+                            if (normK.includes("creacion") || normK.includes("creado")) {
+                                rawCreados = row[key];
+                            }
+                        }
+                    }
 
                     if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
                         for (const key of Object.keys(row)) {
@@ -1850,7 +1934,14 @@
                         finalTasa = parsedVal * 100;
                     }
 
-                    return { anio, tasa: finalTasa };
+                    let numPiloteados = parseNumeric(rawPiloteados);
+                    let numCreados = parseNumeric(rawCreados);
+
+                    if (numCreados > 0) {
+                        finalTasa = (numPiloteados / numCreados) * 100;
+                    }
+
+                    return { anio, tasa: finalTasa, proyectosPiloteados: numPiloteados, proyectosCreacion: numCreados };
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
@@ -1876,7 +1967,7 @@
                     }
                 }
                 if (detectedTasa !== null) {
-                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa, proyectosPiloteados: 0, proyectosCreacion: 0 }];
                 }
             }
             return processed;
@@ -1905,9 +1996,23 @@
 
                     let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
                     let tasaRaw = findVal(["tasadepilotaje", "tasadepilotoanual", "tasadepiloto", "pilotadospiloteables", "pilotaje", "tasa", "valor", "porcentaje", "pct", "%"]);
+                    let rawPiloteados = findVal(["nproyectospiloteados", "proyectospiloteados", "piloteados", "numpiloteados"]);
+                    let rawCreados = findVal(["nproyectosanocreacion", "nproyectosaniocreacion", "proyectosanocreacion", "proyectosaniocreacion", "proyectoscreados", "anocreacion", "creados"]);
 
                     let anio = cleanEncoding(anioRaw).trim();
                     let strVal = String(tasaRaw).trim();
+
+                    if (!rawPiloteados || !rawCreados) {
+                        for (const key of Object.keys(row)) {
+                            const normK = normalizeKey(cleanEncoding(key));
+                            if (normK.includes("pilotead")) {
+                                rawPiloteados = row[key];
+                            }
+                            if (normK.includes("creacion") || normK.includes("creado")) {
+                                rawCreados = row[key];
+                            }
+                        }
+                    }
 
                     if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
                         for (const key of Object.keys(row)) {
@@ -1946,7 +2051,14 @@
                         finalTasa = parsedVal * 100;
                     }
 
-                    return { anio, tasa: finalTasa };
+                    let numPiloteados = parseNumeric(rawPiloteados);
+                    let numCreados = parseNumeric(rawCreados);
+
+                    if (numCreados > 0) {
+                        finalTasa = (numPiloteados / numCreados) * 100;
+                    }
+
+                    return { anio, tasa: finalTasa, proyectosPiloteados: numPiloteados, proyectosCreacion: numCreados };
                 }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
             }
 
@@ -1972,7 +2084,7 @@
                     }
                 }
                 if (detectedTasa !== null) {
-                    processed = [{ anio: detectedAnio, tasa: detectedTasa }];
+                    processed = [{ anio: detectedAnio, tasa: detectedTasa, proyectosPiloteados: 0, proyectosCreacion: 0 }];
                 }
             }
             return processed;
@@ -2213,14 +2325,28 @@
             const kpiTasaImpSub = document.getElementById("kpiTasaImplementacionSub");
             if (kpiTasaImpSub) kpiTasaImpSub.innerText = `Año: ${latestImpAnio || 'N/A'}`;
 
-            const latestPilTasa = getLatestRate(datasetTasaPilotaje);
-            const latestPilAnio = getLatestYear(datasetTasaPilotaje);
-            
+            let pilMatch = datasetTasaPilotaje.find(d => String(d.anio) === String(fAnio));
+            if (!pilMatch && datasetTasaPilotaje.length > 0) {
+                const sortedPil = [...datasetTasaPilotaje].sort((a, b) => (parseInt(a.anio, 10) || 0) - (parseInt(b.anio, 10) || 0));
+                pilMatch = sortedPil[sortedPil.length - 1];
+            }
+
             const kpiTasaPil = document.getElementById("kpiTasaPilotaje");
-            if (kpiTasaPil) kpiTasaPil.innerText = `${latestPilTasa.toFixed(1)}%`;
-            
             const kpiTasaPilSub = document.getElementById("kpiTasaPilotajeSub");
-            if (kpiTasaPilSub) kpiTasaPilSub.innerText = `Año: ${latestPilAnio || 'N/A'}`;
+
+            if (pilMatch) {
+                if (kpiTasaPil) kpiTasaPil.innerText = `${pilMatch.tasa.toFixed(1)}%`;
+                if (kpiTasaPilSub) {
+                    if (pilMatch.proyectosCreacion !== undefined && pilMatch.proyectosCreacion > 0) {
+                        kpiTasaPilSub.innerText = `${pilMatch.proyectosPiloteados} proyectos piloteados / ${pilMatch.proyectosCreacion} proyectos creados`;
+                    } else {
+                        kpiTasaPilSub.innerText = `Año: ${pilMatch.anio || 'N/A'}`;
+                    }
+                }
+            } else {
+                if (kpiTasaPil) kpiTasaPil.innerText = `0%`;
+                if (kpiTasaPilSub) kpiTasaPilSub.innerText = `Año: N/A`;
+            }
 
             let capturedYearFilteredDataset = [];
             if (!isNaN(numericYear)) {
