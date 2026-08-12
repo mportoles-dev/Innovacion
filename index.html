@@ -1164,16 +1164,50 @@
                     const startY = yEnd - ((lines.length - 1) * lineHeight) / 2;
 
                     lines.forEach((lineText, lineIdx) => {
-                        ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
-                    });
+                    ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                });
+            });
+
+            ctx.restore();
+        }
+    };
+
+    const chartProyectosUnidadTotalsPlugin = {
+        id: 'chartProyectosUnidadTotals',
+        afterDraw(chart) {
+            if (chart.config.type !== 'bar' || chart.config.options.indexAxis !== 'y') return;
+            const { ctx, scales: { y } } = chart;
+            ctx.save();
+            ctx.font = 'bold 10px "Poppins", sans-serif';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            chart.data.labels.forEach((label, index) => {
+                let maxX = 0;
+                let total = 0;
+
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                    const meta = chart.getDatasetMeta(datasetIndex);
+                    if (meta && meta.data[index] && !meta.hidden) {
+                        const model = meta.data[index];
+                        if (model.x > maxX) {
+                            maxX = model.x;
+                        }
+                        total += (dataset.data[index] || 0);
+                    }
                 });
 
-                ctx.restore();
-            }
-        };
+                if (total > 0 && maxX > 0) {
+                    ctx.fillText(`${total}`, maxX + 6, y.getPixelForValue(index));
+                }
+            });
+            ctx.restore();
+        }
+    };
 
-        function initChartsContainer() {
-            Chart.defaults.color = '#475569';
+    function initChartsContainer() {
+        Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Poppins, sans-serif';
             Chart.defaults.borderColor = '#e2e8f0';
         }
@@ -1343,26 +1377,58 @@
             const proyectosByGerencia = {};
             filteredDataset.forEach(item => {
                 const gerencia = item.gerencia || "Sin asignar";
-                proyectosByGerencia[gerencia] = (proyectosByGerencia[gerencia] || 0) + 1;
+                if (!proyectosByGerencia[gerencia]) {
+                    proyectosByGerencia[gerencia] = { pilotage: 0, earlier: 0, total: 0 };
+                }
+                if (isPotentialEligible(item)) {
+                    proyectosByGerencia[gerencia].pilotage += 1;
+                } else {
+                    proyectosByGerencia[gerencia].earlier += 1;
+                }
+                proyectosByGerencia[gerencia].total += 1;
             });
 
-            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b] - proyectosByGerencia[a]);
-            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia), 0);
+            const sortedProyectosGerencias = Object.keys(proyectosByGerencia).sort((a, b) => proyectosByGerencia[b].total - proyectosByGerencia[a].total);
+            const maxProjectVal = Math.max(...Object.values(proyectosByGerencia).map(g => g.total), 0);
 
             const ctxProyectosUnidad = document.getElementById("chartProyectosUnidad").getContext("2d");
             chartProyectosUnidadInstance = new Chart(ctxProyectosUnidad, {
                 type: 'bar',
-                plugins: [ChartDataLabels],
+                plugins: [chartProyectosUnidadTotalsPlugin, ChartDataLabels],
                 data: {
                     labels: sortedProyectosGerencias,
-                    datasets: [{
-                        label: 'Proyectos',
-                        data: sortedProyectosGerencias.map(g => proyectosByGerencia[g]),
-                        backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).potencial),
-                        borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
+                    datasets: [
+                        {
+                            label: 'Ejecución Pilotaje, Impl. y Seguimiento',
+                            data: sortedProyectosGerencias.map(g => proyectosByGerencia[g].pilotage),
+                            backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).potencial),
+                            borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            datalabels: {
+                                color: '#ffffff',
+                                anchor: 'center',
+                                align: 'center',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
+                        },
+                        {
+                            label: 'Etapas Anteriores',
+                            data: sortedProyectosGerencias.map(g => proyectosByGerencia[g].earlier),
+                            backgroundColor: sortedProyectosGerencias.map(g => getUnitColors(g).capturado),
+                            borderColor: sortedProyectosGerencias.map(g => getUnitColors(g).border),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            datalabels: {
+                                color: '#1e293b',
+                                anchor: 'center',
+                                align: 'center',
+                                font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
+                                formatter: (val) => val > 0 ? val : ''
+                            }
+                        }
+                    ]
                 },
                 options: {
                     indexAxis: 'y',
@@ -1373,22 +1439,26 @@
                     },
                     plugins: { 
                         legend: { display: false },
-                        datalabels: {
-                            display: true,
-                            color: '#1e293b',
-                            anchor: 'end',
-                            align: 'right',
-                            font: { family: 'Poppins, sans-serif', weight: '800', size: 10 },
-                            formatter: (val) => val > 0 ? val : ''
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: { 
+                            stacked: true,
                             grid: { color: 'rgba(107, 124, 133, 0.12)' }, 
                             ticks: { precision: 0, font: { size: 9 } },
                             suggestedMax: maxProjectVal > 0 ? maxProjectVal + 1 : 5
                         },
-                        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        y: { 
+                            stacked: true,
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10 } } 
+                        }
                     }
                 }
             });
