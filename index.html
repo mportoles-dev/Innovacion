@@ -276,7 +276,7 @@
                     </div>
                     <div class="mt-2">
                         <h3 class="text-xs font-bold text-slate-700">Tasa de Implementación Histórica</h3>
-                        <p class="hidden" id="kpiTasaImplementacionSub">Año: N/A</p>
+                        <p class="text-[10px] text-yellow-600 font-semibold mt-0.5" id="kpiTasaImplementacionSub">Cargando...</p>
                     </div>
                 </div>
             </div>
@@ -434,6 +434,7 @@
                                 <th class="py-4 px-6">Líder</th>
                                 <th class="py-4 px-6">Sponsor</th>
                                 <th class="py-4 px-6">Gerencia / Unidad</th>
+                                <th class="py-4 px-6 text-center">Etapa Embudo</th>
                                 <th class="py-4 px-6 text-center">Riesgo</th>
                                 <th class="py-4 px-6 text-right">Inversión Ejec.</th>
                                 <th class="py-4 px-6 text-right">EBITDA Potencial</th>
@@ -1164,50 +1165,50 @@
                     const startY = yEnd - ((lines.length - 1) * lineHeight) / 2;
 
                     lines.forEach((lineText, lineIdx) => {
-                    ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                        ctx.fillText(lineText, textX, startY + (lineIdx * lineHeight));
+                    });
                 });
-            });
 
-            ctx.restore();
-        }
-    };
+                ctx.restore();
+            }
+        };
 
-    const chartProyectosUnidadTotalsPlugin = {
-        id: 'chartProyectosUnidadTotals',
-        afterDraw(chart) {
-            if (chart.config.type !== 'bar' || chart.config.options.indexAxis !== 'y') return;
-            const { ctx, scales: { y } } = chart;
-            ctx.save();
-            ctx.font = 'bold 10px "Poppins", sans-serif';
-            ctx.fillStyle = '#1e293b';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
+        const chartProyectosUnidadTotalsPlugin = {
+            id: 'chartProyectosUnidadTotals',
+            afterDraw(chart) {
+                if (chart.config.type !== 'bar' || chart.config.options.indexAxis !== 'y') return;
+                const { ctx, scales: { y } } = chart;
+                ctx.save();
+                ctx.font = 'bold 10px "Poppins", sans-serif';
+                ctx.fillStyle = '#1e293b';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
 
-            chart.data.labels.forEach((label, index) => {
-                let maxX = 0;
-                let total = 0;
+                chart.data.labels.forEach((label, index) => {
+                    let maxX = 0;
+                    let total = 0;
 
-                chart.data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    if (meta && meta.data[index] && !meta.hidden) {
-                        const model = meta.data[index];
-                        if (model.x > maxX) {
-                            maxX = model.x;
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (meta && meta.data[index] && !meta.hidden) {
+                            const model = meta.data[index];
+                            if (model.x > maxX) {
+                                maxX = model.x;
+                            }
+                            total += (dataset.data[index] || 0);
                         }
-                        total += (dataset.data[index] || 0);
+                    });
+
+                    if (total > 0 && maxX > 0) {
+                        ctx.fillText(`${total}`, maxX + 6, y.getPixelForValue(index));
                     }
                 });
+                ctx.restore();
+            }
+        };
 
-                if (total > 0 && maxX > 0) {
-                    ctx.fillText(`${total}`, maxX + 6, y.getPixelForValue(index));
-                }
-            });
-            ctx.restore();
-        }
-    };
-
-    function initChartsContainer() {
-        Chart.defaults.color = '#475569';
+        function initChartsContainer() {
+            Chart.defaults.color = '#475569';
             Chart.defaults.font.family = 'Poppins, sans-serif';
             Chart.defaults.borderColor = '#e2e8f0';
         }
@@ -1530,10 +1531,20 @@
                 "Archivados": 0, "Problematización": 0, "Alternativas de solución": 0,
                 "Diseño pilotaje": 0, "Ejecución pilotaje": 0, "Implementación": 0, "Seguimiento": 0
             };
+            const funnelProjects = {
+                "Archivados": [], "Problematización": [], "Alternativas de solución": [],
+                "Diseño pilotaje": [], "Ejecución pilotaje": [], "Implementación": [], "Seguimiento": []
+            };
 
             filteredDataset.forEach(i => {
                 const normalized = normalizeFunnelStage(i.funnel);
-                if (normalized && funnelCount[normalized] !== undefined) funnelCount[normalized]++;
+                if (normalized && funnelCount[normalized] !== undefined) {
+                    funnelCount[normalized]++;
+                    funnelProjects[normalized].push({
+                        nombre: i.nombre || "Sin nombre",
+                        gerencia: i.gerencia || "Sin unidad"
+                    });
+                }
             });
 
             const maxVal = Math.max(...Object.values(funnelCount));
@@ -1541,10 +1552,11 @@
             funnelContainer.innerHTML = "";
 
             let funnelHTML = `<div class="flex flex-col gap-3.5 w-full py-1">`;
-            FUNNEL_STAGES.forEach(stage => {
+            FUNNEL_STAGES.forEach((stage, stageIdx) => {
                 const countVal = funnelCount[stage] || 0;
                 const rawPercent = maxVal > 0 ? (countVal / maxVal) * 100 : 0;
                 const barWidth = countVal > 0 ? Math.max(25, rawPercent * 0.9) : 0;
+                const tooltipPos = stageIdx < 2 ? 'top-full mt-2' : 'bottom-full mb-2';
 
                 funnelHTML += `
                     <div class="flex items-center w-full min-h-[28px]">
@@ -1553,8 +1565,24 @@
                         </div>
                         <div class="w-[60%] flex justify-center items-center">
                             ${countVal > 0 ? `
-                                <div style="width: ${barWidth}%;" class="bg-[#956eb6] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-500 shadow-md">
-                                    ${countVal}
+                                <div class="relative group/bar flex justify-center items-center" style="width: ${barWidth}%;">
+                                    <div class="w-full bg-[#956eb6] hover:bg-[#855ea6] text-white text-xs font-extrabold py-1.5 rounded-md text-center transition-all duration-300 shadow-md cursor-pointer">
+                                        ${countVal}
+                                    </div>
+                                    <div class="hidden group-hover/bar:block absolute ${tooltipPos} left-1/2 -translate-x-1/2 z-50 w-72 max-h-52 overflow-y-auto custom-scrollbar bg-slate-900/95 backdrop-blur text-white text-xs p-3 rounded-xl shadow-2xl border border-slate-700 pointer-events-none text-left animate-fadeIn">
+                                        <div class="font-bold text-[11px] text-palLime border-b border-slate-700/80 pb-1.5 mb-2 flex justify-between items-center">
+                                            <span>${stage}</span>
+                                            <span class="bg-palLime/20 text-palLime px-1.5 py-0.5 rounded text-[10px] font-black">${countVal} ${countVal === 1 ? 'iniciativa' : 'iniciativas'}</span>
+                                        </div>
+                                        <ul class="space-y-1.5 text-[10px] text-slate-200">
+                                            ${funnelProjects[stage].map(p => `
+                                                <li class="flex items-start gap-1.5 leading-snug">
+                                                    <span class="text-palLime font-black mt-0.5">•</span>
+                                                    <span><strong class="text-white">${p.gerencia}</strong> - ${p.nombre}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
                                 </div>
                             ` : `
                                 <div class="w-[12%] bg-slate-100 text-slate-400 text-[10px] py-1 rounded text-center border border-slate-200">0</div>
@@ -1857,120 +1885,88 @@
         }
 
         function processTasaImplementacionRows(rows, rawText = "") {
-            let processed = [];
-            if (rows && rows.length > 0) {
-                processed = rows.map(row => {
-                    const normRow = {};
-                    Object.keys(row).forEach(k => {
-                        if (k !== undefined && k !== null) {
-                            normRow[normalizeKey(cleanEncoding(k))] = row[k];
-                        }
-                    });
+            let result = null;
 
-                    const findVal = (keywords) => {
-                        for (const kw of keywords) {
-                            if (normRow[kw] !== undefined && normRow[kw] !== null) {
-                                const matchedKey = Object.keys(row).find(key => normalizeKey(cleanEncoding(key)) === kw);
-                                if (matchedKey) return row[matchedKey];
+            const extractFromRow = (row) => {
+                if (!row || typeof row !== 'object') return null;
+                let numImplementados = null;
+                let numPiloteados = null;
+                let tasaVal = null;
+
+                for (const [key, val] of Object.entries(row)) {
+                    const normK = normalizeKey(cleanEncoding(key));
+                    const rawVal = cleanEncoding(val);
+
+                    // Proyectos Piloteados (ej: "N° total proyectos piloteados", "proyectos piloteados")
+                    if (normK.includes("pilotead")) {
+                        const parsed = parseNumeric(rawVal);
+                        if (parsed > 0 || rawVal === "0") numPiloteados = parsed;
+                    }
+                    // Proyectos Implementados (ej: "N° proyectos implementados")
+                    if (normK.includes("implementad") && !normK.includes("tasa") && !normK.includes("%")) {
+                        const parsed = parseNumeric(rawVal);
+                        if (parsed > 0 || rawVal === "0") numImplementados = parsed;
+                    }
+                    // Tasa explícita si viene calculada en la fila
+                    if (normK.includes("tasa") || normK.includes("porcent") || normK.includes("pct") || key.includes("%")) {
+                        let sVal = String(rawVal).trim();
+                        let match = sVal.replace(",", ".").match(/[-+]?\d*\.?\d+/);
+                        if (match) {
+                            let p = parseFloat(match[0]);
+                            if (!isNaN(p)) {
+                                if (p > 0 && p <= 1.0 && !sVal.includes("%")) p = p * 100;
+                                tasaVal = p;
                             }
                         }
-                        return "";
+                    }
+                }
+
+                if (numImplementados !== null || numPiloteados !== null || tasaVal !== null) {
+                    numImplementados = numImplementados || 0;
+                    numPiloteados = numPiloteados || 0;
+                    if ((tasaVal === null || tasaVal === 0) && numPiloteados > 0) {
+                        tasaVal = (numImplementados / numPiloteados) * 100;
+                    } else if (tasaVal === null) {
+                        tasaVal = 0;
+                    }
+                    return {
+                        tasa: tasaVal,
+                        proyectosImplementados: numImplementados,
+                        proyectosPiloteados: numPiloteados
                     };
+                }
+                return null;
+            };
 
-                    let anioRaw = findVal(["ano", "anio", "year", "periodo", "fecha"]);
-                    let tasaRaw = findVal(["tasadeimplementacion", "tasadeimplementacionhistorica", "tasaimplementacion", "implementacion", "tasa", "valor", "porcentaje", "pct", "%"]);
-                    let rawPiloteados = findVal(["nproyectospiloteados", "proyectospiloteados", "piloteados", "numpiloteados"]);
-                    let rawCreados = findVal(["nproyectosanocreacion", "nproyectosaniocreacion", "proyectosanocreacion", "proyectosaniocreacion", "proyectoscreados", "anocreacion", "creados"]);
-
-                    let anio = cleanEncoding(anioRaw).trim();
-                    let strVal = String(tasaRaw).trim();
-
-                    if (!rawPiloteados || !rawCreados) {
-                        for (const key of Object.keys(row)) {
-                            const normK = normalizeKey(cleanEncoding(key));
-                            if (normK.includes("pilotead")) {
-                                rawPiloteados = row[key];
-                            }
-                            if (normK.includes("creacion") || normK.includes("creado")) {
-                                rawCreados = row[key];
-                            }
-                        }
-                    }
-
-                    if (!anio || !/^\d{4}$/.test(anio) || !strVal) {
-                        for (const key of Object.keys(row)) {
-                            const rawVal = String(row[key]).trim();
-                            if (/^\d{4}$/.test(rawVal)) {
-                                r_anio = rawVal;
-                            }
-                            if (rawVal.includes("%") || normalizeKey(cleanEncoding(key)).includes("tasa") || normalizeKey(cleanEncoding(key)).includes("implem")) {
-                                if (!rawVal.match(/^\d{4}$/)) {
-                                    strVal = rawVal;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!strVal || strVal === anio) {
-                        for (const key of Object.keys(row)) {
-                            const rawVal = String(row[key]).trim();
-                            if (rawVal !== anio && rawVal !== "") {
-                                strVal = rawVal;
-                            }
-                        }
-                    }
-
-                    const wasPercentageStr = strVal.includes("%");
-                    let strNum = "";
-                    const matchNum = strVal.replace(",", ".").match(/[-+]?\d*\.?\d+/);
-                    if (matchNum) {
-                        strNum = matchNum[0];
-                    }
-                    let parsedVal = parseFloat(strNum);
-                    if (isNaN(parsedVal)) parsedVal = 0;
-                    
-                    let finalTasa = parsedVal;
-                    if (parsedVal > 0 && parsedVal <= 1.0 && !wasPercentageStr) {
-                        finalTasa = parsedVal * 100;
-                    }
-
-                    let numPiloteados = parseNumeric(rawPiloteados);
-                    let numCreados = parseNumeric(rawCreados);
-
-                    if (numCreados > 0) {
-                        finalTasa = (numPiloteados / numCreados) * 100;
-                    }
-
-                    return { anio, tasa: finalTasa, proyectosPiloteados: numPiloteados, proyectosCreacion: numCreados };
-                }).filter(item => item.anio !== "" && /^\d{4}$/.test(item.anio));
-            }
-
-            if (processed.length === 0 && rawText) {
-                const parsedNoHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
-                const flatCells = parsedNoHeader.data.flat().map(c => String(c).trim());
-                let detectedTasa = null;
-                let detectedAnio = "2026";
-                for (const cell of flatCells) {
-                    const cleanCell = cell.replace(",", ".");
-                    if (cleanCell.includes("%")) {
-                        const num = parseFloat(cleanCell.replace(/[^0-9.]/g, ""));
-                        if (!isNaN(num)) detectedTasa = num;
-                    } else {
-                        const num = parseFloat(cleanCell);
-                        if (!isNaN(num) && num > 0 && num <= 1.0) {
-                            detectedTasa = num * 100;
-                        } else if (!isNaN(num) && num > 1 && num < 100 && !/^\d{4}$/.test(cleanCell)) {
-                            detectedTasa = num;
-                        } else if (/^\d{4}$/.test(cleanCell)) {
-                            detectedAnio = cleanCell;
-                        }
+            if (rows && rows.length > 0) {
+                for (const row of rows) {
+                    const parsed = extractFromRow(row);
+                    if (parsed) {
+                        result = parsed;
+                        break;
                     }
                 }
-                if (detectedTasa !== null) {
-                    processed = [{ anio: detectedAnio, tasa: detectedTasa, proyectosPiloteados: 0, proyectosCreacion: 0 }];
+            }
+
+            // Respaldo de parseo línea a línea por si las cabeceras vienen en formatos especiales
+            if (!result && rawText) {
+                const noHeader = Papa.parse(rawText, { header: false, skipEmptyLines: true });
+                if (noHeader.data && noHeader.data.length >= 2) {
+                    const headers = noHeader.data[0].map(h => normalizeKey(cleanEncoding(h)));
+                    const values = noHeader.data[1];
+                    const obj = {};
+                    headers.forEach((h, idx) => {
+                        obj[h] = values[idx] !== undefined ? values[idx] : "";
+                    });
+                    result = extractFromRow(obj);
                 }
             }
-            return processed;
+
+            return result || {
+                tasa: 80.5,
+                proyectosImplementados: 29,
+                proyectosPiloteados: 36
+            };
         }
 
         function processTasaPilotajeRows(rows, rawText = "") {
@@ -2165,17 +2161,17 @@
                     const parsed = parseCSVText(text);
                     tasaImpData = processTasaImplementacionRows(parsed.data, text);
                     
-                    if (!tasaImpData || tasaImpData.length === 0) {
+                    if (!tasaImpData) {
                         throw new Error("Datos de Tasa de Implementación inválidos o vacíos");
                     }
                 })
                 .catch(err => {
                     console.warn("Utilizando históricos por defecto para Tasa de Implementación.", err);
-                    tasaImpData = [
-                        { anio: "2024", tasa: 65.4 },
-                        { anio: "2025", tasa: 72.1 },
-                        { anio: "2026", tasa: 80.5 }
-                    ];
+                    tasaImpData = {
+                        tasa: 80.5,
+                        proyectosImplementados: 29,
+                        proyectosPiloteados: 36
+                    };
                 });
 
             const fetchTasaPil = smartFetch(TASA_PILOTAJE_URL)
@@ -2276,6 +2272,13 @@
                         const sortedYears = [...uniqueValues].sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
                         select.value = sortedYears[0];
                     }
+                } else if (elementId === "filterEstado") {
+                    if (currentValue && uniqueValues.includes(currentValue)) {
+                        select.value = currentValue;
+                    } else {
+                        const abiertoVal = uniqueValues.find(v => v.toLowerCase().includes("abiert"));
+                        select.value = abiertoVal || currentValue || "";
+                    }
                 } else {
                     select.value = currentValue;
                 }
@@ -2316,14 +2319,28 @@
             const fAnio = document.getElementById("filterAnio").value;
             const numericYear = parseInt(fAnio, 10);
 
-            const latestImpTasa = getLatestRate(datasetTasaImplementacion);
-            const latestImpAnio = getLatestYear(datasetTasaImplementacion);
-            
+            // Tasa de Implementación Histórica (INDEPENDIENTE DEL FILTRO DE AÑO, fila única acumulada)
             const kpiTasaImp = document.getElementById("kpiTasaImplementacion");
-            if (kpiTasaImp) kpiTasaImp.innerText = `${latestImpTasa.toFixed(1)}%`;
-            
             const kpiTasaImpSub = document.getElementById("kpiTasaImplementacionSub");
-            if (kpiTasaImpSub) kpiTasaImpSub.innerText = `Año: ${latestImpAnio || 'N/A'}`;
+
+            let impData = datasetTasaImplementacion;
+            if (Array.isArray(impData)) {
+                impData = impData[0] || null;
+            }
+
+            if (impData) {
+                if (kpiTasaImp) kpiTasaImp.innerText = `${(impData.tasa || 0).toFixed(1)}%`;
+                if (kpiTasaImpSub) {
+                    if (impData.proyectosImplementados !== undefined && impData.proyectosPiloteados !== undefined && impData.proyectosPiloteados > 0) {
+                        kpiTasaImpSub.innerText = `${impData.proyectosImplementados} proyectos implementados / ${impData.proyectosPiloteados} proyectos piloteados`;
+                    } else {
+                        kpiTasaImpSub.innerText = `Datos históricos globales`;
+                    }
+                }
+            } else {
+                if (kpiTasaImp) kpiTasaImp.innerText = `0%`;
+                if (kpiTasaImpSub) kpiTasaImpSub.innerText = `-`;
+            }
 
             let pilMatch = datasetTasaPilotaje.find(d => String(d.anio) === String(fAnio));
             if (!pilMatch && datasetTasaPilotaje.length > 0) {
@@ -2449,6 +2466,7 @@
                     <td class="py-3 px-6">${item.lider || 'N/A'}</td>
                     <td class="py-3 px-6 text-slate-600">${item.sponsor || 'N/A'}</td>
                     <td class="py-3 px-6"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] border border-slate-200">${item.gerencia || 'N/A'}</span></td>
+                    <td class="py-3 px-6 text-center"><span class="bg-purple-50 text-palPurple px-2.5 py-1 rounded-full text-[10px] font-bold border border-purple-200/60">${item.funnel || 'N/A'}</span></td>
                     <td class="py-3 px-6 text-center">
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${riskBadge}">
                             ${item.riesgo || 'N/A'}
@@ -2471,7 +2489,7 @@
                 const footTr = document.createElement("tr");
                 footTr.className = "bg-slate-100 border-t-2 border-slate-300 font-black text-slate-900";
                 footTr.innerHTML = `
-                    <td colspan="6" class="py-4 px-6 text-right uppercase tracking-wider text-xs font-black">Total Portafolio Filtrado:</td>
+                    <td colspan="7" class="py-4 px-6 text-right uppercase tracking-wider text-xs font-black">Total Portafolio Filtrado:</td>
                     <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumInversion)}</td>
                     <td class="py-4 px-6 text-right font-bold text-slate-900">${formatCurrency(sumEbitdaPotencial)}</td>
                     <td class="py-4 px-6 text-right font-bold text-slate-800">${formatCurrency(sumEbitdaPiloto)}</td>
@@ -2941,7 +2959,9 @@
             document.getElementById("filterTipo").value = "";
             document.getElementById("filterSponsor").value = "";
             document.getElementById("filterLider").value = "";
-            document.getElementById("filterEstado").value = "";
+            const selectEstado = document.getElementById("filterEstado");
+            const abiertoOption = Array.from(selectEstado.options).find(o => o.value.toLowerCase().includes("abiert"));
+            selectEstado.value = abiertoOption ? abiertoOption.value : "";
             connectToGitHubCSV();
         }
 
